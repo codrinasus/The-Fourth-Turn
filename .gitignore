@@ -12,6 +12,10 @@ __pycache__/
 .idea/
 .vscode/
 
+# Claude Code — local assistant files, not part of the deliverable
+CLAUDE.md
+.claude/
+
 # data/out is scratch (per-query dumps); keep the folder, ignore its contents.
 data/out/*
 !data/out/.gitkeep
