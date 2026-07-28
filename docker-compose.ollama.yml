@@ -1,0 +1,25 @@
+# Optional override: run Ollama inside Docker alongside the FastAPI app and Qdrant.
+#
+# Usage:
+#   docker compose -f docker-compose.yml -f docker-compose.ollama.yml up --build
+#
+# Pull the model once:
+#   docker compose -f docker-compose.yml -f docker-compose.ollama.yml exec ollama ollama pull qwen3.6
+
+services:
+  app:
+    environment:
+      - OLLAMA_BASE_URL=http://ollama:11434
+    depends_on:
+      ollama:
+        condition: service_started
+
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_models:/root/.ollama
+
+volumes:
+  ollama_models:

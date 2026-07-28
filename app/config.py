@@ -17,9 +17,9 @@ class Settings(BaseSettings):
     )
 
     # --- Chat provider (the model that writes answers) ----------------------
-    # One of: "lmstudio", "ollama", "litellm". See app/llm/factory.py and .env.example.
-    llm_provider: str = "lmstudio"
-    chat_model: str = "google/gemma-4-e2b"
+    # One of: "lmstudio", "ollama", "litellm". This team uses local Ollama + qwen3.6.
+    llm_provider: str = "ollama"
+    chat_model: str = "qwen3.6"
 
     ollama_base_url: str = "http://localhost:11434"     # keep Ollama's default port
     lmstudio_base_url: str = "http://localhost:1234"    # keep LM Studio's default port
@@ -35,6 +35,13 @@ class Settings(BaseSettings):
     # IMPROVING EMBEDDINGS IS PART OF THE CHALLENGE — see app/rag/embeddings.py.
     embedding_backend: str = "sentence-transformers"
     embedding_model: str = "intfloat/multilingual-e5-large"
+
+    # --- PDF parsing --------------------------------------------------------
+    # We compared GROBID and Marker on the committed PDF and kept Marker as the
+    # parser. Marker runs as a separate Docker job because installing it in the
+    # FastAPI image would pull large ML/OCR dependencies into the serving stack.
+    marker_markdown_dir: str = "data/extracted/marker"
+    marker_json_dir: str = "data/extracted/marker-json"
 
     # --- Qdrant (vector store) ----------------------------------------------
     # Host port is deliberately unusual to avoid clashes; docker-compose overrides

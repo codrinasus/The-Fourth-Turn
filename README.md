@@ -51,25 +51,30 @@ locally out of the box (sentence-transformers); the LLM works with **LM Studio**
 
 ## Quick start
 
-```bash
+```powershell
 # 1. Fork on GitHub, then clone your fork
 git clone https://github.com/<your-team>/essir2026-aim-hackathon-participants.git
 cd essir2026-aim-hackathon-participants
 
 # 2. Create your .env from the example, then edit it (pick your provider + model)
-cp .env.example .env
+Copy-Item .env.example .env
 
 # 3. Put your chosen PDF in data/in/
-cp ~/Downloads/your-document.pdf data/in/
+Copy-Item $HOME\Downloads\your-document.pdf data\in\document.pdf
 
-# 4. Bring up the app + Qdrant  (unusual ports on purpose)
-docker compose up --build
+# 4. Parse it with Marker. This writes ignored, reproducible artifacts to data/extracted/.
+.\scripts\run_marker.ps1
+
+# 5. Pull the local Ollama model once, then bring up the app + Qdrant + Ollama.
+docker compose -f docker-compose.yml -f docker-compose.ollama.yml up -d ollama
+docker compose -f docker-compose.yml -f docker-compose.ollama.yml exec ollama ollama pull qwen3.6
+docker compose -f docker-compose.yml -f docker-compose.ollama.yml up --build
 #    app     -> http://localhost:8791      (Swagger UI at /docs)
 #    qdrant  -> http://localhost:6391      (dashboard at /dashboard)
 
-# 5. Index your PDF, then ask a question (just question + level)
-curl -s localhost:8791/ingest -H 'content-type: application/json' -d '{}'
-curl -s localhost:8791/query  -H 'content-type: application/json' \
+# 6. Index your PDF, then ask a question (just question + level)
+curl.exe http://localhost:8791/ingest -H "content-type: application/json" -d "{}"
+curl.exe http://localhost:8791/query  -H "content-type: application/json" `
   -d '{"question": "What is this document about?", "level": 1}'
 ```
 
@@ -91,6 +96,7 @@ app/                 the FastAPI service you build on
 ├── vectorstore/     Qdrant wrapper (list / read / write)
 └── rag/             chunking · embeddings · ingest · retrieve · memory · pipeline  <- the challenge
 data/in/             put YOUR chosen PDF here (committed)
+data/extracted/      ignored Marker outputs consumed by /ingest
 data/out/            every /query answer is written here (working scratch)
 submission/          your team.json + the nine answers — the deliverable (level-1/2/3)
 questions/           how to write your nine questions (recommendations)
