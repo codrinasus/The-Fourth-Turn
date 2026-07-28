@@ -19,6 +19,8 @@ CLAUDE.md
 # data/out is scratch (per-query dumps); keep the folder, ignore its contents.
 data/out/*
 !data/out/.gitkeep
+data/pages/*
+data/chunks/*
 
 # COMMITTED on purpose:
 #   - data/in/  (your chosen PDF — the organisers check answers against it)
