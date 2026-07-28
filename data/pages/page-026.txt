@@ -1,0 +1,48 @@
+26 Avishek Anand, Lijun Lyu, Maximilian Idahl, Yumeng Wang, Jonas Wallat, and Zijian Zhang
+10.2 Open Questions
+Now we turn to some of the open questions in the area of explainable information retrieval. We
+divide the questions into three main categories - types of explanations, explaining user models,
+evaluation of explanations, causal explanations and the utility of explanations.
+10.2.1 Explanation by Example. As discussed before, most of the explanation methods have been
+limited to explaining the feature space – words, sentences, or numerical features in learning to rank
+tasks. Prominent among these are attribution methods and hard masking techniques. However,
+data attribution or instance attributes and methods have not been explored in the context of
+information retrieval tasks. Current papers that deal with explanation by examples are limited to
+finding adversarial examples of generated text documents that result in errors of contextual rankers.
+Instance attribution methods attribute the rationale or reason behind the prediction back to the
+input instances in the training data. Examples of instance attribution methods include influence
+functions and data poisoning methods. The interpretability question that instance attribution
+method methods answer is which of the input instances in the training data is responsible for
+training the model in a certain way to cause the following decision.
+For a document retrieval task, the interpretability question could be “which of the queries in
+the training set affect a certain test query ?”. The output of instance attribution tasks can result in
+isolating mislabelled training instances, identifying dataset biases, and providing insights into query
+representation of the complex encoders. Other types of explanations can be generated explanations
+for the stakeholders who are end users. These generative explanations can take the form of fully-
+fledged natural language that is composed of extractive explanations, feature attributions, or even
+instance attribution methods.
+10.2.2 Explaining User Models. Personalized ranking models tailor the search result list according
+to a user’s profile as inferred by the search engine. While it is useful, modern personalization
+techniques cause growing anxiety in their users – “Why am I seeing these search results? What
+does the search engine believe my interests are?”
+Search engines have recently come under increased scrutiny due to their influence on people’s
+decision-making in critical scenarios such as health and elections. Search personalization typically
+involves tailoring the ranking of results for individual users based on models of their past preferences
+and interests. Consequently, there is a growing concern in users due to the possible negative effects
+of personalization that include bias [ 50, 84], filter bubbles [41, 48, 88] and increased opacity of
+the ranking mechanism. Modern personalization techniques are based on learning an effective
+representation of a user by mining sensitive behavioral data like click-throughs [62], query logs [21]
+and topical interests [51] from social media. Given today’s landscape of partisan news coupled with
+the fact that commercial search engines do not highlight personalized results, there is a real need
+to help us better understand what a search engine infers about its users. Specifically, an interesting
+interpretability question to ask is what does the search engine perceive the user as when they issue a
+certain query? This manner of post-hoc auditing of retrieval models can be useful in a variety of
+downstream bias detection and validation applications.
+10.2.3 Evaluation of Explanations. Evaluation of explanations is a general problem in the area
+of interpretable machine learning. There is a large spectrum of evaluation methods, starting
+from functionally grounded evaluations to Human-centered evaluation in the wider domain of
+machine learning and natural language processing. However, in information retrieval, most of the
+explanation evaluation techniques have focused on functionally grounded evaluation. Approaches
+that we reviewed in this paper propose and evaluate explanation methods by their fidelity, validity,
+completeness, and human congruence. We refer to these methods as intrinsic methods.
+Pre-print

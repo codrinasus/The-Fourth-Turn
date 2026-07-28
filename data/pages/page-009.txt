@@ -1,0 +1,46 @@
+Explainable Information Retrieval: A Survey 9
+marker tokens receive the highest attention. The importance of the marker tokens is confirmed
+by observing a strong decrease in model performance when they are removed from the inputs.
+Stopwords appear to be as important as regular words; however, removing them does not appear
+to affect the ranking performance. Additionally, they observe that the attention scores spread more
+uniformly across the input sequence in deeper layers of BERT, as the embeddings become more
+contextualized.
+Regular Words-
+Stopwords-
+Special Tokens- 
+Avg. Importance
+Fig. 5. Example bar chart visualization of feature attributions for different groups of tokens.
+In addition to Integrated Gradients, Zhan et al. [141] also use attention weights to obtain feature
+attributions for a BERT-based ranking model. With an experimental setup similar to Qiao et al .
+[95], they compute attribution scores for different groups of input tokens: The special “[CLS]” and
+“[SEP]” tokens, the query tokens, the document tokens, and the period token. While confirming
+that a significant amount of attention weight is distributed to the special tokens and the period
+token, the authors also find that the attributions produced using attention weights are negatively
+correlated with the attributions produced by Integrated Gradients. Based on their results, the
+authors speculate that these tokens receive high attention weights due to their high document
+frequency. They argue that the model dumps redundant attention on these tokens, while these
+actually carry little relevance information.
+3.3 Evaluating Feature Attributions
+Input feature attributions can be evaluated in many ways. However, there is little agreement on
+which evaluation strategy is best. Sanity-checks [1, 123] test functionally grounded assumptions
+behind feature attributions. Whether feature attributions are faithful to the model that is explained
+can also be evaluated by removing important features and re-evaluating model performance, either
+with or without retraining [ 58, 79, 103]. However, if the model is not retrained, removing or
+replacing features can result in out-of-distribution inputs. Other works propose shortcut, artifact,
+or spurious correlation detection tasks to evaluate feature attributions [2, 7, 59, 137], where bugs
+are added to a model on purpose and then used as ground-truth for explanation evaluation. Feature
+attribution methods that rely on surrogate models need to evaluate their fidelity, that is, how well the
+surrogate model approximates the black box model being explained. Unfortunately, the evaluation
+of feature attributions in IR is often limited to anecdotal examples. Singh and Anand [112] neither
+evaluate the explanation quality of EXS nor the fidelity of the local surrogate models used to
+generate explanations. Verma and Ganguly[125] evaluate LIRME by comparing the explanations to
+a reference of important terms obtained from relevance judgments but also do not explicitly evaluate
+faithfulness. Fernando et al. [39] include an analysis of the faithfulness of LIME explanations for
+neural ranking models by measuring accuracy and mean-squared error of the local surrogate model.
+To evaluate explanations produced by DeepSHAP, they use LIME explanations as a reference.
+Directly optimizing explanations based on evaluation metrics, as done by Singh et al. [115], seems
+advantageous, but does not provide any guarantees of finding a good explanation. Based on the
+limited work on evaluating feature attributions in IR, we argue that claims and hypotheses based on
+insights from feature attribution explanations should be handled with caution unless the explanation
+methodology has been evaluated rigorously.
+Pre-print

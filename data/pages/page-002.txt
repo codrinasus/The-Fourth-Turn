@@ -1,0 +1,53 @@
+2 Avishek Anand, Lijun Lyu, Maximilian Idahl, Yumeng Wang, Jonas Wallat, and Zijian Zhang
+Explainable IR
+Post-hoc
+Feature
+Attribution §3
+Free-text
+Explanations §4
+Adversarial
+Examples §5
+Grounding to IR Properties
+Axiomatic
+Analysis §6
+Probing §7
+Interpretable by-design
+Explainable
+Architectures §8
+Rationale-based
+Methods §9
+Fig. 1. Categorization of explainable IR approaches, where § indicates the section the approach is discussed.
+has quite a diverse landscape owing to the continued and sustained interest in the last few years.
+The initial approaches in ExIR were adaptations of widely popular feature-attribution approaches
+(e.g., LIME [102] and SHAP’s [76]). However, in the following years, there has been a multitude
+of approaches that tackle specific problems in IR. We cover a wide range of approaches, from
+post-hoc approaches (cf. Sections 3, 4 and 5), grounding to axiomatic approaches (cf. Section 6), to
+interpretable-by-design methods (cf. Section 8 and Section 9).
+1.3 Methodology and Scope
+Before we started our literature review, we needed to collect a corpus of relevant papers for ExIR
+and delineate the boundaries of the review.
+1.3.1 Corpus Creation. We started with very first works in ExIR (e.g., [29, 112, 113]), to build up an
+initial pool of papers. We did then forward search from this initial set of papers that mention terms
+“(explain* OR interpretab* OR explanation* OR transparen*)” AND “(retriev* OR rank*”. Secondly, we
+limited our search to articles published in the past five years (2018 – 2022) to provide a representative
+window into current best practices that have emerged since the inception of the earliest works in
+ExIR in the following IR venues – ACM Special Interest Group on Information Retrieval (SIGIR),
+International Conference on the Theory of Information Retrieval (ICTIR), International Conference
+on Web Search and Data Mining(WSDM), Conference on Information and Knowledge Management
+(CIKM), the ACM Web Conference (TheWebConf). In total, after filtering, we ended up with 68
+papers that we consider in this review that are partially relevant. A subset of 32 papers of those
+partially relevant papers find more detailed treatment in this survey.
+1.3.2 Scope. We note that many of the methods in ExIR have methodological overlap with those
+invented in ML, natural language processing (NLP), and recommender systems (RS) communities. In
+fact, most of the approaches in ExIR are based on seminal papers in these communities. We only focus
+on core-IR issues in this survey and, wherever possible, clearly spell out the distinctions from similar
+approaches in NLP, RS and ML in general. Rationale-based models have been heavily investigated
+in NLP. We cover only the methods popularized in IR-centric or venues. Our survey focuses on
+rationale-based models, i.e., document-ranking tasks, in learning-to-rank (LTR), and tasks that rely
+on a retrieval component. Also, RS have a lot of work and even surveys in explainability [ 145].
+We only survey those approaches that are useful for query modeling in query-based systems. The
+papers on the topics of personalization search or explainable RS, although they can be considered as
+user modeling applications of ExIR, were not selected due to either lack of specific interpretability
+methods or being more suitable to be classified into a relatively independent field of study. We also
+exclude IR approaches dealing with image or multi-modal data.
+Pre-print

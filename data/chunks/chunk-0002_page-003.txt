@@ -1,0 +1,47 @@
+Explainable Information Retrieval: A Survey 3
+2 NOTIONS AND CATEGORIZATION
+We start the survey by first introducing the notions and terminologies that are commonly used
+in ExIR. Note that most of the terminologies in ExIR are adapted from the general area of inter-
+pretable machine learning [82], explainable vision [107], natural language processing [117], and
+recommendation systems [145]. We harmonize the differences in the categorizations used in these
+areas to distill a specific method-centric classification of all approaches used in ExIR in Figure 1.
+Our classification permeates the binary divides of post-hoc and interpretable-by-design approaches
+by covering IR-specific dimensions of axiomatic characterization and free-text explanations.
+2.1 Notions in Explainable Information Retrieval
+Explanations are the outputs of an interpretable machine learning procedure or an interpretability
+method. In general machine learning, explanations vary in scope and type. The scope of an explana-
+tion can be a single instance or the entire dataset. The type of explanation refers to the style or
+form of the explanation. Notions in ExIR share commonalities for the most part with general XAI.
+However, there are some variations due to different tasks, inputs, and output types in IR. In the
+following, we describe these IR-specific notions pertaining to explainability.
+2.1.1 Local vs global interpretability. Local interpretability refers to per-instance interpretability.
+For the task of document ranking, an individual query is usually considered as a single instance
+even though multiple decisions might be involved (e.g., multiple query-document pairs and multiple
+preference pairs). Specifically, local interpretability aims to explain the model decisions in the
+locality of a specific query. On the other hand, global interpretability refers to the case when there
+is no distinction across instances/queries in terms of model parameters, input spaces, etc.
+2.1.2 Pointwise, Pairwise, Listwise. Ranking models output a ranked candidate list for a given
+query. Therefore, the explanation of pointwise methods can only explain the models’ decision of a
+single element in the list; while pairwise methods intend to explain the model’s preference of a
+candidate pair. The explanation of listwise methods, however, aims to cover all individual decisions
+in the entire ranking list.
+2.1.3 Type of Explanations. A model decision can be explained differently in terms of input
+features, training data, model parameters, or human-understandable decision structures. When
+an explanation method measures the contribution of each feature in the input instance leading
+to a specific decision, the generated explanation can be a feature attribution. On the one hand,
+feature attributions can be soft masks, i.e., real numbers denoting feature importance. On the other
+hand, they can also be presented as boolean or hard masks where a feature is either present or
+absent in the explanation. An explanation is understandable to humans or users based not only
+if the feature space is understandable but also if the explanation is small. An attribution over a
+feature space of hundreds of dimensions is hard to interpret, even if it is over words and phrases
+that are themselves understandable. In IR, we typically deal with long text documents, and using
+feature attributions and sparsity is a key design criterion. Explanation procedures can enforce
+sparsity constraints to have short extractive attributions or generate a small set of words or terms
+called free-text explanation. Unlike feature-based explanations, explanations can be in terms of
+input instances. Contrastive explanations are such types of explanations where the objective is to
+generate example instances with minor differences from the input example but with contrasting
+predictions. The value of contrastive examples as explanations is grounded in social sciences [81].
+Therefore, using contrastive explanations to understand model behavior is one crucial aspect of
+gaining more transparency into the model’s decision-making process. Finally, rules are also one of
+the prevalent explanations. We denote the explicit decision-making rules ashard-rule, such as a
+Pre-print

@@ -1,0 +1,49 @@
+6 Avishek Anand, Lijun Lyu, Maximilian Idahl, Yumeng Wang, Jonas Wallat, and Zijian Zhang
+features. A scalar representing the importance is assigned to each input feature or groups of input
+features. These scores are then commonly visualized using a heatmap or a bar chart, informing
+the user about which features the model’s prediction is most sensitive to. Figure 3 demonstrates
+example feature attributions for the top-2 ranked documents, following the example from Figure 2.
+Feature attribution methods have been found to be the most popular explanation technique and
+ery:can you do yoga from a chair
+Rank Score Document Text
+ery:can you do yoga from a chair
+Rank Score Document Text
+1
+2
+9.37
+9.34
+10 Yoga Poses You Can Do in a Chair | Chair pose yoga, Chair yoga, Yoga poses ...
+Chair Hip Opening And Strength Flow Yoga | Yoga Sequences, Benefits ...
+Fig. 3. A fictive example using a heatmap to visualize feature attributions for the top-2 ranked documents for
+the query “can you do yoga from a chair ”. Feature importance is highlighted in orange.
+are used in many domains [11]. However, as is common for interpretation techniques, most feature
+attribution methods were originally designed to explain the predictions of classification models.
+Recent work explores how such methods can be applied or adapted to explain the output of
+ranking models, where feature importance scores can be computed for the query or document
+input individually, or for both, as shown in Figure 3. Following our categorization (Section 2), we
+differentiate between model-agnostic and model-introspective feature attribution methods.
+3.1 Model-agnostic Feature Attribution
+A variety of feature attribution methods generate explanations in a model-agnostic way by perturb-
+ing input features and observing the change in the model output. The underlying model is treated
+as a black box.
+3.1.1 Feature Ablation. Feature ablation is a simple perturbation-based approach to computing
+importance scores. Individual (or groups of) input features are removed one at a time, and an
+importance score is assigned based on the observed difference between the model predictions.
+To interpret a BERT-based ranking model, Qiao et al. [95] compute the importance of tokens
+through feature ablation. To produce feature importance scores, they compare the ranking score of
+an unmodified document with the ranking score for the same document when removing a randomly
+chosen input token. Specifically, they only remove input tokens corresponding to regular words
+and keep all tokens that are special tokens or correspond to stopwords. They find that the ranking
+score produced by a BERT model depends on only a few tokens in each document. The ranking
+score often decreases significantly when these tokens are removed. When manually examining the
+important tokens, the authors find that they often correspond to exact match terms, i.e., terms that
+also appear in the input query, and terms in close semantic context. In contrast, when examining
+token importance scores for a neural ranker based on convolutions and interactions [ 30] that
+soft-matches n-grams for ad-hoc search, the most important terms appear to be rather loosely
+related to the input query.
+3.1.2 Surrogate Models. Local Interpretable Model-agnostic Explanations (LIME) [102] is an in-
+terpretability method that generates explanations by training a surrogate model on a dataset of
+perturbed samples to locally approximate the behavior of the underlying black-box model. Typically,
+a linear model, preferably sparse, is chosen as the interpretable surrogate model since the weights
+directly specify the importance of each feature. Using LIME to generate feature attributions, Singh
+Pre-print
