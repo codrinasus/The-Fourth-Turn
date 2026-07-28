@@ -1,0 +1,39 @@
+Paper Task Approach Dataset Evaluation
+Hagen et al. [47] LTR IBD TREC Web tracks 2009-2014 -
+Rennings et al. [101] Text Ranking Post-hoc WikiPassageQA -
+Câmara and Hauff [19] Text Ranking Post-hoc TREC 2019 DL -
+Völske et al. [128] Text Ranking Post-hoc Robust04, MS MARCO Fidelity
+Rosset et al. [104] Text Ranking Regularization MS MARCO -
+Cheng and Fang [26] Text Ranking Regularization WikiQA, MS MARCO -
+Chen et al. [24] Text Ranking Regularization MS MARCO, TREC 2019 DL Anecdotal
+Table 3. Classification of axiomatic methods. The evaluation w.r.t. interpretability can be anecdotal or intrinsically measured by a corresponding faithfulness measure.
+6.1 Interpretable Axiomatic Rankers
+Hagen et al. [47]is one of the first to operationalize retrieval axioms to perform axiomatic re-ranking.
+By learning the importance of individual axioms, they aggregate the axioms’ partial orderings.
+Despite being inherently more interpretable, they evaluate their axiomatic re-ranking step with a
+selection of retrieval models, showing that for most of them the performance significantly increases.
+Given that the axioms and the aggregation method are fully interpretable, the resulting re-ranking
+is also fully interpretable. Bondarenko et al. [14] proposed a utility library called ir_axioms that
+allows experimenting with a collection of 25 different axioms and allows one to add new axioms.
+This library can be used for axiomatic result re-ranking and diagnostic experiments to explain
+neural ranking models.
+6.2 Axioms for Model Diagnostics
+More directly related to the classical post-hoc interpretability work is a line of recent works
+diagnosing and explaining ranking models using axioms. Rennings et al. [101]constructed diagnostic
+datasets based on existing axioms and checked whether classical neural ranking models are in
+agreement with the axiomatic rules. They find that out-of-the-box neural rankers conform with the
+axiomatic rankings to only a limited extent. However, they hypothesize that including diagnostic
+datasets in the training process could boost this conformity. Câmara and Hauff[19] extend this work
+and apply diagnostic datasets similarly to ad-hoc retrieval with BERT. They find thatBERT does
+not align with most of the ranking axioms but significantly outperforms other neural and classical
+approaches. The authors conclude that the current set of axioms is insufficient to understand BERT’s
+notion of relevance. Last in this line of work is an approach to produce axiomatic explanations for
+neural ranking models by Völske et al. [128]. Similar to existing work on axiomatic re-ranking [47]
+and diagnosing neural rankers [ 19, 101], this study investigates whether neural rankings can
+be explained by the combination of existing axioms. To do so, they train a small random forest
+explanation model on the axioms’ partial orderings to reconstruct the ranking list produced by the
+neural ranking model. They find that axiomatic explanations work well in cases where the ranking
+models are confident in their relevance estimation. However, these explanations fail for pairs with
+similar retrieval scores and conclude that more axioms are needed to close this gap.
+6.3 Axioms for Regularizing Neural Rankers
+Recently, a variety of approaches foraxiomatic regularization of neural ranking models has been proposed [24, 26, 104]. These approaches aim to regularize opaque neural rankers to incentivize learning

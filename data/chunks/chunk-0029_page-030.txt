@@ -1,0 +1,55 @@
+[42] Thibault Formal, Benjamin Piwowarski, and Stéphane Clinchant. 2021. A White Box Analysis of ColBERT. InAdvances
+in Information Retrieval - 43rd European Conference on IR Research, ECIR 2021, Virtual Event, March 28 - April 1, 2021,
+Proceedings, Part II (Lecture Notes in Computer Science, Vol. 12657) . Springer, 257–263. https://doi.org/10.1007/978-3030-72240-1_23
+[43] Thibault Formal, Benjamin Piwowarski, and Stéphane Clinchant. 2022. Match Your Words! A Study of Lexical
+Matching in Neural Information Retrieval. In Advances in Information Retrieval - 44th European Conference on IR
+Research, ECIR 2022, Stavanger, Norway, April 10-14, 2022, Proceedings, Part II (Lecture Notes in Computer Science,
+Vol. 13186). Springer, 120–127. https://doi.org/10.1007/978-3-030-99739-7_14
+[44] Robert Geirhos, Jörn-Henrik Jacobsen, Claudio Michaelis, Richard S. Zemel, Wieland Brendel, Matthias Bethge,
+and Felix A. Wichmann. 2020. Shortcut learning in deep neural networks. Nat. Mach. Intell. 2, 11 (2020), 665–673.
+https://doi.org/10.1038/s42256-020-00257-z
+[45] Gregory Goren, Oren Kurland, Moshe Tennenholtz, and Fiana Raiber. 2020. Ranking-Incentivized Quality Preserving
+Content Modification. In Proceedings of the 43rd International ACM SIGIR conference on research and development
+in Information Retrieval, SIGIR 2020, Virtual Event, China, July 25-30, 2020 . ACM, 259–268. https://doi.org/10.1145/
+3397271.3401058
+[46] Jiafeng Guo, Yixing Fan, Qingyao Ai, and W. Bruce Croft. 2016. A Deep Relevance Matching Model for Ad-hoc
+Retrieval. In Proceedings of the 25th ACM International Conference on Information and Knowledge Management, CIKM
+2016, Indianapolis, IN, USA, October 24-28, 2016 . ACM, 55–64. https://doi.org/10.1145/2983323.2983769
+[47] Matthias Hagen, Michael Völske, Steve Göring, and Benno Stein. 2016. Axiomatic Result Re-Ranking. In Proceedings
+of the 25th ACM International Conference on Information and Knowledge Management, CIKM 2016, Indianapolis, IN,
+USA, October 24-28, 2016 . ACM, 721–730. https://doi.org/10.1145/2983323.2983704
+[48] Mario Haim, Andreas Graefe, and Hans-Bernd Brosius. 2018. Burst of the filter bubble? Effects of personalization on
+the diversity of Google News. Digital Journalism 6, 3 (2018), 330–343.
+[49] David A Hanauer. 2006. EMERSE: the electronic medical record search engine. InAMIA annual symposium proceedings,
+Vol. 2006. American Medical Informatics Association, 941.
+[50] Aniko Hannak, Piotr Sapiezynski, Arash Molavi Kakhki, Balachander Krishnamurthy, David Lazer, Alan Mislove, and
+Christo Wilson. 2013. Measuring personalization of web search. In 22nd International World Wide Web Conference,
+WWW ’13, Rio de Janeiro, Brazil, May 13-17, 2013 . International World Wide Web Conferences Steering Committee /
+ACM, 527–538. https://doi.org/10.1145/2488388.2488435
+[51] Morgan Harvey, Fabio Crestani, and Mark James Carman. 2013. Building user profiles from topic models for
+personalised search. In 22nd ACM International Conference on Information and Knowledge Management, CIKM’13, San
+Francisco, CA, USA, October 27 - November 1, 2013 . ACM, 2309–2314. https://doi.org/10.1145/2505515.2505642
+[52] John Hewitt and Percy Liang. 2019. Designing and Interpreting Probes with Control Tasks. In Proceedings of the 2019
+Conference on Empirical Methods in Natural Language Processing and the 9th International Joint Conference on Natural
+Language Processing (EMNLP-IJCNLP). Association for Computational Linguistics, Hong Kong, China, 2733–2743.
+https://doi.org/10.18653/v1/D19-1275
+[53] Sebastian Hofstätter, Bhaskar Mitra, Hamed Zamani, Nick Craswell, and Allan Hanbury. 2021. Intra-Document
+Cascading: Learning to Select Passages for Neural Document Ranking. In SIGIR ’21: The 44th International ACM
+SIGIR Conference on Research and Development in Information Retrieval, Virtual Event, Canada, July 11-15, 2021 . ACM,
+1349–1358. https://doi.org/10.1145/3404835.3462889
+[54] Sebastian Hofstätter, Markus Zlabinger, and Allan Hanbury. 2020. Interpretable & Time-Budget-Constrained Contextualization for Re-Ranking. In ECAI 2020. IOS Press, 513–520.
+[55] Helge Holzmann and Avishek Anand. 2016. Tempas: Temporal archive search based on tags. In Proceedings of the
+25th International Conference Companion on World Wide Web . 207–210. https://doi.org/10.1145/2872518.2890555
+[56] Helge Holzmann, Wolfgang Nejdl, and Avishek Anand. 2017. Exploring web archives through temporal anchor texts.
+In Proceedings of the 2017 ACM on Web Science Conference . 289–298.
+[57] H. Holzmann, W. Nejdl, and A. Anand. 2017. Exploring web archives through temporal anchor texts. In Proceedings
+of the 2017 ACM on Web Science Conference . 289–298. https://doi.org/10.1145/3091478.3091500
+[58] Sara Hooker, Dumitru Erhan, Pieter-Jan Kindermans, and Been Kim. 2019. A Benchmark for Interpretability Methods
+in Deep Neural Networks. In Advances in Neural Information Processing Systems 32: Annual Conference on Neural
+Information Processing Systems 2019, NeurIPS 2019, December 8-14, 2019, Vancouver, BC, Canada . 9734–9745. https:
+//proceedings.neurips.cc/paper/2019/hash/fe4b8556000d0f0cae99daa5c5c5a410-Abstract.html
+[59] Maximilian Idahl, Lijun Lyu, Ujwal Gadiraju, and Avishek Anand. 2021. Towards Benchmarking the Utility of
+Explanations for Model Debugging. In Proceedings of the First Workshop on Trustworthy Natural Language Processing .
+Association for Computational Linguistics, Online, 68–73. https://doi.org/10.18653/v1/2021.trustnlp-1.8
+[60] Alon Jacovi and Yoav Goldberg. 2021. Aligning Faithful Interpretations with their Social Attribution. Transactions of
+the Association for Computational Linguistics 9 (2021), 294–310. https://doi.org/10.1162/tacl_a_00367

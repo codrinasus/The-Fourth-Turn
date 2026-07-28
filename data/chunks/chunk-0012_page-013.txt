@@ -1,0 +1,40 @@
+Raval and Verma [99] generate adversarial examples for black-box retrieval models that lower
+the position of a top-ranked document with minimal changes to the document text. Given the nondifferentiability of replacing discrete tokens, they optimize adversarial examples using a stochastic
+evolutionary algorithm with a one-token-at-a-time replacement strategy. Wu et al. [135] take a
+different approach by training a surrogate model based on pseudo-relevance feedback, which is
+used to approximate the gradient of the underlying black box ranking model. This approximated
+gradient is then used to find adversarial perturbations that promote a target document. Additionally,
+the adversarial perturbations are restricted by semantic similarity to the original document. The
+authors argue that the perturbations are imperceptible and evade spam detection when constraining
+the perturbations to semantic synonyms. Goren et al . [45] craft adversarial examples for the
+LambdaMART LTR model. For a given query, they use past rankings to create perturbations by
+replacing passages in the target document with passages from other high-ranked documents.
+Wang et al. [132] use gradient-based optimization to generate adversarial examples for BERTbased ranking models. They add or replace a few tokens in documents that cause significant rank
+promotions and demotions.
+5.2 Universal Adversarial Triggers
+While adversarial examples focus on input perturbations that change the prediction of individual
+inputs, universal adversarial triggers [130] are input-agnostic perturbations that lead to a model
+making a specific prediction whenever the trigger is concatenated to any input. Starting from
+an initial sequence of tokens, a trigger is optimized via a gradient-based search algorithm that
+iteratively replaces tokens. The effect of replacing a discrete token is usually approximated using
+HotFlip [33]. Since the resulting triggers transfer across input examples, they can be used to explain
+the global behavior of a model and can reveal global patterns.
+5.2.1 Universal Triggers for Text Ranking. Wang et al. [132] adapt universal adversarial triggers for
+text-based ranking models. They propose a global ranking attack to find trigger tokens that are
+adversarial to all queries contained in a dataset. Specifically, they optimize a fixed-length trigger
+so that any document to which it is concatenated will be demoted (or promoted) as much as
+possible for any given query. In their experiments with BERT-based ranking models fine-tuned on
+ClueWeb09 [18] and MS MARCO [86], they discover topical patterns within and between datasets
+and expose potential dataset and model biases. For example, the trigger
+hinduism earthquakes childbirth tornadoes Wikipedia
+promotes a document by 63 ranks on average, and the trigger
+acceptable competition rayon favour ##kei
+demotes a document by 84 ranks on average across all queries. In general, finding triggers for which
+highly relevant documents get demoted appears easier than finding triggers for which low-ranked
+documents are promoted.
+6 AXIOMATIC ANALYSIS OF TEXT RANKING MODELS
+Unlike current data-driven, parameterized models for relevance estimation, traditional IR approaches to ranking involve probabilistic models of relevance such as BM25 [ 3] and axiomatic
+approaches. Both approaches have a top-down defined notion of relevance, allowing for some sort of
+interpretability. Yet, the probabilistic models are currently dominant and axiomatic approaches less
+popular. In contrast to the recent development of neural, and therefore less interpretable, rankers,
+Axiomatic IR postulates and formalizes the properties of principled rankers. The term axiom in IR

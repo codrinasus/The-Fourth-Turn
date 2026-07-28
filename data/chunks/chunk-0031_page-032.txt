@@ -1,0 +1,54 @@
+[79] Andreas Madsen, Nicholas Meade, Vaibhav Adlakha, and Siva Reddy. 2021. Evaluating the Faithfulness of Importance
+Measures in NLP by Recursively Masking Allegedly Important Tokens and Retraining. ArXiv preprint abs/2110.08412
+(2021). https://arxiv.org/abs/2110.08412
+[80] Ryan McDonald, George Brokos, and Ion Androutsopoulos. 2018. Deep Relevance Ranking Using Enhanced DocumentQuery Interactions. In Proceedings of the 2018 Conference on Empirical Methods in Natural Language Processing .
+Association for Computational Linguistics, Brussels, Belgium, 1849–1860. https://doi.org/10.18653/v1/D18-1211
+[81] Tim Miller. 2019. Explanation in artificial intelligence: Insights from the social sciences. Artif. Intell. 267 (2019), 1–38.
+https://doi.org/10.1016/j.artint.2018.07.007
+[82] Christoph Molnar. 2022. Interpretable Machine Learning (2 ed.). https://christophm.github.io/interpretable-ml-book
+[83] Abbe Mowshowitz and Akira Kawaguchi. 2005. Measuring search engine bias. Inf. Process. Manag. 41, 5 (2005),
+1193–1205. https://doi.org/10.1016/j.ipm.2004.05.005
+[84] Eni Mustafaraj, Emma Lurie, and Claire Devine. 2020. The case for voter-centered audits of search engines during
+political elections. In Proceedings of the 2020 Conference on Fairness, Accountability, and Transparency . 559–569.
+[85] Eric Nalisnick, Bhaskar Mitra, Nick Craswell, and Rich Caruana. 2016. Improving Document Ranking with Dual
+Word Embeddings. In Proceedings of the 25th International Conference Companion on World Wide Web (Montréal,
+Québec, Canada) (WWW ’16 Companion) . International World Wide Web Conferences Steering Committee, Republic
+and Canton of Geneva, CHE, 83–84. https://doi.org/10.1145/2872518.2889361
+[86] Tri Nguyen, Mir Rosenberg, Xia Song, Jianfeng Gao, Saurabh Tiwary, Rangan Majumder, and Li Deng. 2016. MS
+MARCO: A Human Generated MAchine Reading COmprehension Dataset. InProceedings of the Workshop on Cognitive
+Computation: Integrating neural and symbolic approaches 2016 co-located with the 30th Annual Conference on Neural
+Information Processing Systems (NIPS 2016), Barcelona, Spain, December 9, 2016 (CEUR Workshop Proceedings, Vol. 1773) ,
+Tarek Richard Besold, Antoine Bordes, Artur S. d’Avila Garcez, and Greg Wayne (Eds.). CEUR-WS.org. http://ceurws.org/Vol-1773/CoCoNIPS_2016_paper9.pdf
+[87] Kishore Papineni, Salim Roukos, Todd Ward, and Wei-Jing Zhu. 2002. Bleu: a Method for Automatic Evaluation
+of Machine Translation. In Proceedings of the 40th Annual Meeting of the Association for Computational Linguistics .
+Association for Computational Linguistics, Philadelphia, Pennsylvania, USA, 311–318. https://doi.org/10.3115/
+1073083.1073135
+[88] Eli Pariser. 2011. The filter bubble: How the new personalized web is changing what we read and how we think . Penguin.
+[89] Fabio Petroni, Aleksandra Piktus, Angela Fan, Patrick Lewis, Majid Yazdani, Nicola De Cao, James Thorne, Yacine
+Jernite, Vladimir Karpukhin, Jean Maillard, Vassilis Plachouras, Tim Rocktäschel, and Sebastian Riedel. 2021. KILT: a
+Benchmark for Knowledge Intensive Language Tasks. In Proceedings of the 2021 Conference of the North American
+Chapter of the Association for Computational Linguistics: Human Language Technologies. Association for Computational
+Linguistics, Online, 2523–2544. https://doi.org/10.18653/v1/2021.naacl-main.200
+[90] Tiago Pimentel, Naomi Saphra, Adina Williams, and Ryan Cotterell. 2020. Pareto Probing: Trading Off Accuracy
+for Complexity. In Proceedings of the 2020 Conference on Empirical Methods in Natural Language Processing (EMNLP) .
+Association for Computational Linguistics, Online, 3138–3153. https://doi.org/10.18653/v1/2020.emnlp-main.254
+[91] Sayantan Polley, Atin Janki, Juliane Thiel, Marcusand Hoebel-Mueller, and Andreas Nuernberger. 2021. ExDocS:
+Evidence based Explainable Document Search. In ACM SIGIR Workshop on Causality in Search and Recommendation .
+ACM. https://csr21.github.io/polley-csr2021.pdf
+[92] Jay M Ponte and W Bruce Croft. 1998. A language modeling approach to information retrieval. In Proceedings of the
+21st annual international ACM SIGIR conference on Research and development in information retrieval . ACM, 275–281.
+[93] Adithya Pratapa, Sai Muralidhar Jayanthi, and Kavya Nerella. 2020. Constrained fact verification for FEVER. In
+Proceedings of the 2020 Conference on Empirical Methods in Natural Language Processing (EMNLP) . 7826–7832.
+[94] Alberto Purpura, Karolina Buchner, Gianmaria Silvello, and Gian Antonio Susto. 2021. Neural feature selection for
+learning to rank. In European Conference on Information Retrieval . Springer, 342–349.
+[95] Yifan Qiao, Chenyan Xiong, Zhenghao Liu, and Zhiyuan Liu. 2019. Understanding the Behaviors of BERT in Ranking.
+ArXiv preprint abs/1904.07531 (2019). https://arxiv.org/abs/1904.07531
+[96] Tao Qin and Tie-Yan Liu. 2013. Introducing LETOR 4.0 Datasets. CoRR abs/1306.2597 (2013).
+[97] Razieh Rahimi, Youngwoo Kim, Hamed Zamani, and James Allan. 2021. Explaining Documents’ Relevance to Search
+Queries. ArXiv preprint abs/2111.01314 (2021). https://arxiv.org/abs/2111.01314
+[98] Nazneen Fatema Rajani, Bryan McCann, Caiming Xiong, and Richard Socher. 2019. Explain Yourself! Leveraging
+Language Models for Commonsense Reasoning. In Proceedings of the 57th Annual Meeting of the Association for
+Computational Linguistics. Association for Computational Linguistics, Florence, Italy, 4932–4942. https://doi.org/10.
+18653/v1/P19-1487
+[99] Nisarg Raval and Manisha Verma. 2020. One word at a time: adversarial attacks on retrieval models. ArXiv preprint
+abs/2008.02197 (2020). https://arxiv.org/abs/2008.02197

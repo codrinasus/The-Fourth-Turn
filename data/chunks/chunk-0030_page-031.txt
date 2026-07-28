@@ -1,0 +1,55 @@
+[61] Zhiying Jiang, Raphael Tang, Ji Xin, and Jimmy Lin. 2021. How Does BERT Rerank Passages? An Attribution Analysis
+with Information Bottlenecks. In Proceedings of the Fourth BlackboxNLP Workshop on Analyzing and Interpreting
+Neural Networks for NLP . Association for Computational Linguistics, Punta Cana, Dominican Republic, 496–509.
+https://doi.org/10.18653/v1/2021.blackboxnlp-1.39
+[62] Thorsten Joachims. 2002. Optimizing search engines using clickthrough data. In Proceedings of the eighth ACM
+SIGKDD international conference on Knowledge discovery and data mining . ACM, 133–142.
+[63] Omar Khattab and Matei Zaharia. 2020. ColBERT: Efficient and Effective Passage Search via Contextualized Late
+Interaction over BERT. In Proceedings of the 43rd International ACM SIGIR conference on research and development in
+Information Retrieval, SIGIR 2020, Virtual Event, China, July 25-30, 2020 . ACM, 39–48. https://doi.org/10.1145/3397271.
+3401075
+[64] Pang Wei Koh and Percy Liang. 2017. Understanding Black-box Predictions via Influence Functions. In Proceedings
+of the 34th International Conference on Machine Learning, ICML 2017, Sydney, NSW, Australia, 6-11 August 2017
+(Proceedings of Machine Learning Research, Vol. 70) . PMLR, 1885–1894. http://proceedings.mlr.press/v70/koh17a.html
+[65] Sawan Kumar and Partha Talukdar. 2020. NILE : Natural Language Inference with Faithful Natural Language
+Explanations. In Proceedings of the 58th Annual Meeting of the Association for Computational Linguistics . Association
+for Computational Linguistics, Online, 8730–8742. https://doi.org/10.18653/v1/2020.acl-main.771
+[66] Karim Lasri, Tiago Pimentel, Alessandro Lenci, Thierry Poibeau, and Ryan Cotterell. 2022. Probing for the Usage
+of Grammatical Number. In Proceedings of the 60th Annual Meeting of the Association for Computational Linguistics
+(Volume 1: Long Papers), ACL 2022, Dublin, Ireland, May 22-27, 2022 . Association for Computational Linguistics,
+8818–8831. https://doi.org/10.18653/v1/2022.acl-long.603
+[67] Victor Lavrenko and W. Bruce Croft. 2001. Relevance Based Language Models. In Proceedings of the 24th Annual
+International ACM SIGIR Conference on Research and Development in Information Retrieval (New Orleans, Louisiana,
+USA) (SIGIR ’01). Association for Computing Machinery, New York, NY, USA, 120–127. https://doi.org/10.1145/
+383952.383972
+[68] Eric Lehman, Jay DeYoung, Regina Barzilay, and Byron C. Wallace. 2019. Inferring Which Medical Treatments Work
+from Reports of Clinical Trials. In Proceedings of the 2019 Conference of the North American Chapter of the Association
+for Computational Linguistics: Human Language Technologies, Volume 1 (Long and Short Papers) . Association for
+Computational Linguistics, Minneapolis, Minnesota, 3705–3717. https://doi.org/10.18653/v1/N19-1371
+[69] Tao Lei, Regina Barzilay, and Tommi Jaakkola. 2016. Rationalizing Neural Predictions. In Proceedings of the 2016
+Conference on Empirical Methods in Natural Language Processing . Association for Computational Linguistics, Austin,
+Texas, 107–117. https://doi.org/10.18653/v1/D16-1011
+[70] Jurek Leonhardt, Koustav Rudra, and Avishek Anand. 2021. Learnt Sparsity for Effective and Interpretable Document
+Ranking. ArXiv preprint abs/2106.12460 (2021). https://arxiv.org/abs/2106.12460
+[71] Mike Lewis, Yinhan Liu, Naman Goyal, Marjan Ghazvininejad, Abdelrahman Mohamed, Omer Levy, Veselin Stoyanov,
+and Luke Zettlemoyer. 2020. BART: Denoising Sequence-to-Sequence Pre-training for Natural Language Generation,
+Translation, and Comprehension. In Proceedings of the 58th Annual Meeting of the Association for Computational
+Linguistics. Association for Computational Linguistics, Online, 7871–7880. https://doi.org/10.18653/v1/2020.aclmain.703
+[72] Chin-Yew Lin. 2004. ROUGE: A Package for Automatic Evaluation of Summaries. In Text Summarization Branches
+Out. Association for Computational Linguistics, Barcelona, Spain, 74–81. https://aclanthology.org/W04-1013
+[73] Jimmy Lin. 2019. The neural hype, justified!: a recantation. SIGIR Forum 53, 2 (2019), 88–93. https://doi.org/10.1145/
+3458553.3458563
+[74] Hui Liu, Qingyu Yin, and William Yang Wang. 2019. Towards Explainable NLP: A Generative Explanation Framework
+for Text Classification. In Proceedings of the 57th Annual Meeting of the Association for Computational Linguistics .
+Association for Computational Linguistics, Florence, Italy, 5570–5581. https://doi.org/10.18653/v1/P19-1560
+[75] Claudio Lucchese, Franco Maria Nardini, Salvatore Orlando, Raffaele Perego, and Alberto Veneri. 2022. ILMART:
+Interpretable Ranking with Constrained LambdaMART. In SIGIR ’22: The 45th International ACM SIGIR Conference
+on Research and Development in Information Retrieval, Madrid, Spain, July 11 - 15, 2022 . ACM, 2255–2259. https:
+//doi.org/10.1145/3477495.3531840
+[76] Scott M. Lundberg, Gabriel G. Erion, and Su-In Lee. 2018. Consistent Individualized Feature Attribution for Tree
+Ensembles. ArXiv preprint abs/1802.03888 (2018). https://arxiv.org/abs/1802.03888
+[77] Scott M. Lundberg and Su-In Lee. 2017. A Unified Approach to Interpreting Model Predictions. In Advances in Neural Information Processing Systems 30: Annual Conference on Neural Information Processing Systems
+2017, December 4-9, 2017, Long Beach, CA, USA . 4765–4774. https://proceedings.neurips.cc/paper/2017/hash/
+8a20a8621978632d76c43dfd28b67767-Abstract.html
+[78] Sean MacAvaney, Sergey Feldman, Nazli Goharian, Doug Downey, and Arman Cohan. 2020. ABNIRML: Analyzing
+the Behavior of Neural IR Models. ArXiv preprint abs/2011.00696 (2020). https://arxiv.org/abs/2011.00696
