@@ -1,1 +1,1 @@
-{}
+{"The introduction warns that over-parameterized models learn \"shortcuts\". Tracing this concept through Feature Attribution (Section 3.2.2) and Probing (Section 7.2), what specific token-level behavior exemplifies this, and what vulnerability does it create?"}
