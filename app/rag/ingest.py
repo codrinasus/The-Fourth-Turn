@@ -8,6 +8,7 @@ sentence-transformers model. Both are yours to improve (see chunking.py and embe
 
 from __future__ import annotations
 
+import shutil
 import uuid
 from pathlib import Path
 
@@ -17,7 +18,7 @@ from qdrant_client import models
 from ..config import get_settings
 from ..models import IngestResponse
 from ..vectorstore.qdrant_store import get_store
-from .chunking import chunk_pages
+from .chunking import Chunk, chunk_pages
 from .embeddings import get_embedder
 
 # A fixed namespace so re-ingesting the same document overwrites its points
@@ -50,6 +51,35 @@ def extract_pages(path: Path) -> list[str]:
     return [(page.extract_text() or "") for page in reader.pages]
 
 
+def _fresh_dir(name: str) -> Path:
+    """An empty data/<name>/ — wiped and recreated so it always matches the last ingest."""
+    path = Path(get_settings().in_dir).parent / name
+    shutil.rmtree(path, ignore_errors=True)
+    path.mkdir(parents=True, exist_ok=True)
+    return path
+
+
+def dump_pages(pages: list[str]) -> Path:
+    """Write each extracted page to data/pages/page-NNN.txt for inspection."""
+    pages_dir = _fresh_dir("pages")
+    for i, text in enumerate(pages, start=1):
+        (pages_dir / f"page-{i:03d}.txt").write_text(text, encoding="utf-8")
+    return pages_dir
+
+
+def dump_chunks(chunks: list[Chunk]) -> Path:
+    """Write each chunk to data/chunks/chunk-NNNN_page-NNN.txt for inspection.
+
+    The page number is in the filename so you can eyeball whether citations will
+    line up with the PDF.
+    """
+    chunks_dir = _fresh_dir("chunks")
+    for c in chunks:
+        name = f"chunk-{c.index:04d}_page-{c.page:03d}.txt"
+        (chunks_dir / name).write_text(c.text, encoding="utf-8")
+    return chunks_dir
+
+
 def ingest(filename: str | None = None, reset: bool = False) -> IngestResponse:
     settings = get_settings()
     embedder = get_embedder()
@@ -57,9 +87,12 @@ def ingest(filename: str | None = None, reset: bool = False) -> IngestResponse:
 
     path = _find_pdf(filename)
     pages = extract_pages(path)
+    dump_pages(pages)
+
     chunks = chunk_pages(pages)
     if not chunks:
         raise ValueError(f"{path.name} produced no text — is it a scanned/image PDF?")
+    dump_chunks(chunks)
 
     # Embed in batches. is_query=False marks these as documents ("passage:" for e5).
     vectors: list[list[float]] = []
