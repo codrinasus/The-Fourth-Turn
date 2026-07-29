@@ -15,9 +15,9 @@ def ingest_document(req: IngestRequest) -> IngestResponse:
     """Parse, embed and index the PDF sitting in `data/in/`.
 
     Run this once before querying (and again after you change chunking or embeddings).
-    By default it indexes **one vector per page** — there is no chunking yet; that is one
-    of the first things you will build (`app/rag/chunking.py`). Pass `reset: true` to
-    rebuild the collection from scratch, and `filename` to pick a specific PDF in `data/in/`.
+    It indexes page-grounded chunks and dumps the same chunks to `data/chunks` for
+    inspection, BM25, and future reranking. Pass `reset: true` to rebuild the
+    collection from scratch, and `filename` to pick a specific PDF in `data/in/`.
     """
     try:
         return ingest(filename=req.filename, reset=req.reset)

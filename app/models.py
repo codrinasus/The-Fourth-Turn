@@ -89,5 +89,5 @@ class IngestRequest(BaseModel):
 class IngestResponse(BaseModel):
     document: str = Field(..., description="the file that was ingested")
     pages: int = Field(..., description="pages parsed")
-    chunks: int = Field(..., description="vectors indexed (one per page by default — until you chunk)")
+    chunks: int = Field(..., description="vectors indexed after page-grounded chunking")
     collection: str = Field(..., description="the Qdrant collection they went into")

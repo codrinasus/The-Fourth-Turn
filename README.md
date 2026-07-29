@@ -4,7 +4,7 @@
 To test bm25 we can do the following:
 
 ```bash
-ocker-compose run --rm app sh -c "PYTHONPATH=. uv run python scripts/test_bm25.py 'What type of research paper is the document?' data/pages"
+docker compose run --rm app sh -c "PYTHONPATH=. uv run python scripts/test_bm25.py 'What type of research paper is the document?' data/chunks"
 ```
 
 
@@ -115,8 +115,9 @@ ai_skill/            VALIDATE_SUBMISSION.md — an AI skill to check your submis
 docs/                everything below, in depth
 ```
 
-Everywhere worth improving is marked with a `TODO(level-N)` comment. The baseline has **no
-chunking** and a **local embedding model** — those are the first things you'll want to improve.
+Everywhere worth improving is marked with a `TODO(level-N)` comment. The baseline has a **local
+embedding model** and a simple paragraph-aware chunker; hybrid retrieval and reranking are the
+next things to improve.
 Start in `app/rag/`.
 
 ## Read next (`docs/`)

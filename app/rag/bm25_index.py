@@ -3,7 +3,7 @@
 Usage:
     from app.rag.bm25_index import BM25Index
     idx = BM25Index()
-    idx.build_from_dir("data/parsed/pages", glob="**/*.txt")
+    idx.build_from_dir("data/chunks", glob="**/*.txt")
     hits = idx.search("your query", top_k=5)
 
 This implementation is intentionally small and depends on `rank_bm25` for scoring.

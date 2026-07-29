@@ -20,6 +20,7 @@ from ..vectorstore.qdrant_store import get_store
 from .chunking import Chunk, chunk_pages
 from .embeddings import get_embedder
 from .pdf_parser import active_parser_name, extract_pages
+from .retrieve import reset_retrieval_indexes
 
 # A fixed namespace so re-ingesting the same document overwrites its points
 # (idempotent ids) instead of duplicating them.
@@ -63,7 +64,7 @@ def dump_chunks(chunks: list[Chunk]) -> Path:
     """
     chunks_dir = _fresh_dir("chunks")
     for c in chunks:
-        name = f"chunk-{c.index:04d}_page-{c.page:03d}.txt"
+        name = f"chunk-{c.index:04d}_page-{c.page:03d}_{c.kind}.txt"
         (chunks_dir / name).write_text(c.text, encoding="utf-8")
     return chunks_dir
 
@@ -81,6 +82,7 @@ def ingest(filename: str | None = None, reset: bool = False) -> IngestResponse:
     if not chunks:
         raise ValueError(f"{path.name} produced no text — is it a scanned/image PDF?")
     dump_chunks(chunks)
+    reset_retrieval_indexes()
 
     # Embed in batches. is_query=False marks these as documents ("passage:" for e5).
     vectors: list[list[float]] = []
@@ -98,6 +100,9 @@ def ingest(filename: str | None = None, reset: bool = False) -> IngestResponse:
             payload={
                 "text": c.text,
                 "page": c.page,
+                "chunk_index": c.index,
+                "section": c.section,
+                "kind": c.kind,
                 "source": path.name,
                 "parser": active_parser_name(),
             },

@@ -3,7 +3,7 @@
 Usage:
     PYTHONPATH=. python3 scripts/test_bm25.py "query" [dir]
 
-If `dir` is omitted the script will try `data/chunks`, then `data/parsed/pages`, then `docs`.
+If `dir` is omitted the script will try `data/chunks`, then `data/pages`, then `docs`.
 """
 from __future__ import annotations
 
@@ -15,10 +15,10 @@ from app.rag.bm25_index import BM25Index
 def choose_dir(arg_dir: str | None) -> str:
     if arg_dir:
         return arg_dir
-    for d in ("data/chunks", "data/parsed/pages", "docs"):
+    for d in ("data/chunks", "data/pages", "docs"):
         if Path(d).exists():
             return d
-    raise SystemExit("no candidate directory found (create data/chunks or data/parsed/pages)")
+    raise SystemExit("no candidate directory found (run /ingest to create data/chunks)")
 
 
 def main():

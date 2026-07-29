@@ -55,10 +55,9 @@ class Settings(BaseSettings):
     # --- Retrieval ----------------------------------------------------------
     top_k: int = 5                 # how many results a query retrieves
 
-    # Chunking is OFF by default: ingest indexes one vector per page (see
-    # app/rag/chunking.py). When you implement real chunking, these are your dials.
-    chunk_size: int = 800          # characters per chunk (once you chunk)
-    chunk_overlap: int = 150       # characters shared between neighbours
+    # The Docling pages are split into page-grounded chunks before indexing.
+    chunk_size: int = 800          # target characters per chunk
+    chunk_overlap: int = 0         # neighbour context will come from retrieval expansion later
 
     # --- Data folders -------------------------------------------------------
     in_dir: str = "data/in"        # put the PDF here; /ingest reads from it
