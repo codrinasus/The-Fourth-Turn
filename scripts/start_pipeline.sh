@@ -4,7 +4,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
-MODEL="${MODEL:-qwen3.6}"
+MODEL="${MODEL:-qwen3:8b}"
 EMBEDDING_MODEL="${EMBEDDING_MODEL:-nomic-embed-text}"
 SKIP_MODEL_PULL="${SKIP_MODEL_PULL:-false}"
 

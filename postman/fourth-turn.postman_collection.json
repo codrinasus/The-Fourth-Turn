@@ -70,6 +70,120 @@
           "raw": "{\n  \"question\": \"<a question that needs evidence from across the whole document>\",\n  \"level\": 3\n}"
         }
       }
+    },
+    {
+      "name": "Chosen questions",
+      "description": "Concrete q1-q9 requests copied from submission/. Send Level 2 requests in order: q4, then q5, then q6.",
+      "item": [
+        {
+          "name": "q1 - Level 1",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/query",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"question\": \"What type of research paper is the document?\",\n  \"level\": 1\n}"
+            }
+          }
+        },
+        {
+          "name": "q2 - Level 1",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/query",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"question\": \"What is the main goal of explainable information retrieval according to the survey?\",\n  \"level\": 1\n}"
+            }
+          }
+        },
+        {
+          "name": "q3 - Level 1",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/query",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"question\": \"What are the defined evaluation of explanations types in IR?\",\n  \"level\": 1\n}"
+            }
+          }
+        },
+        {
+          "name": "q4 - Level 2",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/query",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"question\": \"What is the main limitation the authors acknowledge?\",\n  \"level\": 2\n}"
+            }
+          }
+        },
+        {
+          "name": "q5 - Level 2",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/query",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"question\": \"Why does that happen?\",\n  \"level\": 2\n}"
+            }
+          }
+        },
+        {
+          "name": "q6 - Level 2",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/query",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"question\": \"What is the following section?\",\n  \"level\": 2\n}"
+            }
+          }
+        },
+        {
+          "name": "q7 - Level 3",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/query",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"question\": \"Table 6 classifies IDCM as a \\\"Pipeline\\\" approach. Based on Section 9.1, how does IDCM's two-stage architecture execute this pipeline concept to overcome the input length limitations of modern transformers?\",\n  \"level\": 3\n}"
+            }
+          }
+        },
+        {
+          "name": "q8 - Level 3",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/query",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"question\": \"Summarise the contribution of each section.\",\n  \"level\": 3\n}"
+            }
+          }
+        },
+        {
+          "name": "q9 - Level 3",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/query",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"question\": \"The introduction warns that over-parameterized models learn \\\"shortcuts\\\". Tracing this concept through Feature Attribution (Section 3.2.2) and Probing (Section 7.2), what specific token-level behavior exemplifies this, and what vulnerability does it create?\",\n  \"level\": 3\n}"
+            }
+          }
+        }
+      ]
     }
   ]
 }

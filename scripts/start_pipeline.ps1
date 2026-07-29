@@ -1,5 +1,5 @@
 param(
-    [string]$Model = "qwen3.6",
+    [string]$Model = "qwen3:8b",
     [string]$EmbeddingModel = "nomic-embed-text",
     [switch]$SkipModelPull
 )

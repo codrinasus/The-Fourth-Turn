@@ -17,7 +17,7 @@ docker compose -f docker-compose.yml -f docker-compose.ollama.yml -f docker-comp
 Pull the Ollama chat model once:
 
 ```powershell
-docker compose -f docker-compose.yml -f docker-compose.ollama.yml -f docker-compose.docling.yml exec ollama ollama pull qwen3.6
+docker compose -f docker-compose.yml -f docker-compose.ollama.yml -f docker-compose.docling.yml exec ollama ollama pull qwen3:8b
 docker compose -f docker-compose.yml -f docker-compose.ollama.yml -f docker-compose.docling.yml exec ollama ollama pull nomic-embed-text
 ```
 

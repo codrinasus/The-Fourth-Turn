@@ -17,9 +17,10 @@ class Settings(BaseSettings):
     )
 
     # --- Chat provider (the model that writes answers) ----------------------
-    # One of: "lmstudio", "ollama", "litellm". This team uses local Ollama + qwen3.6.
+    # One of: "lmstudio", "ollama", "litellm". This team uses local Ollama.
+    # qwen3:8b is the default because qwen3.6 needs more RAM than this Docker setup has.
     llm_provider: str = "ollama"
-    chat_model: str = "qwen3.6"
+    chat_model: str = "qwen3:8b"
 
     ollama_base_url: str = "http://localhost:11434"     # keep Ollama's default port
     lmstudio_base_url: str = "http://localhost:1234"    # keep LM Studio's default port

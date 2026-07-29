@@ -46,7 +46,7 @@ Windows:
 
 ```powershell
 docker compose -f docker-compose.yml -f docker-compose.ollama.yml -f docker-compose.docling.yml up -d ollama qdrant docling app
-docker compose -f docker-compose.yml -f docker-compose.ollama.yml -f docker-compose.docling.yml exec ollama ollama pull qwen3.6
+docker compose -f docker-compose.yml -f docker-compose.ollama.yml -f docker-compose.docling.yml exec ollama ollama pull qwen3:8b
 docker compose -f docker-compose.yml -f docker-compose.ollama.yml -f docker-compose.docling.yml exec ollama ollama pull nomic-embed-text
 curl.exe http://localhost:8791/ingest -H "content-type: application/json" -d "{}"
 ```
@@ -55,7 +55,7 @@ macOS:
 
 ```bash
 docker compose -f docker-compose.yml -f docker-compose.ollama.yml -f docker-compose.docling.yml up -d ollama qdrant docling app
-docker compose -f docker-compose.yml -f docker-compose.ollama.yml -f docker-compose.docling.yml exec -T ollama ollama pull qwen3.6
+docker compose -f docker-compose.yml -f docker-compose.ollama.yml -f docker-compose.docling.yml exec -T ollama ollama pull qwen3:8b
 docker compose -f docker-compose.yml -f docker-compose.ollama.yml -f docker-compose.docling.yml exec -T ollama ollama pull nomic-embed-text
 curl -fsS -X POST http://localhost:8791/ingest -H "content-type: application/json" -d "{}"
 ```

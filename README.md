@@ -64,7 +64,7 @@ Copy-Item $HOME\Downloads\your-document.pdf data\in\document.pdf
 
 # 4. Pull the local Ollama model once, then bring up app + Qdrant + Ollama + Docling.
 docker compose -f docker-compose.yml -f docker-compose.ollama.yml -f docker-compose.docling.yml up -d ollama
-docker compose -f docker-compose.yml -f docker-compose.ollama.yml -f docker-compose.docling.yml exec ollama ollama pull qwen3.6
+docker compose -f docker-compose.yml -f docker-compose.ollama.yml -f docker-compose.docling.yml exec ollama ollama pull qwen3:8b
 docker compose -f docker-compose.yml -f docker-compose.ollama.yml -f docker-compose.docling.yml exec ollama ollama pull nomic-embed-text
 docker compose -f docker-compose.yml -f docker-compose.ollama.yml -f docker-compose.docling.yml up -d
 #    app     -> http://localhost:8791      (Swagger UI at /docs)
