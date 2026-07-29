@@ -23,6 +23,9 @@ services:
       - OLLAMA_BASE_URL=http://host.docker.internal:11434
       - LMSTUDIO_BASE_URL=http://host.docker.internal:1234
     volumes:
+      - ./app:/app/app
+      - ./scripts:/app/scripts
+      
       # Your PDF goes in ./data/in; answers are written to ./data/out; your curated
       # answers live in ./submission. All bind-mounted so they survive rebuilds.
       - ./data:/app/data

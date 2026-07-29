@@ -5,8 +5,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from ..llm.base import Message
-from ..vectorstore.qdrant_store import get_store
 from .embeddings import get_embedder
+from .bm25_index import BM25Index
 
 
 @dataclass
@@ -35,9 +35,22 @@ def rewrite_query(question: str, history: list[Message]) -> str:
 def retrieve(question: str, top_k: int, history: list[Message] | None = None) -> list[Context]:
     embedder = get_embedder()
     store = get_store()
-
+    #settings = get_settings()
     query = rewrite_query(question, history or [])
 
+    # If BM25 is enabled in settings, prefer sparse retrieval from the chunk files.
+    #if settings.bm25_enabled:
+    # build a singleton BM25 index lazily
+    if not hasattr(retrieve, "_bm25_index") or retrieve._bm25_index is None:
+        retrieve._bm25_index = BM25Index()
+        retrieve._bm25_index.build_from_dir(settings.bm25_dir)
+    bm25_idx: BM25Index = retrieve._bm25_index
+    hits = bm25_idx.search(query, top_k=top_k)
+    return [
+        Context(text=h.text, page=int(h.page or 0), score=float(h.score)) for h in hits
+    ]
+
+    # Default: dense vector retrieval via the embedder + Qdrant store
     # TODO(level-3): one query + one search is not enough for whole-document
     #   questions ("summarise every chapter", "combine the table on p.40 with the
     #   reference on p.90"). Consider multi-query fan-out, iterative/agentic retrieval
