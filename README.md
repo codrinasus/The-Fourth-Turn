@@ -1,5 +1,15 @@
 # The Fourth Turn
 
+## For us to test
+To test bm25 we can do the following:
+
+```bash
+ocker-compose run --rm app sh -c "PYTHONPATH=. uv run python scripts/test_bm25.py 'What type of research paper is the document?' data/pages"
+```
+
+
+## Description
+
 A hackathon by the **[AI Multimedia Lab](https://aimultimedialab.ro/)** at
 **[ESSIR 2026](https://2026.essir.eu/)** — the European Summer School in Information Retrieval,
 Bucharest. In teams, over the week, you build a backend that **answers questions about a document

@@ -35,15 +35,13 @@ def rewrite_query(question: str, history: list[Message]) -> str:
 def retrieve(question: str, top_k: int, history: list[Message] | None = None) -> list[Context]:
     embedder = get_embedder()
     store = get_store()
-    #settings = get_settings()
     query = rewrite_query(question, history or [])
 
     # If BM25 is enabled in settings, prefer sparse retrieval from the chunk files.
-    #if settings.bm25_enabled:
     # build a singleton BM25 index lazily
     if not hasattr(retrieve, "_bm25_index") or retrieve._bm25_index is None:
         retrieve._bm25_index = BM25Index()
-        retrieve._bm25_index.build_from_dir(settings.bm25_dir)
+        retrieve._bm25_index.build_from_dir("data/pages", glob="**/*.txt")
     bm25_idx: BM25Index = retrieve._bm25_index
     hits = bm25_idx.search(query, top_k=top_k)
     return [
