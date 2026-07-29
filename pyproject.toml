@@ -1,7 +1,7 @@
 [project]
 name = "fourth-turn"
 version = "0.1.0"
-description = "The Fourth Turn — a RAG-over-PDF backend scaffold (ESSIR 2026 hackathon)"
+description = "The Fourth Turn - a RAG-over-PDF backend scaffold (ESSIR 2026 hackathon)"
 requires-python = ">=3.11"
 dependencies = [
     "fastapi>=0.115",
@@ -10,19 +10,10 @@ dependencies = [
     "pydantic-settings>=2.3",
     "httpx>=0.27",
     "qdrant-client>=1.11",
-    "pypdf>=4.2",
-    # Local embeddings out of the box (intfloat/multilingual-e5-large). Pulls torch,
-    # so the first install is large. Swap the model, or switch embedding_backend to
-    # "provider", if you'd rather not carry it — see app/rag/embeddings.py.
-    "sentence-transformers>=3.0",
-    # litellm gives you one interface to ~100 hosted providers (OpenAI, Anthropic,
-    # Gemini, Groq, ...). Ollama and LM Studio are reached directly over HTTP and do
-    # not need it — remove it if you only run local models.
-    "litellm>=1.44",
     "python-multipart>=0.0.9",
 ]
 
-# `uv sync` installs these too; `uv sync --no-dev` skips them (used in the Docker image).
+# `uv sync` installs these too; `uv sync --no-dev` skips them in the Docker image.
 [dependency-groups]
 dev = ["ruff>=0.6"]
 

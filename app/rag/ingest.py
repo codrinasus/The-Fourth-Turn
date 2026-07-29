@@ -1,10 +1,9 @@
 """Load the committed PDF into the vector store.
 
-    parse PDF (data/in) -> pages -> [chunk] -> embeddings -> Qdrant
+    parse PDF (data/in) -> pages -> chunks -> embeddings -> Qdrant
 
-Parser note: we tested GROBID and Marker separately, then chose Marker for this
-document because its Markdown kept page boundaries and tables in a RAG-friendly form.
-GROBID code was removed so there is one parser path to reason about.
+Parser note: Docling is the active path because `/ingest` can call its local
+HTTP service directly.
 """
 
 from __future__ import annotations
@@ -20,7 +19,7 @@ from ..models import IngestResponse
 from ..vectorstore.qdrant_store import get_store
 from .chunking import Chunk, chunk_pages
 from .embeddings import get_embedder
-from .marker_parser import extract_pages
+from .pdf_parser import active_parser_name, extract_pages
 
 # A fixed namespace so re-ingesting the same document overwrites its points
 # (idempotent ids) instead of duplicating them.
@@ -38,20 +37,6 @@ def _find_pdf(filename: str | None) -> Path:
     if not pdfs:
         raise FileNotFoundError(f"no *.pdf found in {in_dir}/ — put your document there first")
     return pdfs[0]
-
-
-<<<<<<< HEAD
-=======
-def extract_pages(path: Path) -> list[str]:
-    """Per-page text via pypdf.
-
-    TODO(level-1): pypdf is fine for clean digital PDFs and poor on complex layout
-      (two columns, tables, ligatures, math). If your citations won't match the
-      document, your extractor is usually why. Try pdfplumber, PyMuPDF, Docling,
-      GROBID or Marker and keep whichever reads your document best.
-    """
-    reader = PdfReader(str(path))
-    return [(page.extract_text() or "") for page in reader.pages]
 
 
 def _fresh_dir(name: str) -> Path:
@@ -83,7 +68,6 @@ def dump_chunks(chunks: list[Chunk]) -> Path:
     return chunks_dir
 
 
->>>>>>> c511ca992b072522db5a4249b4b5bccb012a4855
 def ingest(filename: str | None = None, reset: bool = False) -> IngestResponse:
     settings = get_settings()
     embedder = get_embedder()
@@ -111,7 +95,12 @@ def ingest(filename: str | None = None, reset: bool = False) -> IngestResponse:
         models.PointStruct(
             id=str(uuid.uuid5(_NAMESPACE, f"{path.name}:{c.index}")),
             vector=vec,
-            payload={"text": c.text, "page": c.page, "source": path.name, "parser": "marker"},
+            payload={
+                "text": c.text,
+                "page": c.page,
+                "source": path.name,
+                "parser": active_parser_name(),
+            },
         )
         for c, vec in zip(chunks, vectors)
     ]

@@ -1,13 +1,13 @@
-"""Embeddings — turning text into vectors.
+"""Embeddings: turning text into vectors.
 
-**This is a starting point you are meant to improve.** Out of the box we embed with a
-local sentence-transformers model (`intfloat/multilingual-e5-large`) so the app runs with
-no embedding API and no configuration. It is a solid multilingual baseline — but the choice
-of model, how you build the text you embed, and how you chunk it are all yours to tune.
+By default we embed through the configured provider. For this team, that is
+Ollama with `nomic-embed-text`, which keeps the FastAPI image light. The choice
+of model, how you build the text you embed, and how you chunk it are all yours
+to tune.
 
 `get_embedder()` returns an object with `embed(texts, is_query=False)`. Two backends:
-  - "sentence-transformers" (default): local, downloads the model on first use.
-  - "provider": reuse the chat provider's embed() (Ollama / LM Studio / litellm).
+  - "provider" (default): reuse the chat provider's embed() (Ollama / LM Studio / litellm).
+  - "sentence-transformers": optional Python backend; install the package before using it.
 """
 
 from __future__ import annotations
@@ -18,16 +18,18 @@ from ..config import get_settings
 
 
 class SentenceTransformerEmbedder:
-    """Local embeddings via sentence-transformers.
-
-    The e5 family expects each text to be prefixed with "query: " or "passage: "; we do
-    that automatically. If you switch to a model that does NOT use these prefixes (e.g.
-    BGE, GTE, nomic), drop them — see `_prefix`.
-    """
+    """Optional local embeddings via sentence-transformers."""
 
     def __init__(self, model_name: str):
-        # Imported lazily so the app imports even before the (large) dep is installed.
-        from sentence_transformers import SentenceTransformer
+        # Imported lazily so the app image stays light when provider embeddings are used.
+        try:
+            from sentence_transformers import SentenceTransformer
+        except ImportError as e:
+            raise RuntimeError(
+                "EMBEDDING_BACKEND=sentence-transformers requires installing "
+                "sentence-transformers. The lightweight Docker image uses "
+                "EMBEDDING_BACKEND=provider with Ollama."
+            ) from e
 
         self.model_name = model_name
         self._model = SentenceTransformer(model_name)
@@ -45,7 +47,7 @@ class SentenceTransformerEmbedder:
 
 
 class ProviderEmbedder:
-    """Embeddings from the chat provider (set embedding_backend=provider)."""
+    """Embeddings from the configured provider."""
 
     def __init__(self):
         from ..llm.factory import get_client
@@ -53,7 +55,7 @@ class ProviderEmbedder:
         self._client = get_client()
 
     def embed(self, texts: list[str], is_query: bool = False) -> list[list[float]]:
-        # Most embedding APIs do not distinguish query vs passage; is_query is ignored.
+        # Most provider embedding APIs do not distinguish query vs passage.
         return self._client.embed(texts)
 
 
@@ -67,5 +69,5 @@ def get_embedder():
         return ProviderEmbedder()
     raise ValueError(
         f"unknown embedding_backend: {s.embedding_backend!r} "
-        "(expected 'sentence-transformers' or 'provider')"
+        "(expected 'provider' or 'sentence-transformers')"
     )

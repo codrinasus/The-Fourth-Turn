@@ -1,45 +1,14 @@
-Explainable Information Retrieval: A Survey 23
-Method Task Training Dataset Evaluation
-Expred [146] Knowledge Intensive Pipeline ERASER Benchmark[31] PRF Score, C/S
-Wojtas and Chen [134] Medical Search Pipeline GM12878 Feature Ranking
-Jiang’s IB [61] Text Ranking End-to-End MS MARCO –
-Select and Rank[70] Text Ranking End-to-End TrecDL, Core17, CW09 Anecdotal
-IDCM[53] Text Ranking Pipeline MS MARCO –
-IOT-Match[139] Legal Case Matching Pipeline ELAM, eCAIL PRF Scores
 Table 6. Rationale-based approaches. The C/S score in the evaluation refers to comprehensive and sufficiency.
-During the inference, the prediction model takes the output of the rationale-extraction module as
-its input.
-Later in the same year, DeYoung et al. [31] released a benchmark called ERASER to evaluate
-rationale-based interpretability. The ERASER benchmark consists of a large variety of knowledge-
-intensive tasks that presupposes an IR system, like question answering (QA) and fact-checking.
-Despite the reasonable performance benefits of such select-and-predict approaches, they suffer
-from a crucial deficiency. That is, the rationale-extraction module could “cheat” to overfit the
-pattern of the rationale sub-sequences instead of selecting the rationales based on their semantic
-meaning [7, 60]. To this end, another pipeline approach ExPred [146] was proposed. The main
-idea of ExPred was to make the rationale-extraction phase task-aware by training it in a multitask
-fashion with the downstream task. By doing so, they use an auxiliary output to force the rationale
-selector to learn the semantics of the inputs with respect to the classification task.
-The pipeline models introduced above contain only one extractor-predictor training cycle. Wojtas
-and Chen [134], however, propose to train the rationale extractor and the task predictor alternatively
-for multiple rounds and select the masks using a genetic algorithm. The alternative training cycle is
-initialized by training the classifier on multiple randomly sampled rationales and keeping the best
-rationale mask, resulting in the best classification performance. Then they optimize the rationale-
-extractor and the task-predictor alternatively.
-For document ranking tasks, Hofstätter et al. [53] propose the IDCM (Intra-Document Cascading
-Model) approach to overcome the input length limitations of modern transformer-based rankers.
-IDCM is a pipeline approach whose rationale extractor is an effectively simple model (student
-model) trained to mimic the passage-selection behavior of a more complex model (teacher model).
-The student extractor model selects important passages as rationales from the huge amount of
-documents before calculating the ranking score of selected passages with respect to the current
-query using another complex model. Evaluated on the MS MARCO dataset [86], IDCM turns to
-outperform traditional ranking models.
-Finally, another pipeline model called IOT-match [139] focuses on the case-matching problem.
-The case-matching problem is defined as: given two different legal cases, the model should predict
-whether the two cases are related. They try to solve the problem using optimal transport theory.
-The intuition behind their algorithm is that the predicted sentence matching matrix is also an
-optimal transport matrix that minimizes the transport distance given the sentence discrepancy
-matrix. The sentence matching matrix is a selection matrix that selects sentence pairs from both
-cases, where the sum of their discrepancies is minimized (similarity maximized). After selecting the
-most similar sentences from both cases, they utilize the task prediction model to predict whether
-the two cases are related based on matched sentence pairs as the rationales.
-Pre-print
+
+During the inference, the prediction model takes the output of the rationale-extraction module as its input.
+
+Later in the same year, DeYoung et al. [31] released a benchmark called ERASER to evaluate rationale-based interpretability. The ERASER benchmark consists of a large variety of knowledgeintensive tasks that presupposes an IR system, like question answering (QA) and fact-checking. Despite the reasonable performance benefits of such select-and-predict approaches, they suffer from a crucial deficiency. That is, the rationale-extraction module could 'cheat' to overfit the pattern of the rationale sub-sequences instead of selecting the rationales based on their semantic meaning [7, 60]. To this end, another pipeline approach ExPred [146] was proposed. The main idea of ExPred was to make the rationale-extraction phase task-aware by training it in a multitask fashion with the downstream task. By doing so, they use an auxiliary output to force the rationale selector to learn the semantics of the inputs with respect to the classification task.
+
+The pipeline models introduced above contain only one extractor-predictor training cycle. Wojtas and Chen [134], however, propose to train the rationale extractor and the task predictor alternatively for multiple rounds and select the masks using a genetic algorithm. The alternative training cycle is initialized by training the classifier on multiple randomly sampled rationales and keeping the best rationale mask, resulting in the best classification performance. Then they optimize the rationaleextractor and the task-predictor alternatively.
+
+For document ranking tasks, Hofstätter et al. [53] propose the IDCM (Intra-Document Cascading Model) approach to overcome the input length limitations of modern transformer-based rankers. IDCM is a pipeline approach whose rationale extractor is an effectively simple model (student model) trained to mimic the passage-selection behavior of a more complex model (teacher model). The student extractor model selects important passages as rationales from the huge amount of documents before calculating the ranking score of selected passages with respect to the current query using another complex model. Evaluated on the MS MARCO dataset [86], IDCM turns to outperform traditional ranking models.
+
+Finally, another pipeline model called IOT-match [139] focuses on the case-matching problem . The case-matching problem is defined as: given two different legal cases, the model should predict whether the two cases are related. They try to solve the problem using optimal transport theory. The intuition behind their algorithm is that the predicted sentence matching matrix is also an optimal transport matrix that minimizes the transport distance given the sentence discrepancy matrix. The sentence matching matrix is a selection matrix that selects sentence pairs from both cases, where the sum of their discrepancies is minimized (similarity maximized). After selecting the most similar sentences from both cases, they utilize the task prediction model to predict whether the two cases are related based on matched sentence pairs as the rationales.
+
+Method | Task | Training | Dataset | Evaluation
+Expred [146] Wojtas and Chen [134] Jiang's IB [61] Select and Rank[70] IDCM[53] IOT-Match[139] | Knowledge Intensive Medical Search Text Ranking Text Ranking Text Ranking Legal Case Matching | Pipeline Pipeline End-to-End End-to-End Pipeline Pipeline | ERASER Benchmark[31] GM12878 MS MARCO TrecDL, Core17, CW09 MS MARCO ELAM, eCAIL | PRF Score, C/S Feature Ranking - Anecdotal - PRF Scores

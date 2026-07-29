@@ -27,21 +27,23 @@ class Settings(BaseSettings):
     litellm_api_key: str | None = None
 
     # --- Embeddings (turning text into vectors) -----------------------------
-    # Out of the box we use a local sentence-transformers model so the app runs with
-    # no embedding API and no setup. It downloads on first ingest (~1 GB, once).
-    #   "sentence-transformers"  -> app/rag/embeddings.py, model = embedding_model below
-    #   "provider"               -> reuse the chat provider's embed() (set embedding_model
-    #                               to that provider's embedding model, e.g. nomic-embed-text)
+    # Use provider embeddings so Ollama owns both chat and vectors.
+    # Pull `nomic-embed-text` once before ingest.
     # IMPROVING EMBEDDINGS IS PART OF THE CHALLENGE — see app/rag/embeddings.py.
-    embedding_backend: str = "sentence-transformers"
-    embedding_model: str = "intfloat/multilingual-e5-large"
+    embedding_backend: str = "provider"
+    embedding_model: str = "nomic-embed-text"
 
     # --- PDF parsing --------------------------------------------------------
-    # We compared GROBID and Marker on the committed PDF and kept Marker as the
-    # parser. Marker runs as a separate Docker job because installing it in the
-    # FastAPI image would pull large ML/OCR dependencies into the serving stack.
-    marker_markdown_dir: str = "data/extracted/marker"
-    marker_json_dir: str = "data/extracted/marker-json"
+    # Docling is active because `/ingest` can trigger parsing through a local
+    # HTTP service.
+    pdf_parser: str = "docling"
+    docling_base_url: str = "http://localhost:5001"
+    docling_output_dir: str = "data/extracted/docling"
+    docling_timeout: float = 600.0
+    docling_table_mode: str = "accurate"
+    docling_image_export_mode: str = "referenced"
+    docling_do_ocr: bool = False
+    docling_use_cache: bool = True
 
     # --- Qdrant (vector store) ----------------------------------------------
     # Host port is deliberately unusual to avoid clashes; docker-compose overrides

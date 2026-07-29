@@ -1,48 +1,7 @@
-18 Avishek Anand, Lijun Lyu, Maximilian Idahl, Yumeng Wang, Jonas Wallat, and Zijian Zhang
-rankers that lead to their good ranking performance. They attribute the model’s matching ability
-to three properties (concepts), relevance, document length, and term frequency. They devise a
-behavioral-probing setup that verifies to what extent the model could capture these concepts. For
-manipulation-sensitivity analysis, they test the effect of shuffled words, sentences, or typos on the
-model performance. Lastly, MacAvaney et al. [78] create probing sets for writing style concepts
-such as fluency, formality, or factuality. Their results suggest that neural rankers are biased toward
-factually correct articles and that appending irrelevant text can improve the relevance scores.
-Similarly, the work by Fan et al. [35] strives to understand the relevance-modeling of IR models.
-They also propose to probe for a large set of lexical, syntactic, and semantic concepts such as
-named entities or coreference resolution ability. By comparing the performance of their fine-tuned
-models to a pre-trained BERT, they find that these IR models generally seem to sacrifice small
-parts of their ability to perform lexical and syntactic tasks and improve especially in semantic
-matching (e.g., identifying synonyms). Furthermore, causal intervention analysis is applied to the
-model parameters, input features, and training objectives, resulting in suggesting that a careful
-intervention on linguistic properties can improve the performance of downstream IR models.
 7.3 Probing other Information Retrieval Models
-In addition to the core ranking objective, models for other IR-related tasks have been probed.
-van Aken et al. [124] investigate BERT embeddings of a QA model and how do they interact over
-the layers when answering questions. Specifically, they probed a pre-trained BERT and a QA
-model, finding that training the model for QA improves the performance on related tasks such
-as question type classification or identification of supporting facts. The question of how BERT
-reacts to fine-tuning has also been investigated in several studies [35, 124, 131]. Cai et al. [17] probe
-MRC (machine reading comprehension) models for relevant subtasks (synonyms, abbreviations,
-coreference, as well as question type classification). They find that only for core MRC subtasks, the
-token representation varies in the later layers of the MRC model. The core MRC subtasks include
-tasks such as coreference, question type classification, and answer boundary detection. However,
-for tasks like synonym and abbreviation detection, the representations are only moderately different
-from the pre-trained BERT representations. Wallat et al. [131] probe models fine-tuned for various
-tasks to assess the effect of fine-tuning on (factual) knowledge retention. In their layer-wise
-experiments, they find the ranking model to be specifically knowledgeable, dropping the least
-amount of knowledge compared to the question-answering and named entity recognition models.
-Additionally, large parts, though not all, of the factual knowledge seem to be captured in the latter
-layers. Petroni et al. [89] identify the requirement of world knowledge for many IR tasks such
-as open-domain question-answering, slot filling, entity linking, or fact-checking. To understand
-to what extent do current models capture real-world knowledge, Petroni et al . [89] propose a
-benchmark containing knowledge-intensive tasks (QA, slot filling, entity linking, fact-checking,
-among others) all derived from a single Wikipedia corpus.
+
+In addition to the core ranking objective, models for other IR-related tasks have been probed. van Aken et al. [124] investigate BERT embeddings of a QA model and how do they interact over the layers when answering questions. Specifically, they probed a pre-trained BERT and a QA model, finding that training the model for QA improves the performance on related tasks such as question type classification or identification of supporting facts. The question of how BERT reacts to fine-tuning has also been investigated in several studies [35, 124, 131]. Cai et al. [17] probe MRC (machine reading comprehension) models for relevant subtasks (synonyms, abbreviations, coreference, as well as question type classification). They find that only for core MRC subtasks, the token representation varies in the later layers of the MRC model. The core MRC subtasks include tasks such as coreference, question type classification, and answer boundary detection. However, for tasks like synonym and abbreviation detection, the representations are only moderately different from the pre-trained BERT representations. Wallat et al. [131] probe models fine-tuned for various tasks to assess the effect of fine-tuning on (factual) knowledge retention. In their layer-wise experiments, they find the ranking model to be specifically knowledgeable, dropping the least amount of knowledge compared to the question-answering and named entity recognition models. Additionally, large parts, though not all, of the factual knowledge seem to be captured in the latter layers. Petroni et al. [89] identify the requirement of world knowledge for many IR tasks such as open-domain question-answering, slot filling, entity linking, or fact-checking. To understand to what extent do current models capture real-world knowledge, Petroni et al. [89] propose a benchmark containing knowledge-intensive tasks (QA, slot filling, entity linking, fact-checking, among others) all derived from a single Wikipedia corpus.
+
 7.4 Evaluation
-In the past, probing results have been evaluated differently by the interpretability community
-than other post hoc methods. Whereas other methods such as feature attributions have been
-rigorously evaluated concerning metrics such as fidelity or faithfulness, this has not been the case
-in the probing literature. As suggested by Belinkov [9], a standard probing setting can answer the
-question: What information can be decoded from the model’s embeddings? It does not offer a human-
-centered explanation for a specific data instance, but rather provides general information about the
-model. Thereafter, it does not offer interpretability for users but for model developers, although the
-probing methodology has been scrutinized and extended in various works [52, 119, 127]. Given the
-Pre-print
+
+In the past, probing results have been evaluated differently by the interpretability community than other post hoc methods. Whereas other methods such as feature attributions have been rigorously evaluated concerning metrics such as fidelity or faithfulness, this has not been the case in the probing literature. As suggested by Belinkov [9], a standard probing setting can answer the question: What information can be decoded from the model's embeddings? It does not offer a humancentered explanation for a specific data instance, but rather provides general information about the model. Thereafter, it does not offer interpretability for users but for model developers, although the probing methodology has been scrutinized and extended in various works [52, 119, 127]. Given the correct baselines and a tightly controlled setup, it might be able to shed light on the question of What information is learned by training on a specific task? or How easily extractable is information about a concept from the model? [127]. However, it is unclear whether this information is actually being used by the model at inference time [9]. To resolve this, recent studies borrow ideas from causality research to understand whether a specific concept is utilized during the inference using counterfactual representations, where the concept is voided [34, 66]. The model is proven to have used the concept if the counterfactual representations result in worse task performance. In conclusion, while there has been an in-depth evaluation of the probing paradigm by the NLP and interpretability community and many improvements have been proposed, little of that found its way into IR-related probing studies. Future probing studies in IR will need to include learnings and best practices from established research and use them to evaluate and validate the findings for IR models.

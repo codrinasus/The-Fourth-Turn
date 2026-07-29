@@ -1,45 +1,21 @@
 Explainable Information Retrieval: A Survey
-AVISHEK ANAND and LIJUN LYU,Delft University of Technology, The Netherlands
-MAXIMILIAN IDAHL, YUMENG WANG, JONAS WALLAT, and ZIJIAN ZHANG,L3S Research
+
+AVISHEK ANAND and LIJUN LYU, Delft University of Technology, The Netherlands L3S Research
+
+MAXIMILIANIDAHL, YUMENGWANG,JONASWALLAT,andZIJIANZHANG,
+
 Center, Leibniz University Hannover, Germany
-Explainable information retrieval is an emerging research area aiming to make transparent and trustworthy
-information retrieval systems. Given the increasing use of complex machine learning models in search systems,
-explainability is essential in building and auditing responsible information retrieval models. This survey fills a
-vital gap in the otherwise topically diverse literature of explainable information retrieval. It categorizes and
-discusses recent explainability methods developed for different application domains in information retrieval,
-providing a common framework and unifying perspectives. In addition, it reflects on the common concern of
-evaluating explanations and highlights open challenges and opportunities.
+
+Explainable information retrieval is an emerging research area aiming to make transparent and trustworthy information retrieval systems. Given the increasing use of complex machine learning models in search systems, explainability is essential in building and auditing responsible information retrieval models. This survey fills a vital gap in the otherwise topically diverse literature of explainable information retrieval. It categorizes and discusses recent explainability methods developed for different application domains in information retrieval, providing a common framework and unifying perspectives. In addition, it reflects on the common concern of evaluating explanations and highlights open challenges and opportunities.
+
 1 INTRODUCTION
-Information retrieval (IR) systems are one of the most user-centric systems on the Web, in digital
-libraries, and enterprises. Search engines can be general-purpose (e.g., Web search) to specialized
-expert systems that are geared towards expert consumption or support, including legal and patent
-retrieval IR [22], historical search [55, 56], and scholarly search [49, 116]. On the one hand, riding
-on the recent advances of complex machine learning (ML) models trained on large amounts of
-data, IR has seen impressive performance gains over classical models [ 73]. On the other hand,
-complex models also tend to be opaque and less transparent than their classical and arguably
-simpler counterparts. Therefore, towards an important goal of ensuring a reliable and trustworthy
-IR systems, recent years have seen increased interest in the area of explainable information retrieval
-(ExIR).
+
+Information retrieval (IR) systems are one of the most user-centric systems on the Web, in digital libraries, and enterprises. Search engines can be general-purpose (e.g., Web search) to specialized expert systems that are geared towards expert consumption or support, including legal and patent retrieval IR [22], historical search [55, 56], and scholarly search [49, 116]. On the one hand, riding on the recent advances of complex machine learning (ML) models trained on large amounts of data, IR has seen impressive performance gains over classical models [73]. On the other hand, complex models also tend to be opaque and less transparent than their classical and arguably simpler counterparts. Therefore, towards an important goal of ensuring a reliable and trustworthy IR systems, recent years have seen increased interest in the area of explainable information retrieval (ExIR).
+
 1.1 Motivation
-Firstly, in IR, there has been sufficient evidence of how user interaction data from search engines
-can be a source of biases, especially associated with gender and ethnicity [ 13, 83, 100]. When
-undetected and unidentified, the users of an IR system too are exposed to stereotypical biases that
-reinforce known yet unfair prejudices. Secondly, model retrieval models based on transformer-style
-over-parameterized models can be brittle and sensitive to small adversarial errors [132]. Recently
-developed inductive biases, pre-training procedures, and transfer learning practices might lead
-these statistical over-parameterized models to learn shortcuts [44]. Consequently, shortcuts that do
-not align with human understanding results in learning patterns that areright for the wrong reasons.
-Finally, expert users using specialized search systems – in legal search, medicine, journalism,
-and patent search – need control, agency, and lineage of the search results. For all the above
-IR-centric reasons, among many other general reasons – like utility for legal compliance, scientific
-investigation, and model debugging – the field of ExIR provides the tools/primitives to examine
-learning models and the capability to build transparent IR systems.
+
+Firstly, in IR, there has been sufficient evidence of how user interaction data from search engines can be a source of biases, especially associated with gender and ethnicity [13, 83, 100]. When undetected and unidentified, the users of an IR system too are exposed to stereotypical biases that reinforce known yet unfair prejudices. Secondly, model retrieval models based on transformer-style over-parameterized models can be brittle and sensitive to small adversarial errors [132]. Recently developed inductive biases, pre-training procedures, and transfer learning practices might lead these statistical over-parameterized models to learn shortcuts [44]. Consequently, shortcuts that do not align with human understanding results in learning patterns that are right for the wrong reasons . Finally, expert users using specialized search systems - in legal search, medicine, journalism, and patent search - need control, agency, and lineage of the search results. For all the above IR-centric reasons, among many other general reasons - like utility for legal compliance, scientific investigation, and model debugging - the field of ExIR provides the tools/primitives to examine learning models and the capability to build transparent IR systems.
+
 1.2 The Landscape of Explainable Information Retrieval
-Although interpretability in IR is a fairly recent phenomenon, there has been a large amount of
-growing yet unorganized work that covers many tasks and aspects of data-driven models in IR.
-This survey aims to collect, organize and synthesize the progress in ExIR in the last few years. ExIR
-Authors’ addresses: Avishek Anand, avishek.anand@tudelft.nl; Lijun Lyu, L.Lyu@tudelft.nl, Delft University of Technology,
-P.O. Box 1212, Delft, The Netherlands; Maximilian Idahl, idahl@l3s.de; Yumeng Wang, wang@l3s.de; Jonas Wallat, wallat@
-l3s.de; Zijian Zhang, zzhang@l3s.de, L3S Research Center, Leibniz University Hannover, Appelstr. 9a, Hannover, Lower
-Saxony, Germany.
-arXiv:2211.02405v1  [cs.IR]  4 Nov 2022
+
+Although interpretability in IR is a fairly recent phenomenon, there has been a large amount of growing yet unorganized work that covers many tasks and aspects of data-driven models in IR. This survey aims to collect, organize and synthesize the progress in ExIR in the last few years. ExIR

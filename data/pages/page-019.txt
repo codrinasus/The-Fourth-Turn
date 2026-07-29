@@ -1,53 +1,97 @@
-Explainable Information Retrieval: A Survey 19
+Fig. 9. Types of IBD models. Green and gray color refers to mostly interpretable/non-interpretable components, respectively.
+
 X
+
 Explainable Decision Structure
+
 Feature-interaction-based
+
 Prediction
-Explainable Text RankingExplainable Learning-to-rank
-ery Document
+
+Explainable Text Ranking
+
+Explainable Learning-to-rank
+
+
+
+ery
+
+Document
+
 Rationale-based
+
 Feature Aggregation
+
 Prediction
-ery-document Vector
+
+
+
+ery-document Vector
+
 Feature Aggregation
+
 Feature Interaction
-Feat. Extraction Feature Extraction
-bike theft report stolen bicycle online
-bike theft report stolen bicycle online
-Prediction
-ery Document
-Feature Aggregation
-Sparse Input Representation
-Feat. Extraction Feature Extraction
-bike theft stolen
-X
-bicycle
-bike theft report stolen bicycle online
-Prediction
-ery-document Vector
-Feature Aggregation
+
+Feat. Extraction
+
 Feature Extraction
+
+bike
+
+theft
+
+report stolen bicycle online
+
+bike
+
+theft
+
+report stolen bicycle online
+
+Prediction
+
+
+
+ery
+
+Document
+
+Feature Aggregation
+
+Sparse Input Representation
+
+Feat. Extraction
+
+Feature Extraction
+
+bike
+
+theft
+
+stolen
+
+X
+
+bicycle
+
+bike
+
+theft
+
+report stolen bicycle online
+
+Prediction
+
+
+
+ery-document Vector
+
+Feature Aggregation
+
+Feature Extraction
+
 Explicit Feature Contribution
-Fig. 9. Types of IBD models. Green and gray color refers tomostly interpretable/non-interpretable components,
-respectively.
-correct baselines and a tightly controlled setup, it might be able to shed light on the question of
-What information is learned by training on a specific task? or How easily extractable is information
-about a concept from the model? [127]. However, it is unclear whether this information is actually
-being used by the model at inference time [9]. To resolve this, recent studies borrow ideas from
-causality research to understand whether a specific concept is utilized during the inference using
-counterfactual representations, where the concept is voided [ 34, 66]. The model is proven to
-have used the concept if the counterfactual representations result in worse task performance. In
-conclusion, while there has been an in-depth evaluation of the probing paradigm by the NLP and
-interpretability community and many improvements have been proposed, little of that found its
-way into IR-related probing studies. Future probing studies in IR will need to include learnings and
-best practices from established research and use them to evaluate and validate the findings for IR
-models.
+
 8 EXPLAINABLE-BY-ARCHITECTURE MODELS
-We refer to the first family of IBD models as explainable-by-architecture models. Those models can
-be viewed as a modular framework of multiple components (see Figure 9). The general architecture of
-these models involves intermediate feature extraction (that might involve feature attributions), and
-a task-specific decision structure (that might involve feature interactions). Pragmatically speaking,
-not all components are fully interpretable to ensure competitive task performance. Therefore, most
-of the IBD resort to making only specific components interpretable or transparent. In the following,
-we look at two major use cases of such models in text ranking and LTR tasks.
-Pre-print
+
+We refer to the first family of IBD models as explainable-by-architecture models. Those models can be viewed as a modular framework of multiple components (see Figure 9). The general architecture of these models involves intermediate feature extraction (that might involve feature attributions), and a task-specific decision structure (that might involve feature interactions). Pragmatically speaking, not all components are fully interpretable to ensure competitive task performance. Therefore, most of the IBD resort to making only specific components interpretable or transparent. In the following, we look at two major use cases of such models in text ranking and LTR tasks.

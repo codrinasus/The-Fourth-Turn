@@ -1,0 +1,30 @@
+# Optional override: run Docling Serve next to the FastAPI app.
+#
+# Usage:
+#   docker compose -f docker-compose.yml -f docker-compose.ollama.yml -f docker-compose.docling.yml up -d
+#
+# Docling is called by POST /ingest. It parses the PDF from data/in into structured
+# JSON/Markdown artifacts under data/extracted/docling, then the app chunks and indexes them.
+
+services:
+  app:
+    environment:
+      - PDF_PARSER=docling
+      - DOCLING_BASE_URL=http://docling:5001
+    depends_on:
+      docling:
+        condition: service_started
+
+  docling:
+    image: quay.io/docling-project/docling-serve-cpu:latest
+    ports:
+      - "5001:5001"
+    environment:
+      - DOCLING_DEVICE=cpu
+      - DOCLING_SERVE_ENABLE_UI=0
+      - DOCLING_SERVE_ENG_LOC_NUM_WORKERS=1
+    volumes:
+      - docling_cache:/opt/app-root/src/.cache
+
+volumes:
+  docling_cache:

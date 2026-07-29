@@ -23,7 +23,7 @@ Lab hackathon at ESSIR 2026 (*The Fourth Turn*).
 
 1. Put your document in `data/in/`.
 2. **`POST /ingest`** — parse it, embed it, index it in Qdrant. (Out of the box: one vector
-   per page, local sentence-transformers embeddings. No chunking yet — that is yours to add.)
+   per page, local Ollama embeddings. No chunking yet — that is yours to add.)
 3. **`POST /query`** — ask a question at a level (1, 2 or 3). You get an answer with its
    sources, and a copy is written to `data/out/`.
 

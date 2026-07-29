@@ -1,48 +1,9 @@
-20 Avishek Anand, Lijun Lyu, Maximilian Idahl, Yumeng Wang, Jonas Wallat, and Zijian Zhang
 8.1 Explainable Text Rankers
-In text ranking, the need for interpretability is based on large input sizes and complex feature
-interactions. Since documents can be long, it is hard to ascertain what sections of text the query
-terms interact with within a complex model. This problem is particularly acute in the case of
-contextual models with transformers, where the self-attention mechanism essentially considers all
-pairs of interactions between the query and the document terms. Therefore, one strategy of the
-IBD models in the text ranking family focuses on building interpretable query-document interaction
-functions and, in turn, leading to a more transparent decision-making path. In this setup, the query
-and the document are encoded separately by two individual models and each token (or word) is
-represented by a fixed-size embedding vector. Note that this encoding process remains opaque
-for both context-free and contextualized embeddings. A (partially) explainable model employs
-human-understandable functions to measure the degree of query-document interactions, which
-essentially indicates the similarity of the query and the document. The final relevance judgment can
-then be made based on the interactions. Another line of IBD text rankers is focusing on reducing
-the large input space, which we refer to as rationale-based methods. The idea is to use a small set
-of explicit words or sentences as input leading to the final prediction, whereas how the input is
-selected, and how the prediction is made, remains agnostic. There are extensive works in building
-such sorts of models, to highlight the popularity, we will further discuss this method family in
-Section 9.
-8.1.1 Feature Interaction. We summarizethree ranking models, which utilize two BERT/Transformer-
-style encoders to generate the vectorized representations for query and document individually.
-In the following paragraphs, we emphasize on their interaction and decision-making processes,
-showing how the relevance decision can be explained.
-Colbert [63] follows the conventional term-matching strategy. For each query token, it com-
-putes the cosine similarity scores with each token from the document and keeps the maximum
-similarity score. The final document relevance is computed by simply summing up the maximum
-scores of all query tokens. Essentially, Colbert measures the semantic similarity between the query
-and the document, and a document is deemed more relevant if it contains more terms that are
-semantically closer to the query. Boytsov and Kolter [15] propose NeuralModel1, which adds an ex-
-plainable layer, namely Model1 [10] on top of the input embedding. Specifically, the non-parametric
-Model1 layer maintains pairwise similarity statistics between query-document tokens, which are
-learned/computed from parallel datasets beforehand. The final document relevance is combined
-from all query-document similarity scores by the product-of-sum formula. This approach is very
-similar to Colbert, where the cosine similarity computation can also be viewed as an explainable
-layer. NeuralModel1 experimented with slightly more comprehensive similarity learning, resulting
-in lower interpretability. Nevertheless, with a more complex interaction mechanism, NeuralModel1
-achieves better balance in terms of ranking performance and efficiency.
-Transformer-Kernel [54] maintains a matching matrix, where each row represents the cosine
-similarity scores between a particular query token and all document tokens. In contrast to Colbert,
-which simply takes the maximum similarity from each row and sums them up to obtain the query-
-document relevance, Transformer-Kernel transforms the matching matrix to a set of isomorphic
-matrices with RBF-kernels [ 136] and each kernel focuses on a specific similarity range. This
-interaction shares a similar idea as the similarity histogram in DRMM [46] model but employs the
-kernel-pooling technique to solve the non-differentiation of the hard histogram. The final relevance
-score is learned by a feed-forward layer, given the semantic matrices as the input. Therefore,
-the interaction in Transformer-Kernel can be viewed as smoothed semantic similarity, and the
-Pre-print
+
+In text ranking, the need for interpretability is based on large input sizes and complex feature interactions. Since documents can be long, it is hard to ascertain what sections of text the query terms interact with within a complex model. This problem is particularly acute in the case of contextual models with transformers, where the self-attention mechanism essentially considers all pairs of interactions between the query and the document terms. Therefore, one strategy of the IBD models in the text ranking family focuses on building interpretable query-document interaction functions and, in turn, leading to a more transparent decision-making path. In this setup, the query and the document are encoded separately by two individual models and each token (or word) is represented by a fixed-size embedding vector. Note that this encoding process remains opaque for both context-free and contextualized embeddings. A (partially) explainable model employs human-understandable functions to measure the degree of query-document interactions, which essentially indicates the similarity of the query and the document. The final relevance judgment can then be made based on the interactions. Another line of IBD text rankers is focusing on reducing the large input space, which we refer to as rationale-based methods. The idea is to use a small set of explicit words or sentences as input leading to the final prediction, whereas how the input is selected, and how the prediction is made, remains agnostic. There are extensive works in building such sorts of models, to highlight the popularity, we will further discuss this method family in Section 9.
+
+8.1.1 Feature Interaction. Wesummarize three ranking models, which utilize two BERT/Transformerstyle encoders to generate the vectorized representations for query and document individually. In the following paragraphs, we emphasize on their interaction and decision-making processes, showing how the relevance decision can be explained.
+
+Colbert [63] follows the conventional term-matching strategy. For each query token, it computes the cosine similarity scores with each token from the document and keeps the maximum similarity score. The final document relevance is computed by simply summing up the maximum scores of all query tokens. Essentially, Colbert measures the semantic similarity between the query and the document, and a document is deemed more relevant if it contains more terms that are semantically closer to the query. Boytsov and Kolter [15] propose NeuralModel1, which adds an explainable layer, namely Model1 [10] on top of the input embedding. Specifically, the non-parametric Model1 layer maintains pairwise similarity statistics between query-document tokens, which are learned/computed from parallel datasets beforehand. The final document relevance is combined from all query-document similarity scores by the product-of-sum formula. This approach is very similar to Colbert, where the cosine similarity computation can also be viewed as an explainable layer. NeuralModel1 experimented with slightly more comprehensive similarity learning, resulting in lower interpretability. Nevertheless, with a more complex interaction mechanism, NeuralModel1 achieves better balance in terms of ranking performance and efficiency.
+
+Transformer-Kernel [54] maintains a matching matrix, where each row represents the cosine similarity scores between a particular query token and all document tokens. In contrast to Colbert, which simply takes the maximum similarity from each row and sums them up to obtain the querydocument relevance, Transformer-Kernel transforms the matching matrix to a set of isomorphic matrices with RBF-kernels [136] and each kernel focuses on a specific similarity range. This interaction shares a similar idea as the similarity histogram in DRMM [46] model but employs the kernel-pooling technique to solve the non-differentiation of the hard histogram. The final relevance score is learned by a feed-forward layer, given the semantic matrices as the input. Therefore, the interaction in Transformer-Kernel can be viewed as smoothed semantic similarity, and the relevance decision is learned via a neural layer, making the Transformer-Kernel less interpretable in comparison to Colbert and NeuralModel1.

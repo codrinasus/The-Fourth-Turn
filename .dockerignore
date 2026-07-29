@@ -6,6 +6,11 @@ __pycache__/
 .gitignore
 .env
 results/
+data/
+submission/
+questions/
+templates/
+ai_skill/
 docs/
 postman/
 tools/

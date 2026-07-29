@@ -1,59 +1,35 @@
-34 Avishek Anand, Lijun Lyu, Maximilian Idahl, Yumeng Wang, Jonas Wallat, and Zijian Zhang
-[118] Jost Tobias Springenberg, Alexey Dosovitskiy, Thomas Brox, and Martin Riedmiller. 2014. Striving for simplicity: The
-all convolutional net. arXiv preprint arXiv:1412.6806 (2014).
-[119] Pascal Sturmfels, Scott Lundberg, and Su-In Lee. 2020. Visualizing the Impact of Feature Attribution Baselines. Distill
-(2020). https://doi.org/10.23915/distill.00022 https://distill.pub/2020/attribution-baselines.
-[120] Mukund Sundararajan, Ankur Taly, and Qiqi Yan. 2017. Axiomatic Attribution for Deep Networks. In Proceedings
-of the 34th International Conference on Machine Learning, ICML 2017, Sydney, NSW, Australia, 6-11 August 2017
-(Proceedings of Machine Learning Research, Vol. 70) , Doina Precup and Yee Whye Teh (Eds.). PMLR, 3319–3328.
-http://proceedings.mlr.press/v70/sundararajan17a.html
-[121] Ian Tenney, Dipanjan Das, and Ellie Pavlick. 2019. BERT Rediscovers the Classical NLP Pipeline. In Proceedings of
-the 57th Annual Meeting of the Association for Computational Linguistics . Association for Computational Linguistics,
-Florence, Italy, 4593–4601. https://doi.org/10.18653/v1/P19-1452
-[122] Ian Tenney, Patrick Xia, Berlin Chen, Alex Wang, Adam Poliak, R. Thomas McCoy, Najoung Kim, Benjamin Van
-Durme, Samuel R. Bowman, Dipanjan Das, and Ellie Pavlick. 2019. What do you learn from context? Probing for
-sentence structure in contextualized word representations. In7th International Conference on Learning Representations,
-ICLR 2019, New Orleans, LA, USA, May 6-9, 2019 . OpenReview.net. https://openreview.net/forum?id=SJzSgnRcKX
-[123] Richard Tomsett, Dan Harborne, Supriyo Chakraborty, Prudhvi Gurram, and Alun D. Preece. 2020. Sanity Checks
-for Saliency Metrics. In The Thirty-Fourth AAAI Conference on Artificial Intelligence, AAAI 2020, February 7-12, 2020 .
-AAAI Press, 6021–6029. https://aaai.org/ojs/index.php/AAAI/article/view/6064
-[124] Betty van Aken, Benjamin Winter, Alexander Löser, and Felix A. Gers. 2019. How Does BERT Answer Questions?: A
-Layer-Wise Analysis of Transformer Representations. In Proceedings of the 28th ACM International Conference on
-Information and Knowledge Management, CIKM 2019, Beijing, China, November 3-7, 2019 . ACM, 1823–1832. https:
-//doi.org/10.1145/3357384.3358028
-[125] Manisha Verma and Debasis Ganguly. 2019. LIRME: Locally Interpretable Ranking Model Explanation. In Proceedings
-of the 42nd International ACM SIGIR Conference on Research and Development in Information Retrieval, SIGIR 2019,
-Paris, France, July 21-25, 2019 , Benjamin Piwowarski, Max Chevalier, Éric Gaussier, Yoelle Maarek, Jian-Yun Nie, and
-Falk Scholer (Eds.). ACM, 1281–1284. https://doi.org/10.1145/3331184.3331377
-[126] Jesse Vig. 2019. A Multiscale Visualization of Attention in the Transformer Model. In Proceedings of the 57th Annual
-Meeting of the Association for Computational Linguistics: System Demonstrations . Association for Computational
-Linguistics, Florence, Italy, 37–42. https://doi.org/10.18653/v1/P19-3007
-[127] Elena Voita and Ivan Titov. 2020. Information-Theoretic Probing with Minimum Description Length. In Proceedings
-of the 2020 Conference on Empirical Methods in Natural Language Processing (EMNLP) . Association for Computational
-Linguistics, Online, 183–196. https://doi.org/10.18653/v1/2020.emnlp-main.14
-[128] Michael Völske, Alexander Bondarenko, Maik Fröbe, Benno Stein, Jaspreet Singh, Matthias Hagen, and Avishek Anand.
-2021. Towards Axiomatic Explanations for Neural Ranking Models. In ICTIR ’21: The 2021 ACM SIGIR International
-Conference on the Theory of Information Retrieval, Virtual Event, Canada, July 11, 2021 , Faegheh Hasibi, Yi Fang, and
-Akiko Aizawa (Eds.). ACM, 13–22. https://doi.org/10.1145/3471158.3472256
-[129] Ellen M Voorhees. 2006. The TREC 2005 robust track. In ACM SIGIR Forum, Vol. 40. ACM New York, NY, USA, 41–48.
-[130] Eric Wallace, Shi Feng, Nikhil Kandpal, Matt Gardner, and Sameer Singh. 2019. Universal Adversarial Triggers
-for Attacking and Analyzing NLP. In Proceedings of the 2019 Conference on Empirical Methods in Natural Language
-Processing and the 9th International Joint Conference on Natural Language Processing (EMNLP-IJCNLP) . Association for
-Computational Linguistics, Hong Kong, China, 2153–2162. https://doi.org/10.18653/v1/D19-1221
-[131] Jonas Wallat, Jaspreet Singh, and Avishek Anand. 2020. BERTnesia: Investigating the capture and forgetting of
-knowledge in BERT. In Proceedings of the Third BlackboxNLP Workshop on Analyzing and Interpreting Neural Networks
-for NLP. Association for Computational Linguistics, Online, 174–183. https://doi.org/10.18653/v1/2020.blackboxnlp-
-1.17
-[132] Yumeng Wang, Lijun Lyu, and Avishek Anand. 2022. BERT Rankers are Brittle: A Study using Adversarial Document
-Perturbations. In Proceedings of the 2022 ACM SIGIR International Conference on Theory of Information Retrieval .
-115–120.
-[133] Sarah Wiegreffe and Ana Marasovic. 2021. Teach Me to Explain: A Review of Datasets for Explainable Natural
-Language Processing. In Proceedings of the Neural Information Processing Systems Track on Datasets and Benchmarks ,
-J. Vanschoren and S. Yeung (Eds.), Vol. 1. https://datasets-benchmarks-proceedings.neurips.cc/paper/2021/file/
-698d51a19d8a121ce581499d7b701668-Paper-round1.pdf
-[134] Maksymilian Wojtas and Ke Chen. 2020. Feature Importance Ranking for Deep Learning. In Advances in Neural
-Information Processing Systems, Vol. 33. Curran Associates, Inc., 5105–5114. https://proceedings.neurips.cc/paper/
-2020/file/36ac8e558ac7690b6f44e2cb5ef93322-Paper.pdf
-[135] Chen Wu, Ruqing Zhang, Jiafeng Guo, Maarten de Rijke, Yixing Fan, and Xueqi Cheng. 2022. PRADA: Practical
-Black-Box Adversarial Attacks against Neural Ranking Models. ArXiv preprint abs/2204.01321 (2022). https:
-Pre-print
+Jost Tobias Springenberg, Alexey Dosovitskiy, Thomas Brox, and Martin Riedmiller. 2014. Striving for simplicity: The all convolutional net. arXiv preprint arXiv:1412.6806 (2014).
+
+Pascal Sturmfels, Scott Lundberg, and Su-In Lee. 2020. Visualizing the Impact of Feature Attribution Baselines. Distill (2020). https://doi.org/10.23915/distill.00022 https://distill.pub/2020/attribution-baselines.
+
+Mukund Sundararajan, Ankur Taly, and Qiqi Yan. 2017. Axiomatic Attribution for Deep Networks. In Proceedings of the 34th International Conference on Machine Learning, ICML 2017, Sydney, NSW, Australia, 6-11 August 2017 (Proceedings of Machine Learning Research, Vol. 70) , Doina Precup and Yee Whye Teh (Eds.). PMLR, 3319-3328. http://proceedings.mlr.press/v70/sundararajan17a.html
+
+Ian Tenney, Dipanjan Das, and Ellie Pavlick. 2019. BERT Rediscovers the Classical NLP Pipeline. In Proceedings of the 57th Annual Meeting of the Association for Computational Linguistics . Association for Computational Linguistics, Florence, Italy, 4593-4601. https://doi.org/10.18653/v1/P19-1452
+
+Ian Tenney, Patrick Xia, Berlin Chen, Alex Wang, Adam Poliak, R. Thomas McCoy, Najoung Kim, Benjamin Van Durme, Samuel R. Bowman, Dipanjan Das, and Ellie Pavlick. 2019. What do you learn from context? Probing for sentence structure in contextualized word representations. In 7th International Conference on Learning Representations, ICLR 2019, New Orleans, LA, USA, May 6-9, 2019 . OpenReview.net. https://openreview.net/forum?id=SJzSgnRcKX
+
+Richard Tomsett, Dan Harborne, Supriyo Chakraborty, Prudhvi Gurram, and Alun D. Preece. 2020. Sanity Checks for Saliency Metrics. In The Thirty-Fourth AAAI Conference on Artificial Intelligence, AAAI 2020, February 7-12, 2020 . AAAI Press, 6021-6029. https://aaai.org/ojs/index.php/AAAI/article/view/6064
+
+Betty van Aken, Benjamin Winter, Alexander Löser, and Felix A. Gers. 2019. How Does BERT Answer Questions?: A Layer-Wise Analysis of Transformer Representations. In Proceedings of the 28th ACM International Conference on Information and Knowledge Management, CIKM 2019, Beijing, China, November 3-7, 2019 . ACM, 1823-1832. https: //doi.org/10.1145/3357384.3358028
+
+Manisha Verma and Debasis Ganguly. 2019. LIRME: Locally Interpretable Ranking Model Explanation. In Proceedings of the 42nd International ACM SIGIR Conference on Research and Development in Information Retrieval, SIGIR 2019, Paris, France, July 21-25, 2019 , Benjamin Piwowarski, Max Chevalier, Éric Gaussier, Yoelle Maarek, Jian-Yun Nie, and Falk Scholer (Eds.). ACM, 1281-1284. https://doi.org/10.1145/3331184.3331377
+
+Jesse Vig. 2019. A Multiscale Visualization of Attention in the Transformer Model. In Proceedings of the 57th Annual Meeting of the Association for Computational Linguistics: System Demonstrations . Association for Computational Linguistics, Florence, Italy, 37-42. https://doi.org/10.18653/v1/P19-3007
+
+Elena Voita and Ivan Titov. 2020. Information-Theoretic Probing with Minimum Description Length. In Proceedings of the 2020 Conference on Empirical Methods in Natural Language Processing (EMNLP) . Association for Computational Linguistics, Online, 183-196. https://doi.org/10.18653/v1/2020.emnlp-main.14
+
+Michael Völske, Alexander Bondarenko, Maik Fröbe, Benno Stein, Jaspreet Singh, Matthias Hagen, and Avishek Anand. 2021. Towards Axiomatic Explanations for Neural Ranking Models. In ICTIR '21: The 2021 ACM SIGIR International Conference on the Theory of Information Retrieval, Virtual Event, Canada, July 11, 2021 , Faegheh Hasibi, Yi Fang, and Akiko Aizawa (Eds.). ACM, 13-22. https://doi.org/10.1145/3471158.3472256
+
+Ellen M Voorhees. 2006. The TREC 2005 robust track. In ACM SIGIR Forum , Vol. 40. ACM New York, NY, USA, 41-48.
+
+Eric Wallace, Shi Feng, Nikhil Kandpal, Matt Gardner, and Sameer Singh. 2019. Universal Adversarial Triggers for Attacking and Analyzing NLP. In Proceedings of the 2019 Conference on Empirical Methods in Natural Language Processing and the 9th International Joint Conference on Natural Language Processing (EMNLP-IJCNLP) . Association for Computational Linguistics, Hong Kong, China, 2153-2162. https://doi.org/10.18653/v1/D19-1221
+
+Jonas Wallat, Jaspreet Singh, and Avishek Anand. 2020. BERTnesia: Investigating the capture and forgetting of knowledge in BERT. In Proceedings of the Third BlackboxNLP Workshop on Analyzing and Interpreting Neural Networks for NLP . Association for Computational Linguistics, Online, 174-183. https://doi.org/10.18653/v1/2020.blackboxnlp1.17
+
+Yumeng Wang, Lijun Lyu, and Avishek Anand. 2022. BERT Rankers are Brittle: A Study using Adversarial Document Perturbations. In Proceedings of the 2022 ACM SIGIR International Conference on Theory of Information Retrieval . 115-120.
+
+Sarah Wiegreffe and Ana Marasovic. 2021. Teach Me to Explain: A Review of Datasets for Explainable Natural Language Processing. In Proceedings of the Neural Information Processing Systems Track on Datasets and Benchmarks , J. Vanschoren and S. Yeung (Eds.), Vol. 1. https://datasets-benchmarks-proceedings.neurips.cc/paper/2021/file/ 698d51a19d8a121ce581499d7b701668-Paper-round1.pdf
+
+Maksymilian Wojtas and Ke Chen. 2020. Feature Importance Ranking for Deep Learning. In Advances in Neural Information Processing Systems , Vol. 33. Curran Associates, Inc., 5105-5114. https://proceedings.neurips.cc/paper/ 2020/file/36ac8e558ac7690b6f44e2cb5ef93322-Paper.pdf
+
+Chen Wu, Ruqing Zhang, Jiafeng Guo, Maarten de Rijke, Yixing Fan, and Xueqi Cheng. 2022. PRADA: Practical Black-Box Adversarial Attacks against Neural Ranking Models. ArXiv preprint abs/2204.01321 (2022). https:

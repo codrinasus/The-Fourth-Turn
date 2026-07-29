@@ -45,9 +45,9 @@ fork's URL, the nine answers, a technical note, and a Friday presentation.
 
 ## The stack
 
-Python · FastAPI · `uv` · Docker · Qdrant. Backend only (a frontend is optional). Embeddings run
-locally out of the box (sentence-transformers); the LLM works with **LM Studio** (default),
-**Ollama**, or any hosted API via **litellm**.
+Python · FastAPI · `uv` · Docker · Qdrant. Backend only (a frontend is optional). Chat and
+embeddings run locally through **Ollama** by default. PDF parsing uses local **Docling Serve** by
+default so `/ingest` can trigger extraction directly.
 
 ## Quick start
 
@@ -62,17 +62,16 @@ Copy-Item .env.example .env
 # 3. Put your chosen PDF in data/in/
 Copy-Item $HOME\Downloads\your-document.pdf data\in\document.pdf
 
-# 4. Parse it with Marker. This writes ignored, reproducible artifacts to data/extracted/.
-.\scripts\run_marker.ps1
-
-# 5. Pull the local Ollama model once, then bring up the app + Qdrant + Ollama.
-docker compose -f docker-compose.yml -f docker-compose.ollama.yml up -d ollama
-docker compose -f docker-compose.yml -f docker-compose.ollama.yml exec ollama ollama pull qwen3.6
-docker compose -f docker-compose.yml -f docker-compose.ollama.yml up --build
+# 4. Pull the local Ollama model once, then bring up app + Qdrant + Ollama + Docling.
+docker compose -f docker-compose.yml -f docker-compose.ollama.yml -f docker-compose.docling.yml up -d ollama
+docker compose -f docker-compose.yml -f docker-compose.ollama.yml -f docker-compose.docling.yml exec ollama ollama pull qwen3.6
+docker compose -f docker-compose.yml -f docker-compose.ollama.yml -f docker-compose.docling.yml exec ollama ollama pull nomic-embed-text
+docker compose -f docker-compose.yml -f docker-compose.ollama.yml -f docker-compose.docling.yml up -d
 #    app     -> http://localhost:8791      (Swagger UI at /docs)
 #    qdrant  -> http://localhost:6391      (dashboard at /dashboard)
+#    docling -> http://localhost:5001      (API docs at /docs)
 
-# 6. Index your PDF, then ask a question (just question + level)
+# 5. Index your PDF, then ask a question (just question + level)
 curl.exe http://localhost:8791/ingest -H "content-type: application/json" -d "{}"
 curl.exe http://localhost:8791/query  -H "content-type: application/json" `
   -d '{"question": "What is this document about?", "level": 1}'
@@ -96,7 +95,7 @@ app/                 the FastAPI service you build on
 ├── vectorstore/     Qdrant wrapper (list / read / write)
 └── rag/             chunking · embeddings · ingest · retrieve · memory · pipeline  <- the challenge
 data/in/             put YOUR chosen PDF here (committed)
-data/extracted/      ignored Marker outputs consumed by /ingest
+data/extracted/      ignored Docling parser outputs consumed by /ingest
 data/out/            every /query answer is written here (working scratch)
 submission/          your team.json + the nine answers — the deliverable (level-1/2/3)
 questions/           how to write your nine questions (recommendations)
@@ -124,6 +123,8 @@ Start in `app/rag/`.
    into a strategy advisor for this challenge.
 10. [`09_faq.md`](docs/09_faq.md) — common questions.
 11. [`10_contact.md`](docs/10_contact.md) — how to reach the organisers.
+
+12. [`docling-parser.md`](docs/docling-parser.md) - how the Docling parser service is wired.
 
 ## Before you push
 
