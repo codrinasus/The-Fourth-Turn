@@ -363,3 +363,104 @@ request, the strip is a guarantee.
 
 Final state: **25/25 quotes verbatim**, lint and format clean, all nine committed. Still on
 `feat/reranker-and-citations` — the merge to `main` is still yours to make.
+
+
+---
+
+## 11. Overnight: the dropout paper, wider quotes, and a bug the ablation caught
+
+You swapped the document to **Srivastava et al. 2014, "Dropout: A Simple Way to Prevent
+Neural Networks from Overfitting"** (30 pages → 151 chunks → 34 sections) and asked for
+four things. All four are done, merged into `main`, and pushed.
+
+### The nine questions
+
+Rewritten for the new paper and every premise checked against the PDF before committing.
+The factual one you asked for is **q1: "What is the biological motivation for dropout
+described in the paper?"** — page 4, §2, the theory of the role of sex in evolution. q9
+threads the same idea to its empirical test: where the authors actually *show*
+co-adaptation being broken (§7.1, pages 15–16). All nine are in `questions/chosen.json`.
+
+### How the citation matching works — you asked me to explain this
+
+Three stages, and no step is allowed to invent text:
+
+1. **The model says which passages it used.** Context passages are numbered in the prompt;
+   the answer carries `(1)`, `(2, 6)` markers. Only the cited ones become `sources`.
+2. **The code picks the span — it slices, never generates.** Sentences of a cited chunk are
+   scored against the question by the same cross-encoder used for reranking.
+3. **The PDF arbitrates.** The chosen span is looked up in `data/in/srivastava14a.pdf`
+   using **pypdf — a different extractor from the Docling one we index with** — so a match
+   means two independent readers agree the text is there. The lookup returns the PDF's own
+   characters and the page the text is *really* on, which is how citations get their page
+   corrected when Docling labels a block with the page it merely started on.
+
+Matching normalises **only extraction artefacts**, on both sides: whitespace, line-break
+hyphenation, ligatures, and the dash/quote variants the extractors disagree about. Case and
+wording are untouched, so a paraphrase fails. `uv run python scripts/audit_quotes.py`
+reports the number and exits non-zero if any quote fails.
+
+### Whole chunks instead of cut sentences — done, and made safe
+
+You were right that the relevant part was getting cut: the cross-encoder picks the sentence
+best matching the *question*, which is often the sentence beside the one carrying the fact.
+
+Rather than always dumping the chunk and hoping it verifies, it now tries **the whole chunk
+→ the paragraph around the best sentence → the sentence**, and ships the largest one the
+PDF can vouch for. That gives you the full passage whenever it is provable, and cannot
+lower the verbatim rate, because the sentence is still the last resort. **Median quote went
+from ~150 to 580 characters** — q1 now returns the entire Motivation passage, uncut.
+
+### Natural-language search queries — confirmed, and enforced in code
+
+Agreed, and it was already the direction: the model is asked for plain questions, and
+`agent._plain()` strips Lucene syntax if it reaches for `AND`/`OR`/quotes anyway (it did —
+`survey authors argue" AND ("fidelity" OR "faithfulness")`). Stopwords are harmless: BM25
+discounts them by IDF and the embedder wants natural phrasing. Nothing pushes toward
+keywords anywhere in the pipeline.
+
+### The thing worth reading — an ablation that proved my own comment wrong
+
+Running Level 3 with `AGENT_ENABLED=false` showed the reflective loop making q8 **worse**:
+its best passage fell from 0.89 to 0.03. The mechanism was not what I had assumed and had
+written in a code comment. The cross-encoder scores every candidate *independently*, so
+extra candidates can never lower an existing score — the only way a good passage loses is
+by **never reaching the reranker**. Six invented section-specific queries out-voted the
+paragraph that actually lists what each section does; it fell below the 60-candidate pool
+cut and was never scored.
+
+My comment claimed "a wasted round cannot displace an earlier hit, because everything is
+fused at the end". That was false. Two fixes made it true — weighted fusion (question 1.0,
+decomposition 0.7, speculative follow-up 0.4) and a **reserved pool** where half the slots
+belong to the question and its decomposition. After that:
+
+| | loop off | loop on |
+|---|---|---|
+| q7 | p8 0.93 | p8 0.94 |
+| q8 | p3 0.89 | p3 0.83 |
+| q9 | p15 0.03, p16 **0.00** | p16 **0.78**, p15 0.61 |
+
+q9 is the case Level 3 exists for, and only the loop finds it. **`REWRITE_ENABLED` and
+`AGENT_ENABLED` are now real settings**, so both ablations are reproducible rather than
+described, with baselines committed under `docs/ablations/`.
+
+### Final state
+
+| | |
+|---|---|
+| best source score, q1–q9 | 0.81 · 0.99 · 0.97 · 0.97 · **1.00** · 0.96 · 0.94 · 0.83 · 0.78 |
+| quotes verbatim on their cited page | **28/28 (100%)** |
+| answers checked by hand against the PDF | all nine correct, including q7's figures (21.8% TIMIT, 31.05%→29.62% Reuters, both p13) |
+| validation checklist | all five sections PASS |
+| lint / format | clean |
+| `main` | merged and pushed — `5cecf1f` |
+
+### Two things I decided without you, flag them if you disagree
+
+1. **The document filename stayed `srivastava14a.pdf`** rather than being renamed to
+   `document.pdf`. The rules ask for one committed PDF, not a specific name, and the JMLR
+   filename preserves provenance. `_find_pdf` globs, so nothing depends on the name.
+2. **Swapping the document mid-week** is a deviation from the organisers' "keep it all
+   week" wording. It is compliant in substance — one PDF, committed, and all nine answers
+   regenerated against that exact file — but if a juror raises it, the answer is that
+   nothing in the submission refers to the old paper.
