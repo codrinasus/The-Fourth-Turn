@@ -1,24 +1,24 @@
 {
-  "question_id": "q01674e",
+  "question_id": "q984090",
   "level": 3,
   "question": "Across the classification tables in this survey - post-hoc methods, axiomatic methods, explainable-by-architecture models and rationale-based approaches - what is the most common way the quality of explanations is evaluated, and what do the authors themselves say about relying on that kind of evidence?",
-  "answer": "Across the provided classification tables, **anecdotal evaluation** (providing illustrative examples to demonstrate model behavior) is the most common method used to assess explanation quality (1, 2). The authors critique this reliance, noting that \"little formal evaluation of the insights gained through these methods has been done from an interpretability perspective\" and pointing out that only a few studies actually employ established intrinsic metrics like fidelity or human-centered assessments (3). They indicate that depending on anecdotal evidence is insufficient for validating explanation quality, emphasizing that future work must adopt rigorous, standardized evaluation protocols.",
+  "answer": "Across the survey's classification tables and discussed methodologies, **anecdotal examples** (or informal/visual demonstrations) are the most frequently reported approach for evaluating explanation quality. The authors criticize this reliance by noting that there is **\"little formal evaluation of the insights gained through these methods from an interpretability perspective\"** (1). They observe that while some works employ established metrics like fidelity, the field predominantly defaults to anecdotal evidence rather than rigorous faithfulness measures or human-centered validation protocols (2, 3). Consequently, they stress that researchers must move beyond informal proofs and adopt standardized interpretability evaluation metrics and user studies to properly validate explanation quality.",
   "conversation_id": "level-3",
   "sources": [
-    {
-      "page": 10,
-      "quote": "Table 1. Overview of post-hoc explanation methods.",
-      "score": 0.5243
-    },
-    {
-      "page": 15,
-      "quote": "Table 3. Classification of axiomatic methods.",
-      "score": 0.3356
-    },
     {
       "page": 16,
       "quote": "In addition, only Völske et al. [128] use established interpretability evaluation metrics and measure the fidelity of their generated (post-hoc) explanations.",
       "score": 0.2709
+    },
+    {
+      "page": 15,
+      "quote": "Table 3. Classification of axiomatic methods.",
+      "score": 0.3275
+    },
+    {
+      "page": 10,
+      "quote": "Table 1. Overview of post-hoc explanation methods.",
+      "score": 0.5186
     }
   ],
   "diagnostics": {
@@ -28,11 +28,17 @@
     "retrieved_chunks": 8,
     "retrieval_query": "Across the classification tables in this survey - post-hoc methods, axiomatic methods, explainable-by-architecture models and rationale-based approaches - what is the most common way the quality of explanations is evaluated, and what do the authors themselves say about relying on that kind of evidence?",
     "sub_queries": [
-      "What are the most frequently used metrics or methods for evaluating explanation quality across post-hoc, axiomatic, explainable-by-architecture, and rationale-based approaches in the survey?",
-      "What do the authors state regarding the reliability or limitations of relying on these common evaluation methods for evidence?"
+      "How is the quality of explanations primarily evaluated across post-hoc methods, axiomatic methods, explainable-by-architecture models, and rationale-based approaches in the survey?",
+      "What critique or commentary do the authors provide regarding the reliability of this common evaluation method?"
+    ],
+    "retrieval_steps": [
+      "search: 3 queries",
+      "step 1: missing 'The specific evaluation method most common across all four categories and the authors' commentary on relying on that evidence.' → 2 more queries",
+      "step 2: missing 'Information on the most common evaluation method across all four specified categories and authors' critiques of relying on that evidence.' → 2 more queries",
+      "step budget (2) reached"
     ],
     "tokens": null,
-    "latency_ms": 83301,
-    "timestamp": "2026-07-30T17:18:19Z"
+    "latency_ms": 126051,
+    "timestamp": "2026-07-30T21:38:28Z"
   }
 }

@@ -1,8 +1,8 @@
 {
-  "question_id": "q580c2d",
+  "question_id": "qf439c7",
   "level": 3,
   "question": "Summarise the contribution of each section.",
-  "answer": "Based on the provided context, the contributions of each surveyed section are:\n\n- **Feature Attribution & Post-hoc Methods:** Assigns importance scores to input features using isolated black-box components or linear approximations to identify model sensitivity and explain relevance (1, 2). Evaluations typically rely on anecdotal examples rather than rigorous fidelity metrics (3).\n- **Axiomatic Analysis:** Aggregates established IR axioms to build interpretable rankers, align neural models with known relevance constraints for diagnostic analysis, and regularize training to enhance robustness and generalization (4).\n- **Probing & Parametric Analysis:** Uses linear approximators or behavioral-probing setups to attribute ranking performance to specific concepts like term frequency, document length, and semantic similarity, verifying how effectively models capture these underlying properties (2).\n- **Explainable-by-Architecture Models:** Introduces explicit feature contribution methods and transparent decision-tree approaches with reduced input spaces for Learning-to-Rank tasks, utilizing \"soft-rule\" explanations that differ from hard rule paths (3, 5).\n- **Rationale-Based Methods:** Employs a two-stage process to extract sparse, human-understandable rationales, addressing discrete output training challenges through pipeline or end-to-end optimization frameworks (6).\n- **Survey Categorization & Landscape:** Subdivides Interpretable-by-Design approaches into partially/fully interpretable architectural components and feature-sparsity-enforcing rationale methods, while tracing the field's evolution from adapted feature-attribution tools to specialized post-hoc, axiomatic, and design-based techniques (7, 8).",
+  "answer": "Based on the provided context, the contributions across the covered sections are:\n\n- **Explicit Feature Contribution & LTR Models:** NeuralGAM aggregates isolated black-box feature scores via summation to yield transparent relevance decisions, though individual score generation remains opaque (1). This approach emphasizes explicit feature contribution as offering direct, transparent correlations between inputs and predictions beyond standard heatmaps (2). The authors note that while most methods in this area rely on anecdotal examples, NeuralGAM uniquely uses reference tree-models to justify explanation faithfulness (3).\n- **Axiomatic Analysis & Probing:** Researchers align axioms with neural approaches to build rankers, diagnose models, or regularize training to ensure robustness and interpretability (4). Methods use linear approximations to attribute relevance performance to features like term frequency and document length, confirming alignment with IR axioms (5). Additionally, studies classify probing literature by task and concept to verify whether models encode specific properties in architectural components like attention maps or exhibit general behavioral patterns (6).\n- **Rationale-Based Methods:** This framework extracts sparse rationales for task prediction, emphasizing the primary challenge of training modules with discrete outputs (7). It categorizes these approaches into pipeline or end-to-end optimization styles and references a comparative summary table (7).\n- **Limitations & Open Questions:** Current Explainable IR research disproportionately focuses on ranking tasks and system developers, largely overlooking other IR applications and the end-user as the primary stakeholder (8). The authors call for future work to expand beyond these functional biases to address broader use cases and stakeholders (8).",
   "conversation_id": "level-3",
   "sources": [
     {
@@ -11,39 +11,39 @@
       "score": 0.0756
     },
     {
-      "page": 17,
-      "quote": "The resulting coefficients are then used to understand the importance of the corresponding aspects.",
-      "score": 0.0264
-    },
-    {
-      "page": 21,
-      "quote": "A summary of methods can be found in Table 5.",
-      "score": 0.0111
-    },
-    {
-      "page": 14,
-      "quote": "Although there is no general model of relevance yet, previous work aggregated axioms to build axiomatic rankers (Section 6.1), analyze and explain existing neural ranking approaches by aligning them to known axioms (Section 6.2), and use axioms to regularize the training of neural rankers (Section 6.3).",
-      "score": 0.0106
-    },
-    {
       "page": 21,
       "quote": "8.2.1 Explicit Feature Contribution. Different from the previously discussed feature-attribution methods, explicit feature contribution indicates a simple and transparent correlation between each input feature and the relevance prediction, in addition to showing importance heatmaps.",
       "score": 0.0085
     },
     {
+      "page": 21,
+      "quote": "A summary of methods can be found in Table 5.",
+      "score": 0.0107
+    },
+    {
+      "page": 14,
+      "quote": "Although there is no general model of relevance yet, previous work aggregated axioms to build axiomatic rankers (Section 6.1), analyze and explain existing neural ranking approaches by aligning them to known axioms (Section 6.2), and use axioms to regularize the training of neural rankers (Section 6.3).",
+      "score": 0.0111
+    },
+    {
+      "page": 17,
+      "quote": "The resulting coefficients are then used to understand the importance of the corresponding aspects.",
+      "score": 0.0291
+    },
+    {
+      "page": 17,
+      "quote": "Table 4. Classification of the probing literature (Section 7).",
+      "score": 0.0062
+    },
+    {
       "page": 22,
       "quote": "We summarize the approaches in this section in Table 6.",
-      "score": 0.004
+      "score": 0.0041
     },
     {
-      "page": 2,
-      "quote": "Section 8 and Section 9).",
-      "score": 0.0038
-    },
-    {
-      "page": 4,
-      "quote": "Section 8) where components of the model architecture are partially or fully interpretable.",
-      "score": 0.0029
+      "page": 25,
+      "quote": "In this section, we will discuss the limitations, challenges, and open questions in the area of explainable information retrieval.",
+      "score": 0.0048
     }
   ],
   "diagnostics": {
@@ -53,13 +53,18 @@
     "retrieved_chunks": 8,
     "retrieval_query": "Summarise the contribution of each section.",
     "sub_queries": [
-      "What is the main contribution of the first section?",
-      "What is the main contribution of the second section?",
-      "What is the main contribution of the third section?",
-      "What is the main contribution of the final section?"
+      "What is the contribution of section 1?",
+      "What is the contribution of section 2?",
+      "What is the contribution of section 3?"
+    ],
+    "retrieval_steps": [
+      "search: 4 queries",
+      "step 1: missing 'Summaries for sections discussing axiomatic rankers, regularization of neural rankers by axioms, probing literature classification, explicit feature contribution models, transparent decision-tree models, and rationale-based methods.' → 3 more queries",
+      "step 2: missing 'Contributions of Section 6 (Axiomatic IR) and Section 7 (Probing literature)' → 2 more queries",
+      "step budget (2) reached"
     ],
     "tokens": null,
-    "latency_ms": 104598,
-    "timestamp": "2026-07-30T17:19:43Z"
+    "latency_ms": 133502,
+    "timestamp": "2026-07-30T21:40:35Z"
   }
 }

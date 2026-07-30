@@ -154,6 +154,7 @@ def answer(req: QueryRequest) -> QueryResponse:
             retrieved_chunks=len(contexts),
             retrieval_query=retrieval.query,
             sub_queries=retrieval.sub_queries,
+            retrieval_steps=retrieval.steps,
             tokens=None,  # TODO: report real token usage if your provider returns it
             latency_ms=latency_ms,
             timestamp=now.strftime("%Y-%m-%dT%H:%M:%SZ"),

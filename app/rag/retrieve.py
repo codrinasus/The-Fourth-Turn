@@ -9,7 +9,7 @@ from pathlib import Path
 from ..config import get_settings
 from ..llm.base import Message
 from ..vectorstore.qdrant_store import get_store
-from . import decompose, rerank, rewrite
+from . import agent, decompose, rerank, rewrite
 from .bm25_index import BM25Index
 from .embeddings import get_embedder
 
@@ -39,6 +39,7 @@ class Retrieval:
     contexts: list[Context]
     query: str
     sub_queries: list[str] = field(default_factory=list)
+    steps: list[str] = field(default_factory=list)
 
 
 def rewrite_query(question: str, history: list[Message]) -> str:
@@ -202,6 +203,31 @@ def retrieve(
     rankings = [ranking for sub in subs for ranking in _arms(sub, depth)]
     rankings.extend(_arms(query, depth))  # the question itself always gets a vote
 
+    searched = [query, *subs]
+    steps = [f"search: {len(searched)} quer{'y' if len(searched) == 1 else 'ies'}"]
+
+    # Level 3 only: read what came back and search again for whatever is missing. Every
+    # round appends to `rankings`, so a poor follow-up query wastes a round but can never
+    # displace a passage an earlier round found — the fusion below still sees all of it.
+    if level >= 3 and settings.agent_enabled:
+        for step in range(settings.agent_max_steps):
+            # Judge against the best of what we have, not the raw union: the top of the
+            # fused pool is what the answer would actually be built from right now.
+            so_far = _dedup(_fuse(rankings, settings.max_rerank_pool))
+            best = _rerank(query, so_far, top_k)
+            enough, missing, follow_ups = agent.next_queries(
+                question, [c.text for c in best], searched
+            )
+            if enough:
+                steps.append(f"step {step + 1}: evidence sufficient")
+                break
+            log.info("step %d: missing %r — searching %s", step + 1, missing, follow_ups)
+            steps.append(f"step {step + 1}: missing '{missing}' → {len(follow_ups)} more queries")
+            rankings.extend(ranking for q in follow_ups for ranking in _arms(q, depth))
+            searched.extend(follow_ups)
+        else:
+            steps.append(f"step budget ({settings.agent_max_steps}) reached")
+
     # Fuse the whole union and let the cross-encoder see all of it. Previously fusion cut
     # to `depth` first, throwing away a third of the unique candidates before the only
     # component with calibrated scores got a look at them.
@@ -212,5 +238,6 @@ def retrieve(
     return Retrieval(
         contexts=_rerank(query, pool, top_k),
         query=query,
+        steps=steps,
         sub_queries=subs,
     )

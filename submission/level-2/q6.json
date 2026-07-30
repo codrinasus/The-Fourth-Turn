@@ -1,34 +1,19 @@
 {
-  "question_id": "qf6d9f4",
+  "question_id": "q081c04",
   "level": 2,
   "question": "And how do they propose to address it?",
-  "answer": "They propose using local surrogate models instead of global ones to accurately approximate the complex ranker at specific points in the data (1). This approach avoids the pitfall where a single simple model must reconcile conflicting relevance factors across an entire ranking (2). The provided text also notes related strategies such as training interpretable surrogates that operate only on an interpretable feature subset (3), using pipeline architectures to decouple passage selection from scoring, and applying greedy search to maximize the validity and completeness of explanatory features (4, 5).",
+  "answer": "The authors propose addressing this limitation by utilizing **local surrogate models** instead of attempting to approximate the entire decision boundary with a single global model (1). By focusing on specific query regions rather than the full ranking, local surrogates avoid the fidelity degradation caused by multiple and conflicting relevance factors that span across different parts of a complex model's output (2).",
   "conversation_id": "level-2",
   "sources": [
     {
       "page": 7,
       "quote": "This showcases the limitation that simple models, even when trained with a much larger quantity of training data, are not able to faithfully explain all localities of the decision boundary of a complex model and that using local surrogate models can be advantageous.",
-      "score": 0.9885
+      "score": 0.9866
     },
     {
       "page": 25,
-      "quote": "Therefore, rankings with multiple and sometimes conflicting relevance factors for a single simple surrogate model might not be able to provide high fidelity.",
-      "score": 0.4286
-    },
-    {
-      "page": 7,
-      "quote": "On the LTR datasets [96] they find that a faithful interpretable ranker can only be learned for certain query localities.",
-      "score": 0.475
-    },
-    {
-      "page": 23,
-      "quote": "[53] propose the IDCM (Intra-Document Cascading Model) approach to overcome the input length limitations of modern transformer-based rankers.",
-      "score": 0.2209
-    },
-    {
-      "page": 7,
-      "quote": "For LTR models, Singh et al. [115] propose a simple, yet effective greedy search-based approach to find explanations.",
-      "score": 0.1971
+      "quote": "10.1.1 Limiting Assumptions. The underlying assumption for surrogate models is that a simple model can locally approximate the behavior of a complex black-box ranker.",
+      "score": 0.4124
     }
   ],
   "diagnostics": {
@@ -36,10 +21,13 @@
     "chat_model": "qwen3.6:latest",
     "embedding_model": "bge-m3",
     "retrieved_chunks": 5,
-    "retrieval_query": "And how do the authors propose to address the limitation that simple models are not able to faithfully explain all localities of a complex model's decision boundary?",
+    "retrieval_query": "How do the authors propose to address the limitation that simple models cannot faithfully explain all localities of a complex model's decision boundary?",
     "sub_queries": [],
+    "retrieval_steps": [
+      "search: 1 query"
+    ],
     "tokens": null,
-    "latency_ms": 68028,
-    "timestamp": "2026-07-30T17:17:10Z"
+    "latency_ms": 55911,
+    "timestamp": "2026-07-30T21:37:31Z"
   }
 }

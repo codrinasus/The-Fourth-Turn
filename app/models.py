@@ -60,6 +60,14 @@ class Diagnostics(BaseModel):
         ),
         examples=[["What token-level behavior do attention weights reveal?"]],
     )
+    retrieval_steps: list[str] = Field(
+        default_factory=list,
+        description=(
+            "trace of the level-3 reflective retrieval loop: what was searched, what the "
+            "model judged to be missing, and why the loop stopped."
+        ),
+        examples=[["search: 5 queries", "step 1: evidence sufficient"]],
+    )
     tokens: int | None = Field(
         None, description="total tokens for this turn, if known", examples=[3200]
     )

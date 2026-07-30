@@ -1,4 +1,4 @@
-"""Resolve a conversational follow-up into a standalone search query.
+"""Turn the latest turn of a conversation into a search query.
 
 This is the heart of Level 2, and the reason the hackathon is named after it.
 
@@ -12,79 +12,49 @@ that on our own stack — see TECHNICAL_NOTE.md — where a level-2 turn whose h
 already contained the answer still replied "the context does not state", because history
 never reached the retriever.
 
-So the follow-up is resolved **before** embedding, in two stages:
-
-1. `is_context_dependent()` — a cheap linguistic gate. A question carrying a dangling
-   pronoun ("that", "it", "they"), opening with a conjunction ("And how …"), or too short
-   to stand on its own cannot be searched as written. Anything else already has its own
-   content words and is left completely alone, which keeps standalone questions free of
-   both the latency and the risk of a rewrite. The gate tests *grammar*, not topic — it
-   knows nothing about this document or these nine questions.
-2. `standalone_query()` — the chat model rewrites the follow-up against the recent turns
-   into one self-contained question, with the antecedents substituted in.
+So whenever there is a conversation, the model reads it and writes the query. There is no
+heuristic deciding *whether* a question needs resolving: an earlier version of this module
+gated on grammar (dangling pronoun, continuation opener, question length) and only called
+the model when the gate fired. That gate was wrong in both directions — it rewrote
+"What is **this** survey about?", which needs nothing, and it would sail past "What about
+legal search?" if phrased with enough words. Deciding what a question refers to *is* a
+language-understanding problem, so it belongs to the language model, not to a regex. The
+model is told to return a self-contained question unchanged, which is the same judgement
+the gate was trying to make, made by something equipped to make it.
 
 The rewrite is treated as untrusted output: it is validated (single line, bounded length,
-non-empty, not a refusal) and on any failure we fall back to *previous question + current
-question* concatenated, which is a strictly better retrieval query than the bare follow-up
-and needs no model at all.
+non-empty) and on any failure we fall back to *previous question + current question*
+concatenated, which is a strictly better retrieval query than a bare follow-up and needs
+no model at all.
 """
 
 from __future__ import annotations
 
 import logging
-import re
 
 from ..llm.base import LLMError, Message
 from ..llm.factory import get_client
 
 log = logging.getLogger(__name__)
 
-# Words that can only refer to something already said. "it"/"they"/"them" are matched as
-# whole words so "item" or "therapy" do not trip the gate.
-_DEPENDENT = re.compile(
-    r"\b(that|those|these|this|it|its|they|them|their|he|she|his|her|"
-    r"the former|the latter|the same|such)\b",
-    re.IGNORECASE,
-)
-# A question that opens with a conjunction or a bare wh-word is continuing a thread.
-_CONTINUATION = re.compile(
-    r"^\s*(and|but|so|also|then|plus|what about|how about|why|why not|how come|"
-    r"anything else|which one|ok|okay)\b",
-    re.IGNORECASE,
-)
-
-_MIN_STANDALONE_WORDS = 6  # below this there is rarely enough content to retrieve on
 _MAX_QUERY_CHARS = 400  # a rewrite longer than this is prose, not a query
 _HISTORY_TURNS = 3  # recent turns shown to the rewriter
 _ANSWER_BUDGET = 600  # chars of each past answer kept as antecedent material
 
 _SYSTEM = (
-    "You rewrite the last question of a conversation so that it can be understood on its "
-    "own, with no conversation attached.\n"
+    "You write the search query for the last question in a conversation, so that it can be "
+    "used to search a document with no conversation attached.\n"
     "Rules:\n"
-    "- Replace every pronoun and reference to earlier turns with the thing it refers to.\n"
-    "- Keep the user's intent exactly. Do not answer the question.\n"
-    "- Do not add facts that are not in the conversation.\n"
-    "- If the question already stands on its own, repeat it unchanged.\n"
-    "- Reply with the rewritten question only: one line, no preamble, no quotes."
+    "- Replace every pronoun and every reference to an earlier turn with the thing it "
+    "refers to. 'Why does that happen?' must name what 'that' is.\n"
+    "- Resolve an ambiguous reference to ONE thing — the main subject of the previous "
+    "answer. Never expand it into a list of everything that was mentioned.\n"
+    "- If the question already stands on its own, repeat it EXACTLY as written. Do not "
+    "append background, qualifiers or facts from earlier answers to it.\n"
+    "- Ask about one thing. The result must be a single, short question.\n"
+    "- Do not answer the question. Do not add facts that are not in the conversation.\n"
+    "- Reply with the question only: one line, no preamble, no quotes, no explanation."
 )
-
-
-def is_context_dependent(question: str) -> bool:
-    """True when the question cannot be retrieved on its own as written.
-
-    Deliberately grammatical: dangling reference, continuation opener, or too few words
-    to carry content. It never inspects the topic, so it behaves the same on any
-    document and cannot encode knowledge of a specific question.
-    """
-    stripped = question.strip()
-    if not stripped:
-        return False
-    if _CONTINUATION.match(stripped):
-        return True
-    if _DEPENDENT.search(stripped):
-        return True
-    return len(stripped.split()) < _MIN_STANDALONE_WORDS
 
 
 def _recent(history: list[Message]) -> list[Message]:
@@ -129,31 +99,32 @@ def _clean(reply: str) -> str | None:
 def standalone_query(question: str, history: list[Message]) -> str:
     """`question` rewritten so it can be retrieved without the conversation.
 
-    Returns the original question untouched when there is no history or the question is
-    already self-contained. Never raises: every failure path degrades to `_fallback`.
+    The first turn of a conversation has nothing to resolve against and is returned as
+    asked. After that the model always gets a say. Never raises: every failure path
+    degrades to `_fallback`.
     """
-    if not history or not is_context_dependent(question):
+    if not history:
         return question
 
-    messages: list[Message] = [{"role": "system", "content": _SYSTEM}]
     conversation = "\n".join(
         f"{'User' if m['role'] == 'user' else 'Assistant'}: {m['content']}"
         for m in _recent(history)
     )
-    messages.append(
+    messages: list[Message] = [
+        {"role": "system", "content": _SYSTEM},
         {
             "role": "user",
             "content": (
                 f"Conversation so far:\n{conversation}\n\n"
-                f"Question to rewrite: {question}\n\n"
-                "Rewritten standalone question:"
+                f"Question to turn into a search query: {question}\n\n"
+                "Search query:"
             ),
-        }
-    )
+        },
+    ]
 
     try:
         # No reasoning here: substituting an antecedent is mechanical, and thinking on a
-        # local 8B model costs more latency than the rewrite itself.
+        # local model costs more latency than the rewrite itself.
         rewritten = _clean(get_client().chat(messages, thinking=False))
     except LLMError as e:
         log.warning("query rewrite unavailable (%s) — falling back to history concatenation", e)
@@ -163,5 +134,8 @@ def standalone_query(question: str, history: list[Message]) -> str:
         log.warning("query rewrite returned nothing usable — falling back to concatenation")
         return _fallback(question, history)
 
-    log.info("rewrote %r -> %r", question, rewritten)
+    if rewritten == question:
+        log.info("query kept as asked: %r", question)
+    else:
+        log.info("rewrote %r -> %r", question, rewritten)
     return rewritten

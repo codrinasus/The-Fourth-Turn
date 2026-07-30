@@ -1,14 +1,24 @@
 {
-  "question_id": "qed8ba2",
+  "question_id": "q9d10da",
   "level": 1,
   "question": "How does the survey categorise the evaluation of explanations?",
-  "answer": "The survey categorizes evaluation approaches into application-grounded, human-grounded, and functionality-grounded (1).",
+  "answer": "The survey classifies evaluation approaches into three categories: application-grounded, human-grounded, and functionality-grounded (1). In information retrieval, most techniques focus on functionally grounded evaluations, which are often referred to as intrinsic methods that assess quality based on fidelity, validity, completeness, and human congruence (2). Additionally, human evaluations are distinguished by participant expertise (experts vs. non-experts) and methodology (anecdotal vs. fine-grained/task-based) (3).",
   "conversation_id": "level-1",
   "sources": [
     {
       "page": 5,
       "quote": "Functionality-grounded evaluation does not involve humans and relies on a closed-form definition of interpretability that serves as a proxy to evaluate the explanation quality.",
       "score": 0.7629
+    },
+    {
+      "page": 26,
+      "quote": "10.2.3 Evaluation of Explanations. Evaluation of explanations is a general problem in the area of interpretable machine learning.",
+      "score": 0.7451
+    },
+    {
+      "page": 5,
+      "quote": "Evaluations can be simply anecdotal. In this case, example explanations are shown to users, and typically binary judgments regarding the goodness of the explanations are elicited.",
+      "score": 0.4682
     }
   ],
   "diagnostics": {
@@ -18,8 +28,11 @@
     "retrieved_chunks": 5,
     "retrieval_query": "How does the survey categorise the evaluation of explanations?",
     "sub_queries": [],
+    "retrieval_steps": [
+      "search: 1 query"
+    ],
     "tokens": null,
-    "latency_ms": 34689,
-    "timestamp": "2026-07-30T17:14:34Z"
+    "latency_ms": 50649,
+    "timestamp": "2026-07-30T21:34:48Z"
   }
 }

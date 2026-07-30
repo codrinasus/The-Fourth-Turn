@@ -303,3 +303,63 @@ built on evidence rather than on a guessed constant.
 
 Read `TECHNICAL_NOTE.md` before Friday — it is what the jury reads, and §5 ("what broke")
 is the part worth being able to defend out loud.
+
+---
+
+## 10. Your two changes: no gate, and a ReAct loop for Level 3
+
+**The grammatical gate is gone.** `rag/rewrite.py` now calls the model whenever there is
+history, and the model decides — it is told to repeat a self-contained question exactly. In
+the final run it does that for six of the nine and rewrites q5, q6 and q9. You were right
+about the principle; the gate was making wrong calls in both directions (it would rewrite
+"What is *this* survey about?", and miss "What about legal search?").
+
+It was not free, though, and the first run after removing it was **worse** — worth knowing
+because it is the argument someone will make against the change:
+
+- q2 got contaminated. "…according to the survey" became "…according to the survey *that
+  considers 68 papers, and a subset of 32 of them receive a more detailed treatment*" — it
+  glued q1's answer onto an unrelated question.
+- q5 over-resolved. q4's answer lists three limitations, so "that" became all three, and q5
+  and q6 went straight back to hedging ("If you are referring to…") — the exact failure the
+  rewriting exists to cure.
+
+Both were prompt problems, not architecture problems. The rewriter is now told to resolve an
+ambiguous reference to **one** thing — the main subject of the previous answer, never a list
+— and to repeat a self-contained question *exactly* rather than enriching it. That fixed
+both: q5 back to 0.67, q6 to 0.99, no hedging, and q2 left alone.
+
+**`rag/agent.py` is the ReAct loop.** After retrieving, the model sees the best passages and
+answers one question: is this enough, and if not, what is missing? Its follow-up queries get
+searched and appended to the same pool. Three properties I was careful about:
+
+- it judges **evidence, not its own answer** — asking a model whether it likes its answer
+  invites it to loop until it agrees with itself; asking whether passages contain a fact is
+  a checklist;
+- it **cannot lose evidence** — every round appends to one pool that is fused and reranked
+  once at the end, so a bad follow-up wastes a round but cannot displace an earlier hit;
+- it **always terminates** — budget of 2, stop when it proposes nothing new, stop on any
+  LLM error. The trace is in `diagnostics.retrieval_steps`.
+
+**Measured, and the honest read is one win in three:**
+
+| | decompose only | + loop |
+|---|---|---|
+| q7 | p10 0.52, p15 0.34, p16 0.27 | 0.52 / 0.33 / 0.27 — **no gain**, 2 steps spent |
+| q8 | p21 0.08 + near-zeros | same — **no gain**, structure still comes from the outline |
+| q9 | p1 0.16, p17 0.67, p9 0.06 | p17 **0.84**, **p8 0.23** — the only thing that ever retrieves §3.2.2 |
+| latency | 83–105 s | 105–134 s |
+
+q9 is the case Level 3 is actually about — the question names §3.2.2 and §7.2, and only the
+loop found §3.2.2. q7 and q8 pay ~40 s for nothing. I kept it because the q9 gain is real
+and a wasted round is harmless, but it is not a uniform win and the note says so.
+
+**One defect worth seeing**, because it is invisible unless you read the generated queries.
+Asked for a "search query", the model wrote Lucene:
+`survey authors argue" AND ("fidelity" OR "faithfulness")`. Our embedder encodes the
+operators as words and BM25 matches `AND` and the quotes as literal tokens. The prompt now
+asks for plain questions *and* `_plain()` strips the syntax in code — a prompt rule is a
+request, the strip is a guarantee.
+
+Final state: **25/25 quotes verbatim**, lint and format clean, all nine committed. Still on
+`feat/reranker-and-citations` — the merge to `main` is still yours to make.

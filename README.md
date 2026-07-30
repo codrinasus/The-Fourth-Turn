@@ -127,6 +127,7 @@ Inside `app/rag/`, in the order a question passes through them:
 | `memory.py` | per-level conversation history |
 | `rewrite.py` | **Level 2** — resolves a follow-up into a standalone query *before* retrieval |
 | `decompose.py` | **Level 3** — splits a whole-document question into sub-questions |
+| `agent.py` | **Level 3** — reads the evidence, judges whether it is enough, searches again |
 | `retrieve.py` | dense + BM25 per query, RRF over all arms, dedup, cross-encoder rerank |
 | `rerank.py` | `bge-reranker-v2-m3` client; calibrated 0–1 scores |
 | `citations.py` | which passages the answer used, and which span of each is the evidence |

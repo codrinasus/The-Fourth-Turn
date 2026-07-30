@@ -76,6 +76,13 @@ class Settings(BaseSettings):
     top_k: int = 5  # how many results a query retrieves
     top_k_level3: int = 8  # whole-document questions need evidence from more places
 
+    # Level 3 reflective retrieval (app/rag/agent.py): after retrieving, the model reads
+    # the evidence and searches again for whatever is missing. Each step costs one short
+    # LLM call plus a retrieval pass. The budget is a hard stop — the loop also ends as
+    # soon as the model says the evidence is sufficient or proposes nothing new.
+    agent_enabled: bool = True
+    agent_max_steps: int = 2
+
     # The Docling pages are split into page-grounded chunks before indexing.
     chunk_size: int = 800  # target characters per chunk
     chunk_overlap: int = 0  # neighbour context will come from retrieval expansion later
