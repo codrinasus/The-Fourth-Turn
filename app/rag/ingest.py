@@ -17,9 +17,9 @@ from qdrant_client import models
 from ..config import get_settings
 from ..models import IngestResponse
 from ..vectorstore.qdrant_store import get_store
-from .chunking import Chunk, chunk_pages
+from .chunking import Chunk, chunk_blocks, chunk_pages
 from .embeddings import get_embedder
-from .pdf_parser import active_parser_name, extract_pages
+from .pdf_parser import active_parser_name, extract_blocks, extract_pages
 from .retrieve import reset_retrieval_indexes
 
 # A fixed namespace so re-ingesting the same document overwrites its points
@@ -78,17 +78,22 @@ def ingest(filename: str | None = None, reset: bool = False) -> IngestResponse:
     pages = extract_pages(path)
     dump_pages(pages)
 
-    chunks = chunk_pages(pages)
+    # Prefer the structure-aware path: chunk boundaries then fall on the document's own
+    # section headings instead of on a character count.
+    blocks = extract_blocks(path)
+    chunks = chunk_blocks(blocks) if blocks else chunk_pages(pages)
     if not chunks:
         raise ValueError(f"{path.name} produced no text — is it a scanned/image PDF?")
     dump_chunks(chunks)
     reset_retrieval_indexes()
 
     # Embed in batches. is_query=False marks these as documents ("passage:" for e5).
+    # `embed_text` carries the section breadcrumb, so a chunk from deep inside a section
+    # still vectorises as belonging to it; the payload keeps `text` verbatim for quoting.
     vectors: list[list[float]] = []
     batch = 32
     for i in range(0, len(chunks), batch):
-        texts = [c.text for c in chunks[i : i + batch]]
+        texts = [c.embed_text for c in chunks[i : i + batch]]
         vectors.extend(embedder.embed(texts, is_query=False))
 
     store.ensure_collection(dim=len(vectors[0]), reset=reset)
@@ -102,6 +107,7 @@ def ingest(filename: str | None = None, reset: bool = False) -> IngestResponse:
                 "page": c.page,
                 "chunk_index": c.index,
                 "section": c.section,
+                "heading_path": c.heading_path,
                 "kind": c.kind,
                 "source": path.name,
                 "parser": active_parser_name(),

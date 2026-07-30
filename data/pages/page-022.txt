@@ -1,4 +1,10 @@
 Table 5. Explainable-by-architecture Methods. Components indicate which component of the model architecture is explainable. Note that Colbert did not discuss or evaluate explainability. More similar datasets are used in each paper, and we choose one as representative.
+Method | Task | Components | Explanation | Dataset | Evaluation
+Colbert [63] | Text Ranking | Interaction | Soft-rule | MS MARCO | -
+Transformer-Kernel [54] | Text Ranking | Interaction | Soft-rule | MS MARCO | Anecdotal
+NeuralModel1 [15] | Text Ranking | Interaction | Soft-rule | MS MARCO | Anecdotal
+NeuralGAM [149] | LTR | Input | Feature Attr. | Yahoo | Reference
+ILMART [75] | LTR | Fully | Hard-rule | Yahoo | Anecdotal
 
 9 RATIONALE-BASED METHODS
 
@@ -6,51 +12,8 @@ The second class of IBD methods deals to enhance the interpretability of IR mode
 
 Fig. 10. Example of a binary rationale selection. First, a subset of tokens is selected. Then, a prediction is made based on the selected rationale tokens. Selected rationales are highlighted in orange.
 
-
-
-ery:
-
-can you do yoga from a chair
-
-Rank
-
-Score
-
-Document Text
-
-
-
-ery:
-
-can you do yoga from a chair
-
-Rank
-
-Score
-
-Document Text
-
-1
-
-2
-
-9.37
-
-9.34
-
-10 Yoga Poses You Can Do in a Chair | Chair pose yoga, Chair yoga, Yoga poses ...
-
-Chair Hip Opening And Strength Flow Yoga | Yoga Sequences, Benefits ...
-
 We summarize the approaches in this section in Table 6. The feature extraction stage in rationalebased models is sometimes called the selection or rationale-generation stage [70, 146]. The major challenge in rationale-based methods is training the rationale-extraction module due to the discrete rationale output of this stage. There are essentially two types of rationale-based methods based on the optimization styles pipeline or end-to-end .
 
 9.1 Pipeline Approaches
 
 A rationale-based model is a pipeline model if the rationale-extraction module is trained separately from the task prediction module. Most pipeline methods require the presence of human-annotated, extractive rationale data to train the rationale-extraction network. The first pipeline model was proposed by Lehman et al. [68]. Their approach was proposed for the analysis of clinical trial reports, where the aim is to predict whether the clinical trial causes a significant effect compared with the control group. The reports are themselves annotated by human experts, where experts do annotate not only the significance of the trial but also the snippet of the reports as the rationale supporting such prediction. This constitutes the training data for the rationale-extraction module.
-
-Method | Task | Components | Explanation | Dataset | Evaluation
-Colbert [63] | Text Ranking | Interaction | Soft-rule | MS MARCO | -
-Transformer-Kernel [54] | Text Ranking | Interaction | Soft-rule | MS MARCO | Anecdotal
-NeuralModel1 [15] | Text Ranking | Interaction | Soft-rule | MS MARCO | Anecdotal
-NeuralGAM [149] | LTR | Input | Feature Attr. | Yahoo | Reference
-ILMART [75] | LTR | Fully | Hard-rule | Yahoo | Anecdotal

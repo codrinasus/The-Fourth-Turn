@@ -18,18 +18,22 @@ from ..config import get_settings
 from ..llm.base import LLMError, Message
 from ..llm.factory import get_client
 from ..models import Diagnostics, QueryRequest, QueryResponse, Source
-from . import memory
+from . import citations, memory
 from .retrieve import Context, retrieve
 
 SYSTEM_PROMPT = (
     "You answer questions about a single document using only the context provided. "
     "If the context does not contain the answer, say so plainly rather than guessing. "
-    "Be specific and concise."
+    "Be specific and concise.\n"
+    "The context passages are numbered (1), (2), (3). Cite the passage you took each claim "
+    "from by writing its number in parentheses right after the claim — for example: "
+    "'The authors evaluate on MS MARCO (2).' Cite only passages you actually used; do not "
+    "cite a passage you did not rely on, and do not invent numbers."
 )
 
 
 def _build_messages(question: str, contexts: list[Context], history: list[Message]) -> list[Message]:
-    context_block = "\n\n".join(f"[page {c.page}] {c.text}" for c in contexts) or "(no context retrieved)"
+    context_block = citations.number_contexts(contexts)
     messages: list[Message] = [{"role": "system", "content": SYSTEM_PROMPT}]
     # Prior turns give the model the conversation so far (Level 2). Retrieval still
     # needs the rewritten query — history in the prompt is necessary but not sufficient.
@@ -43,16 +47,24 @@ def _build_messages(question: str, contexts: list[Context], history: list[Messag
     return messages
 
 
-def _sources_from(contexts: list[Context]) -> list[Source]:
-    # Baseline: the retrieved units become the citations, truncated to a short quote.
-    # TODO(level-1): a page (or chunk) is not a precise citation. Return the specific
-    #   sentence that supports the answer, with its correct page — not the whole unit.
+def _sources_from(question: str, contexts: list[Context], cited: list[int]) -> list[Source]:
+    """One Source per *cited* passage, quoting the sentence that supports the answer.
+
+    `cited` holds the context indices the model marked. When it cites nothing (or the LLM
+    was unavailable) we fall back to the retrieval order, so an answer is never left
+    unevidenced — but the quote is still a real sentence rather than a truncated chunk.
+    """
+    chosen = cited or list(range(len(contexts)))
     out: list[Source] = []
-    for c in contexts:
-        quote = c.text.strip().replace("\n", " ")
-        if len(quote) > 300:
-            quote = quote[:300].rsplit(" ", 1)[0] + "…"
-        out.append(Source(page=c.page, quote=quote, score=round(c.score, 4)))
+    for i in chosen:
+        c = contexts[i]
+        out.append(
+            Source(
+                page=c.page,
+                quote=citations.evidence_quote(question, c),
+                score=round(c.score, 4),
+            )
+        )
     return out
 
 
@@ -92,6 +104,11 @@ def answer(req: QueryRequest) -> QueryResponse:
             "no generated answer."
         )
 
+    # The model cites the prompt's numbering; keep only what it used and renumber so
+    # "(1)" in the answer points at sources[0].
+    cited = citations.parse_markers(answer_text, len(contexts))
+    answer_text = citations.renumber(answer_text, cited)
+
     memory.append(conversation_id, req.question, answer_text)
     latency_ms = int((time.perf_counter() - started) * 1000)
 
@@ -101,7 +118,7 @@ def answer(req: QueryRequest) -> QueryResponse:
         question=req.question,
         answer=answer_text,
         conversation_id=conversation_id,
-        sources=_sources_from(contexts),
+        sources=_sources_from(req.question, contexts, cited),
         diagnostics=Diagnostics(
             provider=settings.llm_provider,
             chat_model=settings.chat_model,

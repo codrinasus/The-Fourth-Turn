@@ -1,13 +1,5 @@
 Fig. 5. Example bar chart visualization of feature attributions for different groups of tokens.
 
-Regular Words-
-
-Stopwords-
-
-Special Tokens-
-
-Avg. Importance
-
 In addition to Integrated Gradients, Zhan et al. [141] also use attention weights to obtain feature attributions for a BERT-based ranking model. With an experimental setup similar to Qiao et al. [95], they compute attribution scores for different groups of input tokens: The special '[CLS]' and '[SEP]' tokens, the query tokens, the document tokens, and the period token. While confirming that a significant amount of attention weight is distributed to the special tokens and the period token, the authors also find that the attributions produced using attention weights are negatively correlated with the attributions produced by Integrated Gradients. Based on their results, the authors speculate that these tokens receive high attention weights due to their high document frequency. They argue that the model dumps redundant attention on these tokens, while these actually carry little relevance information.
 
 3.3 Evaluating Feature Attributions

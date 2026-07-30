@@ -1,0 +1,37 @@
+# Optional override: run the cross-encoder reranker next to the app.
+#
+# Usage (with the rest of the stack):
+#   docker compose -f docker-compose.yml -f docker-compose.ollama.yml \
+#                  -f docker-compose.docling.yml -f docker-compose.reranker.yml up -d
+#
+# llama.cpp's server exposes an OpenAI-shaped /v1/rerank. It serves
+# BAAI/bge-reranker-v2-m3 (568M, multilingual — the cross-encoder sibling of the bge-m3
+# embedder we retrieve with) as Q8_0 GGUF, ~600 MB. The image is arm64-native, so it runs
+# on Apple Silicon without emulation; the model is downloaded once into a named volume.
+#
+# app/rag/rerank.py scores the fused dense+BM25 candidates against the query and keeps the
+# best TOP_K. If this service is down, retrieval degrades to fusion order rather than failing.
+
+services:
+  app:
+    environment:
+      - RERANKER_BASE_URL=http://reranker:8080
+    depends_on:
+      reranker:
+        condition: service_started
+
+  reranker:
+    image: ghcr.io/ggml-org/llama.cpp:server
+    command: >
+      --hf-repo gpustack/bge-reranker-v2-m3-GGUF
+      --hf-file bge-reranker-v2-m3-Q8_0.gguf
+      --reranking
+      --host 0.0.0.0 --port 8080
+      -c 4096
+    ports:
+      - "8792:8080"
+    volumes:
+      - reranker_models:/root/.cache/llama.cpp
+
+volumes:
+  reranker_models:

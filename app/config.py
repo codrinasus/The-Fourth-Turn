@@ -18,9 +18,15 @@ class Settings(BaseSettings):
 
     # --- Chat provider (the model that writes answers) ----------------------
     # One of: "lmstudio", "ollama", "litellm". This team uses local Ollama.
-    # qwen3:8b is the default because qwen3.6 needs more RAM than this Docker setup has.
+    # qwen3.6 is a reasoning model and needs noticeably more RAM than qwen3:8b — if Docker
+    # cannot give Ollama enough, fall back to CHAT_MODEL=qwen3:8b in .env.
     llm_provider: str = "ollama"
-    chat_model: str = "qwen3:8b"
+    chat_model: str = "qwen3.6"
+
+    # Thinking is ON: qwen3 reasons before answering and the answers are better for it.
+    # The <think> block itself is stripped in app/llm/base.py so it never reaches the
+    # graded `answer` field. Set false only to trade quality for speed.
+    ollama_thinking: bool = True
 
     ollama_base_url: str = "http://localhost:11434"     # keep Ollama's default port
     lmstudio_base_url: str = "http://localhost:1234"    # keep LM Studio's default port
@@ -28,11 +34,13 @@ class Settings(BaseSettings):
     litellm_api_key: str | None = None
 
     # --- Embeddings (turning text into vectors) -----------------------------
-    # Use provider embeddings so Ollama owns both chat and vectors.
-    # Pull `nomic-embed-text` once before ingest.
+    # Use provider embeddings so Ollama owns both chat and vectors — no
+    # sentence-transformers in the image. Pull `bge-m3` once before ingest.
+    # bge-m3 is 1024-dim (nomic-embed-text was 768), so switching needs a re-ingest
+    # with reset: true. It is a symmetric model: no query/passage prefixes.
     # IMPROVING EMBEDDINGS IS PART OF THE CHALLENGE — see app/rag/embeddings.py.
     embedding_backend: str = "provider"
-    embedding_model: str = "nomic-embed-text"
+    embedding_model: str = "bge-m3"
 
     # --- PDF parsing --------------------------------------------------------
     # Docling is active because `/ingest` can trigger parsing through a local
@@ -51,6 +59,15 @@ class Settings(BaseSettings):
     # this to the in-container hostname. The container itself still speaks 6333.
     qdrant_url: str = "http://localhost:6391"
     qdrant_collection: str = "aim_hackathon"
+
+    # --- Reranking ----------------------------------------------------------
+    # BAAI/bge-reranker-v2-m3 served by llama.cpp (docker-compose.reranker.yml). The
+    # cross-encoder rescores the fused dense+BM25 pool; TOP_K survive into the prompt.
+    # If the service is down, retrieval falls back to fusion order.
+    reranker_enabled: bool = True
+    reranker_base_url: str = "http://localhost:8792"
+    reranker_timeout: float = 90.0
+    rerank_candidates: int = 20    # size of the pool handed to the cross-encoder
 
     # --- Retrieval ----------------------------------------------------------
     top_k: int = 5                 # how many results a query retrieves

@@ -30,9 +30,6 @@ services:
       # answers live in ./submission. All bind-mounted so they survive rebuilds.
       - ./data:/app/data
       - ./submission:/app/submission
-      # Embedding model weights (~2 GB). Without this they live in the container's
-      # writable layer and are re-downloaded on every rebuild/recreate.
-      - hf_cache:/root/.cache/huggingface
     depends_on:
       qdrant:
         condition: service_started
@@ -49,4 +46,3 @@ services:
 
 volumes:
   qdrant_storage:
-  hf_cache:

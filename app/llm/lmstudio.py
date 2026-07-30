@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import httpx
 
-from .base import LLMError, Message
+from .base import LLMError, Message, strip_thinking
 
 
 class LMStudioClient:
@@ -27,7 +27,7 @@ class LMStudioClient:
                 timeout=self.timeout,
             )
             resp.raise_for_status()
-            return resp.json()["choices"][0]["message"]["content"]
+            return strip_thinking(resp.json()["choices"][0]["message"]["content"])
         except Exception as e:
             raise LLMError(f"lmstudio chat failed: {e}") from e
 

@@ -11,14 +11,14 @@ data/in/document.pdf -> POST /ingest -> Docling Serve -> chunks -> embeddings ->
 Start the stack:
 
 ```powershell
-docker compose -f docker-compose.yml -f docker-compose.ollama.yml -f docker-compose.docling.yml up -d
+docker compose -f docker-compose.yml -f docker-compose.ollama.yml -f docker-compose.docling.yml -f docker-compose.reranker.yml up -d
 ```
 
 Pull the Ollama chat model once:
 
 ```powershell
-docker compose -f docker-compose.yml -f docker-compose.ollama.yml -f docker-compose.docling.yml exec ollama ollama pull qwen3:8b
-docker compose -f docker-compose.yml -f docker-compose.ollama.yml -f docker-compose.docling.yml exec ollama ollama pull nomic-embed-text
+docker compose -f docker-compose.yml -f docker-compose.ollama.yml -f docker-compose.docling.yml -f docker-compose.reranker.yml exec ollama ollama pull qwen3.6
+docker compose -f docker-compose.yml -f docker-compose.ollama.yml -f docker-compose.docling.yml -f docker-compose.reranker.yml exec ollama ollama pull bge-m3
 ```
 
 Then import the Postman collection and run:

@@ -2,13 +2,18 @@
 
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass
 from pathlib import Path
 
+from ..config import get_settings
 from ..llm.base import Message
 from ..vectorstore.qdrant_store import get_store
+from . import rerank
 from .bm25_index import BM25Index
 from .embeddings import get_embedder
+
+log = logging.getLogger(__name__)
 
 
 @dataclass
@@ -71,8 +76,8 @@ def _dense_search(query: str, top_k: int) -> list[Context]:
 def _hybrid_fuse(dense: list[Context], sparse: list[Context], top_k: int) -> list[Context]:
     """Merge dense and BM25 candidates with reciprocal-rank fusion.
 
-    This is deliberately simple. The next scoring step should be a reranker over this
-    merged candidate pool, not a second parser or a hand-written answer shortcut.
+    Deliberately simple: fusion decides which candidates the cross-encoder gets to see
+    (`rerank_pool` below), and the cross-encoder decides the final order.
     """
     by_key: dict[tuple[int, str], Context] = {}
     fused_scores: dict[tuple[int, str], float] = {}
@@ -94,14 +99,36 @@ def _hybrid_fuse(dense: list[Context], sparse: list[Context], top_k: int) -> lis
     ]
 
 
+def _rerank(query: str, candidates: list[Context], top_k: int) -> list[Context]:
+    """Rescore the pool with the cross-encoder, keeping fusion order as the fallback."""
+    if not get_settings().reranker_enabled or len(candidates) <= 1:
+        return candidates[:top_k]
+    try:
+        scores = rerank.score(query, [c.text for c in candidates])
+    except rerank.RerankError as e:
+        log.warning("%s — keeping fusion order", e)
+        return candidates[:top_k]
+
+    rescored = [
+        Context(text=c.text, page=c.page, score=s) for c, s in zip(candidates, scores)
+    ]
+    rescored.sort(key=lambda c: c.score, reverse=True)
+    return rescored[:top_k]
+
+
 def retrieve(question: str, top_k: int, history: list[Message] | None = None) -> list[Context]:
+    settings = get_settings()
     query = rewrite_query(question, history or [])
 
-    # Retrieve more candidates than we finally show. This gives the future reranker a
-    # useful pool while keeping the LLM context limited to top_k chunks.
-    candidate_k = max(top_k, min(top_k * 3, 20))
-    dense = _dense_search(query, candidate_k)
-    sparse = _bm25_search(query, candidate_k)
+    # Retrieve more candidates than we finally show: the wider pool is what gives the
+    # cross-encoder something to fix, while the prompt still only sees top_k chunks.
+    pool_size = max(top_k, settings.rerank_candidates if settings.reranker_enabled else top_k * 3)
+    dense = _dense_search(query, pool_size)
+    sparse = _bm25_search(query, pool_size)
     if not sparse:
-        return dense[:top_k]
-    return _hybrid_fuse(dense, sparse, top_k)
+        log.warning("BM25 returned nothing (is data/chunks populated?) — dense-only retrieval")
+        pool = dense
+    else:
+        pool = _hybrid_fuse(dense, sparse, pool_size)
+
+    return _rerank(query, pool, top_k)

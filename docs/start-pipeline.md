@@ -45,18 +45,18 @@ SKIP_MODEL_PULL=true bash scripts/start_pipeline.sh
 Windows:
 
 ```powershell
-docker compose -f docker-compose.yml -f docker-compose.ollama.yml -f docker-compose.docling.yml up -d ollama qdrant docling app
-docker compose -f docker-compose.yml -f docker-compose.ollama.yml -f docker-compose.docling.yml exec ollama ollama pull qwen3:8b
-docker compose -f docker-compose.yml -f docker-compose.ollama.yml -f docker-compose.docling.yml exec ollama ollama pull nomic-embed-text
+docker compose -f docker-compose.yml -f docker-compose.ollama.yml -f docker-compose.docling.yml -f docker-compose.reranker.yml up -d ollama qdrant docling reranker app
+docker compose -f docker-compose.yml -f docker-compose.ollama.yml -f docker-compose.docling.yml -f docker-compose.reranker.yml exec ollama ollama pull qwen3.6
+docker compose -f docker-compose.yml -f docker-compose.ollama.yml -f docker-compose.docling.yml -f docker-compose.reranker.yml exec ollama ollama pull bge-m3
 curl.exe http://localhost:8791/ingest -H "content-type: application/json" -d "{}"
 ```
 
 macOS:
 
 ```bash
-docker compose -f docker-compose.yml -f docker-compose.ollama.yml -f docker-compose.docling.yml up -d ollama qdrant docling app
-docker compose -f docker-compose.yml -f docker-compose.ollama.yml -f docker-compose.docling.yml exec -T ollama ollama pull qwen3:8b
-docker compose -f docker-compose.yml -f docker-compose.ollama.yml -f docker-compose.docling.yml exec -T ollama ollama pull nomic-embed-text
+docker compose -f docker-compose.yml -f docker-compose.ollama.yml -f docker-compose.docling.yml -f docker-compose.reranker.yml up -d ollama qdrant docling reranker app
+docker compose -f docker-compose.yml -f docker-compose.ollama.yml -f docker-compose.docling.yml -f docker-compose.reranker.yml exec -T ollama ollama pull qwen3.6
+docker compose -f docker-compose.yml -f docker-compose.ollama.yml -f docker-compose.docling.yml -f docker-compose.reranker.yml exec -T ollama ollama pull bge-m3
 curl -fsS -X POST http://localhost:8791/ingest -H "content-type: application/json" -d "{}"
 ```
 
@@ -64,6 +64,7 @@ After startup:
 
 - Swagger: `http://localhost:8791/docs`
 - Docling API: `http://localhost:5001/docs`
+- Reranker: `http://localhost:8792/health` (bge-reranker-v2-m3 via llama.cpp `/v1/rerank`)
 - Qdrant dashboard: `http://localhost:6391/dashboard`
 - Query endpoint: `POST http://localhost:8791/query`
 

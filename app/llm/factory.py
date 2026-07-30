@@ -20,7 +20,13 @@ def get_client():
     provider = s.llm_provider.lower()
 
     if provider == "ollama":
-        return OllamaClient(s.ollama_base_url, s.chat_model, s.embedding_model, s.request_timeout)
+        return OllamaClient(
+            s.ollama_base_url,
+            s.chat_model,
+            s.embedding_model,
+            s.request_timeout,
+            s.ollama_thinking,
+        )
     if provider == "lmstudio":
         return LMStudioClient(s.lmstudio_base_url, s.chat_model, s.embedding_model, s.request_timeout)
     if provider == "litellm":

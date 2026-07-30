@@ -10,7 +10,7 @@ from LITELLM_API_KEY / LITELLM_API_BASE, or the provider's own env var
 
 from __future__ import annotations
 
-from .base import LLMError, Message
+from .base import LLMError, Message, strip_thinking
 
 
 class LiteLLMClient:
@@ -40,7 +40,7 @@ class LiteLLMClient:
                 timeout=self.timeout,
                 temperature=0.2,
             )
-            return resp["choices"][0]["message"]["content"]
+            return strip_thinking(resp["choices"][0]["message"]["content"])
         except Exception as e:
             raise LLMError(f"litellm chat failed: {e}") from e
 

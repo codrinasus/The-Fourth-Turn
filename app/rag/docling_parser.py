@@ -18,6 +18,7 @@ import hashlib
 import json
 import shutil
 import zipfile
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
@@ -33,21 +34,55 @@ _SKIP_LABELS = {
 }
 
 
-def extract_pages(pdf_path: Path) -> list[str]:
+@dataclass
+class Block:
+    """One structural unit of the document, in reading order.
+
+    `label` is Docling's own classification (`section_header`, `text`, `list_item`,
+    `table`, `caption`, `formula`, `code`). Carrying it through to the chunker is what
+    lets us split on real section boundaries instead of re-deriving them with a regex.
+    """
+
+    text: str
+    page: int          # 1-indexed
+    label: str
+    level: int | None = None    # heading depth, `section_header` only
+    caption: str = ""           # tables/pictures: their caption, already resolved
+
+
+def _load_document(pdf_path: Path) -> dict[str, Any]:
     settings = get_settings()
     base_dir, json_path, markdown_path = _artifact_paths(pdf_path)
 
     if settings.docling_use_cache and json_path.is_file():
-        data = json.loads(json_path.read_text(encoding="utf-8"))
-    else:
-        result = _convert_with_docling(pdf_path, base_dir)
-        data = _document_json(result)
-        _write_artifacts(base_dir, json_path, markdown_path, data, _document_markdown(result))
+        return json.loads(json_path.read_text(encoding="utf-8"))
 
+    result = _convert_with_docling(pdf_path, base_dir)
+    data = _document_json(result)
+    _write_artifacts(base_dir, json_path, markdown_path, data, _document_markdown(result))
+    return data
+
+
+def extract_pages(pdf_path: Path) -> list[str]:
+    data = _load_document(pdf_path)
     pages = _pages_from_docling_json(data)
     if not any(page.strip() for page in pages):
         raise ValueError("Docling produced no page-grounded text")
     return pages
+
+
+def extract_blocks(pdf_path: Path) -> list[Block]:
+    """Return labelled blocks in reading order.
+
+    `extract_pages` flattens everything to one string per page, which throws away the
+    structure Docling worked out. This walks `body.children` instead, so headings stay
+    headings and tables stay whole.
+    """
+    data = _load_document(pdf_path)
+    blocks = _blocks_from_docling_json(data)
+    if not blocks:
+        raise ValueError("Docling produced no page-grounded blocks")
+    return blocks
 
 
 def _artifact_paths(pdf_path: Path) -> tuple[Path, Path, Path]:
@@ -215,26 +250,103 @@ def _save_data_uri(images_dir: Path, uri: str) -> str:
 
 
 def _pages_from_docling_json(data: dict[str, Any]) -> list[str]:
+    """Page text, assembled from the same blocks and in the same order as the chunks.
+
+    Grouping the raw `texts`/`tables`/`pictures` arrays instead pushed every table to the
+    foot of its page, so a chunk could fail a verbatim check against the page it came from.
+    """
     pages: dict[int, list[str]] = {}
-    for item in _iter_content_items(data):
-        page_no = _page_number(item)
-        text = _item_text(item)
-        if page_no is None or not text:
-            continue
-        pages.setdefault(page_no, []).append(text)
+    for block in _blocks_from_docling_json(data):
+        text = f"{block.caption}\n{block.text}" if block.caption else block.text
+        pages.setdefault(block.page, []).append(text)
 
     if not pages:
         return []
     return ["\n\n".join(pages.get(page, [])).strip() for page in range(1, max(pages) + 1)]
 
 
-def _iter_content_items(data: dict[str, Any]) -> list[dict[str, Any]]:
-    items: list[dict[str, Any]] = []
-    for key in ("texts", "tables", "pictures"):
-        value = data.get(key)
-        if isinstance(value, list):
-            items.extend(item for item in value if isinstance(item, dict))
-    return items
+def _resolve_ref(data: dict[str, Any], ref: str) -> dict[str, Any] | None:
+    """Resolve a Docling `#/texts/12`-style pointer into the item it names."""
+    parts = ref.lstrip("#/").split("/")
+    if len(parts) != 2:
+        return None
+    collection = data.get(parts[0])
+    if not isinstance(collection, list):
+        return None
+    try:
+        item = collection[int(parts[1])]
+    except (ValueError, IndexError):
+        return None
+    return item if isinstance(item, dict) else None
+
+
+def _caption_text(data: dict[str, Any], item: dict[str, Any]) -> str:
+    """Captions are not in `body.children` — they hang off their table/picture."""
+    refs = item.get("captions")
+    if not isinstance(refs, list):
+        return ""
+    texts = []
+    for ref in refs:
+        target = _resolve_ref(data, ref.get("$ref", "")) if isinstance(ref, dict) else None
+        if target:
+            texts.append(_normalize(str(target.get("text") or "")))
+    return " ".join(t for t in texts if t).strip()
+
+
+def _blocks_from_docling_json(data: dict[str, Any]) -> list[Block]:
+    blocks: list[Block] = []
+    seen: set[str] = set()
+
+    def visit(ref: str, inherited_page: int | None) -> None:
+        if ref in seen:
+            return
+        seen.add(ref)
+        item = _resolve_ref(data, ref)
+        if item is None:
+            return
+
+        label = str(item.get("label", "")).lower()
+        # `groups` are containers (lists); their children carry the real content.
+        children = item.get("children")
+        page = _page_number(item) or inherited_page
+        if isinstance(children, list) and children and label in {"list", "group", ""}:
+            for child in children:
+                if isinstance(child, dict):
+                    visit(str(child.get("$ref", "")), page)
+            return
+
+        if label in _SKIP_LABELS or page is None:
+            return
+
+        # A picture carries no text of its own; its caption is the only indexable
+        # content, and it lives behind a `$ref` rather than inline.
+        text = _caption_text(data, item) if label == "picture" else _item_text(item)
+        if not text:
+            return
+
+        blocks.append(
+            Block(
+                text=text,
+                page=page,
+                label=label or "text",
+                level=_heading_level(item) if label == "section_header" else None,
+                # Pictures have no text of their own, so `_item_text` already returned
+                # their caption; only tables need it kept alongside the grid.
+                caption=_caption_text(data, item) if label == "table" else "",
+            )
+        )
+
+    for child in (data.get("body") or {}).get("children", []):
+        if isinstance(child, dict):
+            visit(str(child.get("$ref", "")), None)
+    return blocks
+
+
+def _heading_level(item: dict[str, Any]) -> int | None:
+    try:
+        return int(item.get("level"))
+    except (TypeError, ValueError):
+        return None
 
 
 def _page_number(item: dict[str, Any]) -> int | None:

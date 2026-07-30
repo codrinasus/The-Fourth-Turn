@@ -73,13 +73,14 @@ Copy-Item .env.example .env
 Copy-Item $HOME\Downloads\your-document.pdf data\in\document.pdf
 
 # 4. Pull the local Ollama model once, then bring up app + Qdrant + Ollama + Docling.
-docker compose -f docker-compose.yml -f docker-compose.ollama.yml -f docker-compose.docling.yml up -d ollama
-docker compose -f docker-compose.yml -f docker-compose.ollama.yml -f docker-compose.docling.yml exec ollama ollama pull qwen3:8b
-docker compose -f docker-compose.yml -f docker-compose.ollama.yml -f docker-compose.docling.yml exec ollama ollama pull nomic-embed-text
-docker compose -f docker-compose.yml -f docker-compose.ollama.yml -f docker-compose.docling.yml up -d
+docker compose -f docker-compose.yml -f docker-compose.ollama.yml -f docker-compose.docling.yml -f docker-compose.reranker.yml up -d ollama
+docker compose -f docker-compose.yml -f docker-compose.ollama.yml -f docker-compose.docling.yml -f docker-compose.reranker.yml exec ollama ollama pull qwen3.6
+docker compose -f docker-compose.yml -f docker-compose.ollama.yml -f docker-compose.docling.yml -f docker-compose.reranker.yml exec ollama ollama pull bge-m3
+docker compose -f docker-compose.yml -f docker-compose.ollama.yml -f docker-compose.docling.yml -f docker-compose.reranker.yml up -d
 #    app     -> http://localhost:8791      (Swagger UI at /docs)
 #    qdrant  -> http://localhost:6391      (dashboard at /dashboard)
 #    docling -> http://localhost:5001      (API docs at /docs)
+#    reranker-> http://localhost:8792      (bge-reranker-v2-m3, /v1/rerank)
 
 # 5. Index your PDF, then ask a question (just question + level)
 curl.exe http://localhost:8791/ingest -H "content-type: application/json" -d "{}"

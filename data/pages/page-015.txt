@@ -1,4 +1,12 @@
 Table 3. Classification of axiomatic methods. The evaluation w.r.t. interpretability can be anecdotal or intrinsically measured by a corresponding faithfulness measure.
+Paper | Task | Approach | Dataset | Evaluation
+Hagen et al. [47] | LTR | IBD | TREC Web tracks 2009-2014 | -
+Rennings et al. [101] | Text Ranking | Post-hoc | WikiPassageQA | -
+Câmara and Hauff [19] | Text Ranking | Post-hoc | TREC 2019 DL | -
+Völske et al. [128] | Text Ranking | Post-hoc | Robust04, MS MARCO | Fidelity
+Rosset et al. [104] | Text Ranking | Regularization | MS MARCO | -
+Cheng and Fang [26] | Text Ranking | Regularization | WikiQA, MS MARCO | -
+Chen et al. [24] | Text Ranking | Regularization | MS MARCO, TREC 2019 DL | Anecdotal
 
 6.1 Interpretable Axiomatic Rankers
 
@@ -11,12 +19,3 @@ More directly related to the classical post-hoc interpretability work is a line 
 6.3 Axioms for Regularizing Neural Rankers
 
 Recently, a variety of approaches for axiomatic regularization of neural ranking models has been proposed [24, 26, 104]. These approaches aim to regularize opaque neural rankers to incentivize learning of the principled, axiomatic notions of relevance. This has the benefits of faster convergence [104], improved performance [26] or generalization ability [24, 104], and improved interpretability [24]. The method by which the ranking models are regularized varies from adding a regularization term to the loss function [24, 104] to axiomatically perturbing the training data to amplify desirable properties [26]. An example of such a regularization term is applied by Chen et al. [24] who add a relevance loss to their final loss function that checks how well the model's relevance judgments coincides with the axioms'. Cheng and Fang [26] extend the training dataset by randomly sampling instances and perturbing them according to three document length normalization axioms, such as by adding noise terms. Then, these more noisy documents are assigned a lower relevancy value. From such perturbed data examples, the model is expected to understand the corresponding normalization axiom based on document length. While current regularization methods offer only limited (perceived) interpretability, the approach similar to the neuro-symbolic approaches [108] marry the benefits of both axioms and data-driven models.
-
-Paper | Task | Approach | Dataset | Evaluation
-Hagen et al. [47] | LTR | IBD | TREC Web tracks 2009-2014 | -
-Rennings et al. [101] | Text Ranking | Post-hoc | WikiPassageQA | -
-Câmara and Hauff [19] | Text Ranking | Post-hoc | TREC 2019 DL | -
-Völske et al. [128] | Text Ranking | Post-hoc | Robust04, MS MARCO | Fidelity
-Rosset et al. [104] | Text Ranking | Regularization | MS MARCO | -
-Cheng and Fang [26] | Text Ranking | Regularization | WikiQA, MS MARCO | -
-Chen et al. [24] | Text Ranking | Regularization | MS MARCO, TREC 2019 DL | Anecdotal

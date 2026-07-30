@@ -12,18 +12,4 @@ Figure 8 shows an example in which we test whether a ranking model encodes infor
 
 Fig. 8. Example of the probing paradigm. A small classifier (the probe model) is used to predict properties (in this case the question type) from a ranker's frozen representations.
 
-What attracts tourists to Rome?
-
-Location
-
-Embeddings
-
-Frozen
-
-Ranker
-
-Probe
-
-Model
-
 To do so, we need a small, labeled dataset of questions and their respective question types. We then train the probing classifier to recover the question type information from the ranker's frozen embeddings. Originally, the model would be considered to encode the property of interest if the classifier can better predict it than a majority classifier. However, depending on the task's difficulty, dataset size, and classifier complexity, large portions of the resulting performance must be attributed to the classifier. Therefore, a large set of improvements to the probing paradigm have been proposed - from introducing suitable baselines [142] and control tasks [52], over varying the classifier complexity [90], to measuring the target property's ease of extraction from the embeddings [127]. For a more comprehensive overview of the initial probing paradigm and the proposed improvements, we refer to the paper by Belinkov [9].

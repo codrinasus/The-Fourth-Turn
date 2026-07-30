@@ -4,7 +4,7 @@
 #   docker compose -f docker-compose.yml -f docker-compose.ollama.yml up --build
 #
 # Pull the model once:
-#   docker compose -f docker-compose.yml -f docker-compose.ollama.yml exec ollama ollama pull qwen3:8b
+#   docker compose -f docker-compose.yml -f docker-compose.ollama.yml exec ollama ollama pull qwen3.6
 
 services:
   app:
