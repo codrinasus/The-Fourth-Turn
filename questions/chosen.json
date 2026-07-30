@@ -2,22 +2,22 @@
   {
     "id": "q1",
     "level": 1,
-    "question": "How many papers does the survey consider, and how many of them receive a more detailed treatment?"
+    "question": "What is the biological motivation for dropout described in the paper?"
   },
   {
     "id": "q2",
     "level": 1,
-    "question": "What is the main goal of explainable information retrieval according to the survey?"
+    "question": "What dropout probabilities do the authors use for hidden units and for input units?"
   },
   {
     "id": "q3",
     "level": 1,
-    "question": "How does the survey categorise the evaluation of explanations?"
+    "question": "How does the paper approximate combining exponentially many networks without running them all at test time?"
   },
   {
     "id": "q4",
     "level": 2,
-    "question": "What is the main limitation the authors acknowledge?"
+    "question": "What drawback of dropout do the authors report?"
   },
   {
     "id": "q5",
@@ -27,12 +27,12 @@
   {
     "id": "q6",
     "level": 2,
-    "question": "And how do they propose to address it?"
+    "question": "And what benefit does that same noise bring?"
   },
   {
     "id": "q7",
     "level": 3,
-    "question": "Across the classification tables in this survey - post-hoc methods, axiomatic methods, explainable-by-architecture models and rationale-based approaches - what is the most common way the quality of explanations is evaluated, and what do the authors themselves say about relying on that kind of evidence?"
+    "question": "Across the image, speech, text and genetics experiments, which data sets is dropout evaluated on, and what does the paper report as its typical effect on the error rate?"
   },
   {
     "id": "q8",
@@ -42,6 +42,6 @@
   {
     "id": "q9",
     "level": 3,
-    "question": "The introduction warns that over-parameterized models learn \"shortcuts\". Tracing this concept through the attention-based feature attribution work (Section 3.2.2) and the probing of ranking models (Section 7.2), what specific token-level behavior exemplifies this, and what vulnerability does it create?"
+    "question": "Section 2 motivates dropout by analogy with sexual reproduction preventing the co-adaptation of genes. Where do the authors later show that this actually happens inside a neural network, and what do they observe?"
   }
 ]

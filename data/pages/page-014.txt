@@ -1,18 +1,19 @@
-Table 2. Selection of proposed retrieval axioms. Adapted from a more complete list of axioms available in [14].
-Property | Axiom | Details
-Term Frequency | TFC1 [36] | Prefer documents with more query term occurrences Given 𝑄 = 𝑞, | 𝐷 1 | = | 𝐷 2 | , 𝑡 𝑓 ( 𝑞,𝐷 1 ) > 𝑡 𝑓 ( 𝑞,𝐷 2 )⇒ 𝐷 1 > 𝑇𝐹𝐶 1 𝐷 2
-Document Length | LNC1 [36] | Penalize long documents for non-relevant terms Given 𝑡 ∉ 𝑄 , arbitrary term 𝑤 , 𝑡 𝑓 ( 𝑡,𝐷 1 ) > 𝑡 𝑓 ( 𝑡,𝐷 2 )∧ ∀ 𝑤 ≠ 𝑡 𝑡 𝑓 ( 𝑤,𝐷 1 ) = 𝑡 𝑓 ( 𝑤,𝐷 2 )⇒ 𝐷 1 > 𝐿𝑁𝐶 1 𝐷 2
-Semantic Similarity | STMC1 [38] | Prefer terms more similar to query terms Given 𝑄 = 𝑞,𝐷 1 = 𝑡 1 ,𝐷 2 = 𝑡 2 ,𝑞 ≠ 𝑡 1 ,𝑞 ≠ 𝑡 2 , 𝑠𝑖𝑚 ( 𝑞, 𝑡 1 ) > 𝑠𝑖𝑚 ( 𝑞, 𝑡 2 ) ⇒ 𝐷 1 > 𝑆𝑇𝑀𝐶 1 𝐷 2
-Query Aspect | AND [148] | Prefer documents containing all query terms Given 𝑄 = 𝑞 1 ,𝑞 2 , 𝑡𝑑 ( 𝑞 1 ) ≥ 𝑡𝑑 ( 𝑞 _2 ) , 𝑡 𝑓 ( 𝑞 1 ,𝐷 1 ) = 1 ∧ 𝑡 𝑓 ( 𝑞 2 ,𝐷 1 ) = 1 ∧ 𝑡 𝑓 ( 𝑞 1 ,𝐷 2 ) > 1 ∧ 𝑡 𝑓 ( 𝑞 2 ,𝐷 2 ) = 0 ⇒ 𝐷 1 > 𝐴𝑁𝐷 𝐷 2
+Table 8: Results on the Alternative Splicing Data Set.
+Method | Code Quality | (bits)
+Neural Network (early stopping) (Xiong et al., 2011) | 440 |
+Regression, PCA (Xiong et al., 2011) | 463 |
+SVM, PCA (Xiong et al., 2011) | 487 |
+Neural Network with dropout | 567 |
+Bayesian Neural Network (Xiong et al., 2011) | 623 |
 
-was first coined by Bruza and Huibers [16], who proposed to describe retrieval mechanisms using axioms expressed through concepts in the field of IR.
+Table 8 summarizes the performance of different models on this data set. Xiong et al. (2011) used Bayesian neural nets for this task. As expected, we found that Bayesian neural nets perform better than dropout. However, we see that dropout improves significantly upon the performance of standard neural nets and outperforms all other methods. The challenge in this data set is to prevent overfitting since the size of the training set is small. One way to prevent overfitting is to reduce the input dimensionality using PCA. Thereafter, standard techniques such as SVMs or logistic regression can be used. However, with dropout we were able to prevent overfitting without the need to do dimensionality reduction. The dropout nets are very large (1000s of hidden units) compared to a few tens of units in the Bayesian network. This shows that dropout has a strong regularizing effect.
 
-Axiom TFC1 : Prefer documents with more query term occurences. Qu ery: are dogs great ? d i : We have all kinds of dogs. Because dogs are superior pets. d j : Cats are way better than dogs. We love our cute cats. d i > TFC1 d j
+6.5 Comparison with Standard Regularizers
 
-An example axiom is TFC1 [36] which proposes to prefer documents having more query terms occurrences (Figure 7). Formally, given a query 𝑞 = 𝑡 and two documents 𝑑 1 , 𝑑 2 with | 𝑑 1 | = | 𝑑 2 | , TFC1 is defined as
+Several regularization methods have been proposed for preventing overfitting in neural networks. These include L2 weight decay (more generally Tikhonov regularization (Tikhonov, 1943)), lasso (Tibshirani, 1996), KL-sparsity and max-norm regularization. Dropout can be seen as another way of regularizing neural networks. In this section we compare dropout with some of these regularization methods using the MNIST data set.
 
-Similarly, a large set of axioms has been proposed in recent decades, ranging over different aspects of relevance such as term frequency [36, 37], document length [36], semantic similarity [38], or term proximity [47] among others (see Table 2). For a more detailed description of the various axioms, we refer to an overview by Bondarenko et al. [14].
+The same network architecture (784-1024-1024-2048-10) with ReLUs was trained using stochastic gradient descent with different regularizations. Table 9 shows the results. The values of different hyperparameters associated with each kind of regularization (decay constants, target sparsity, dropout rate, max-norm upper bound) were obtained using a validation set. We found that dropout combined with max-norm regularization gives the lowest generalization error.
 
-Axioms are human-understandable concepts. This is in stark contrast to neural networks, which have been shown time and time again to learn spurious correlations [44] and to be susceptible to adversarial attacks [132]. Although not yet achieved, a long-term goal of axiomatic IR could be a concept of relevance built on axioms. This conceptualization of relevance would then be robust to attacks, generalize to novel distributions, and be interpretable for humans.
+7. Salient Features
 
-Although there is no general model of relevance yet, previous work aggregated axioms to build axiomatic rankers (Section 6.1), analyze and explain existing neural ranking approaches by aligning them to known axioms (Section 6.2), and use axioms to regularize the training of neural rankers (Section 6.3). An overview of this classification and papers in this section can be found in Table 3.
+The experiments described in the previous section provide strong evidence that dropout is a useful technique for improving neural networks. In this section, we closely examine how dropout affects a neural network. We analyze the effect of dropout on the quality of features produced. We see how dropout affects the sparsity of hidden unit activations. We also see how the advantages obtained from dropout vary with the probability of retaining units, size of the network and the size of the training set. These observations give some insight into why dropout works so well.

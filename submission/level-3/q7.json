@@ -1,24 +1,29 @@
 {
-  "question_id": "q984090",
+  "question_id": "qffe689",
   "level": 3,
-  "question": "Across the classification tables in this survey - post-hoc methods, axiomatic methods, explainable-by-architecture models and rationale-based approaches - what is the most common way the quality of explanations is evaluated, and what do the authors themselves say about relying on that kind of evidence?",
-  "answer": "Across the survey's classification tables and discussed methodologies, **anecdotal examples** (or informal/visual demonstrations) are the most frequently reported approach for evaluating explanation quality. The authors criticize this reliance by noting that there is **\"little formal evaluation of the insights gained through these methods from an interpretability perspective\"** (1). They observe that while some works employ established metrics like fidelity, the field predominantly defaults to anecdotal evidence rather than rigorous faithfulness measures or human-centered validation protocols (2, 3). Consequently, they stress that researchers must move beyond informal proofs and adopt standardized interpretability evaluation metrics and user studies to properly validate explanation quality.",
+  "question": "Across the image, speech, text and genetics experiments, which data sets is dropout evaluated on, and what does the paper report as its typical effect on the error rate?",
+  "answer": "Dropout is evaluated on MNIST, SVHN, CIFAR-10, CIFAR-100, and ImageNet for images; TIMIT for speech; Reuters-RCV1 for text; and a small genetic dataset for alternative splicing prediction (1). Its typical effect is a consistent reduction in error rates and improved generalization across all tested domains (1). The paper reports particularly large improvements for vision tasks (2), clear reductions for speech recognition where it lowers the phone error rate to 21.8% (3), and drops the text classification error from 31.05% to 29.62%, though notes this gain is less pronounced than in vision and speech (4).",
   "conversation_id": "level-3",
   "sources": [
     {
-      "page": 16,
-      "quote": "In addition, only Völske et al. [128] use established interpretability evaluation metrics and measure the fidelity of their generated (post-hoc) explanations.",
-      "score": 0.2709
+      "page": 7,
+      "quote": "We trained dropout neural networks for classification problems on data sets in different domains. We found that dropout improved generalization performance on all data sets compared to neural networks that did not use dropout. Table 1 gives a brief description of the data sets. The data sets are",
+      "score": 0.7534
     },
     {
-      "page": 15,
-      "quote": "Table 3. Classification of axiomatic methods.",
-      "score": 0.3275
+      "page": 9,
+      "quote": "We demonstrate the effectiveness of dropout in that setting on more interesting data sets.",
+      "score": 0.6023
     },
     {
-      "page": 10,
-      "quote": "Table 1. Overview of post-hoc explanation methods.",
-      "score": 0.5186
+      "page": 12,
+      "quote": "Next, we applied dropout to a speech recognition task.",
+      "score": 0.4816
+    },
+    {
+      "page": 13,
+      "quote": "6.3 Results on a Text Data Set To test the usefulness of dropout in the text domain, we used dropout networks to train a document classifier. We used a subset of the Reuters-RCV1 data set which is a collection of over 800,000 newswire articles from Reuters. These articles cover a variety of topics. The task is to take a bag of words representation of a document and classify it into 50 disjoint topics. Appendix B.5 describes the setup in more detail. Our best neural net which did not use dropout obtained an error rate of 31 .05%. Adding dropout reduced the error to 29.62%. We found that the improvement was much smaller compared to that for the vision and speech data sets.",
+      "score": 0.7459
     }
   ],
   "diagnostics": {
@@ -26,19 +31,18 @@
     "chat_model": "qwen3.6:latest",
     "embedding_model": "bge-m3",
     "retrieved_chunks": 8,
-    "retrieval_query": "Across the classification tables in this survey - post-hoc methods, axiomatic methods, explainable-by-architecture models and rationale-based approaches - what is the most common way the quality of explanations is evaluated, and what do the authors themselves say about relying on that kind of evidence?",
+    "retrieval_query": "Across the image, speech, text and genetics experiments, which data sets is dropout evaluated on, and what does the paper report as its typical effect on the error rate?",
     "sub_queries": [
-      "How is the quality of explanations primarily evaluated across post-hoc methods, axiomatic methods, explainable-by-architecture models, and rationale-based approaches in the survey?",
-      "What critique or commentary do the authors provide regarding the reliability of this common evaluation method?"
+      "What datasets is dropout evaluated on in the provided document?",
+      "What does the paper report as the typical effect of dropout on the error rate?"
     ],
     "retrieval_steps": [
       "search: 3 queries",
-      "step 1: missing 'The specific evaluation method most common across all four categories and the authors' commentary on relying on that evidence.' → 2 more queries",
-      "step 2: missing 'Information on the most common evaluation method across all four specified categories and authors' critiques of relying on that evidence.' → 2 more queries",
-      "step budget (2) reached"
+      "step 1: missing 'The specific data sets used for genetics/computational biology experiments and their corresponding error rate improvements.' → 2 more queries",
+      "step 2: evidence sufficient"
     ],
     "tokens": null,
-    "latency_ms": 126051,
-    "timestamp": "2026-07-30T21:38:28Z"
+    "latency_ms": 128158,
+    "timestamp": "2026-07-30T22:41:38Z"
   }
 }

@@ -1,5 +1,13 @@
-Fig. 9. Types of IBD models. Green and gray color refers to mostly interpretable/non-interpretable components, respectively.
+We again use the MNIST data set and do classification by averaging the predictions of k randomly sampled neural networks. Figure 11 shows the test error rate obtained for different values of k . This is compared with the error obtained using the weight scaling method (shown as a horizontal line). It can be seen that around k = 50, the Monte-Carlo method becomes as good as the approximate method. Thereafter, the Monte-Carlo method is slightly better than the approximate method but well within one standard deviation of it. This suggests that the weight scaling method is a fairly good approximation of the true model average.
 
-8 EXPLAINABLE-BY-ARCHITECTURE MODELS
+8. Dropout Restricted Boltzmann Machines
 
-We refer to the first family of IBD models as explainable-by-architecture models. Those models can be viewed as a modular framework of multiple components (see Figure 9). The general architecture of these models involves intermediate feature extraction (that might involve feature attributions), and a task-specific decision structure (that might involve feature interactions). Pragmatically speaking, not all components are fully interpretable to ensure competitive task performance. Therefore, most of the IBD resort to making only specific components interpretable or transparent. In the following, we look at two major use cases of such models in text ranking and LTR tasks.
+Besides feed-forward neural networks, dropout can also be applied to Restricted Boltzmann Machines (RBM). In this section, we formally describe this model and show some results to illustrate its key properties.
+
+8.1 Model Description
+
+Consider an RBM with visible units v ∈ { 0 , 1 } D and hidden units h ∈ { 0 , 1 } F . It defines the following probability distribution
+
+Where θ = { W, a , b } represents the model parameters and Z is the partition function. Dropout RBMs are RBMs augmented with a vector of binary random variables r ∈ { 0 , 1 } F . Each random variable r j takes the value 1 with probability p , independent of others. If r j takes the value 1, the hidden unit h j is retained, otherwise it is dropped from the model. The joint distribution defined by a Dropout RBM can be expressed as
+
+✶ ✶ ✶ Z ′ ( θ, r ) is the normalization constant. g ( h j , r j ) imposes the constraint that if r j = 0, h j must be 0. The distribution over h , conditioned on v and r is factorial

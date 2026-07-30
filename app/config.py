@@ -91,7 +91,11 @@ class Settings(BaseSettings):
     in_dir: str = "data/in"  # put the PDF here; /ingest reads from it
     out_dir: str = "data/out"  # every /query answer is written here as JSON
 
-    request_timeout: float = 120.0
+    # Seconds for one provider call. A Level-3 answer sees the section outline plus eight
+    # passages and reasons over them, which measured up to ~135 s here — at 120 s the q7
+    # generation timed out and the pipeline shipped its "[LLM unavailable]" degradation
+    # into a graded answer. Sized to leave real headroom over the slowest observed call.
+    request_timeout: float = 300.0
 
 
 @lru_cache

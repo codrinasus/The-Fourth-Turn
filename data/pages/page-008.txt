@@ -1,19 +1,30 @@
-3.2 Model-introspective Feature Attribution
+Alternative Splicing data set: RNA features for predicting alternative gene splicing (Xiong et al., 2011).
 
-In contrast to model-agnostic methods, model-introspective feature attribution methods require white-box access to the model being explained. Model-introspective methods typically rely on gradients or other properties of the model to compute feature importance scores.
+We chose a diverse set of data sets to demonstrate that dropout is a general technique for improving neural nets and is not specific to any particular application domain. In this section, we present some key results that show the effectiveness of dropout. A more detailed description of all the experiments and data sets is provided in Appendix B.
 
-3.2.1 Gradient-based Methods. Many feature attribution methods generate an explanation by computing the gradient with respect to the input features. This gradient reflects how a small change in the input features affects the prediction. The vanilla gradient method can produce noisy explanations and suffers from a saturation problem. A variety of methods aim to remedy these issues. For example, Integrated Gradients [120] accumulates gradients on a path between a baseline input and the actual input. While this resolves the saturation problem, the baseline input is a hyperparameter to be chosen carefully. It is unclear what baseline is best, and each baseline makes assumptions about the distribution of the data and the concept of missingness in the feature space [119]. Other gradient-based feature attribution methods, such as Layer-wise Relevance Propagation [4], Guided Backpropagation [118], or DeepLIFT [110] back-propagate custom relevance scores using modified, sometimes layer-specific, rules.
+Table 1: Overview of the data sets used in this paper.
+Data Set | Domain | Dimensionality | Training Set | Test Set
+MNIST | Vision | 784 (28 × 28 grayscale) | 60K | 10K
+SVHN | Vision | 3072 (32 × 32 color) | 600K | 26K
+CIFAR-10/100 | Vision | 3072 (32 × 32 color) | 60K | 10K
+ImageNet (ILSVRC-2012) | Vision | 65536 (256 × 256 color) | 1.2M | 150K
+TIMIT | Speech | 2520 (120-dim, 21 frames) | 1.1M frames | 58K frames
+Reuters-RCV1 | Text | 2000 | 200K | 200K
+Alternative Splicing | Genetics | 1014 | 2932 | 733
 
-Fernando et al. [39] apply DeepSHAP [77], a combination of SHAP [77] and DeepLIFT [110], to neural retrieval models. Specifically, they investigate the sensitivity of the explanations to different choices for constructing a baseline input document. Generating explanations for a subset of queries from the TREC Robust04 test collection and the corresponding top-3 ranked documents, they find that the explanations are indeed sensitive to the baseline input. The DeepSHAP explanations are also compared to explanations produced by LIME, and while for some baseline inputs there is high overlap in the most important features, there is a lack of overlap for others.
+6.1 Results on Image Data Sets
 
-Purpura et al. [94] use simple gradient-based feature attribution to find the most important features used by LTR models. They generate a saliency map for each instance in a training dataset and select feature groups by thresholding the normalized importance values. Feature selection is then performed by counting how often each feature group is considered important across all extracted saliency maps.
+We used five image data sets to evaluate dropout-MNIST, SVHN, CIFAR-10, CIFAR-100 and ImageNet. These data sets include different image types and training set sizes. Models which achieve state-of-the-art results on all of these data sets use dropout.
 
-Zhan et al. [141] use Integrated Gradients [120] to obtain feature attributions for a BERT-based ranking model. As a baseline input, they create an empty query and an empty document input by replacing the corresponding tokens with the special padding token ' [PAD] '. An example of feature attributions for BERT-style input is visualized in Figure 4.
+6.1.1 MNIST
 
-[CLS] can you do yoga from a chair [SEP] 10 Yoga Poses You Can Do in a Chair | Chair pose ... [SEP]
+Table 2: Comparison of different models on MNIST.
+Method | Unit Type | Architecture | Error %
+Standard Neural Net (Simard et al., 2003) SVM Gaussian kernel Dropout NN Dropout NN Dropout NN + max-norm constraint Dropout NN + max-norm constraint Dropout NN + max-norm constraint Dropout NN + max-norm constraint Dropout NN + max-norm constraint | Logistic NA Logistic ReLU ReLU ReLU ReLU ReLU | 2 layers, 800 units NA 3 layers, 1024 units 3 layers, 1024 units 3 layers, 1024 units 3 layers, 2048 units 2 layers, 4096 units 2 layers, 8192 units 240) | 1.60 1.40 1.35 1.25 1.06 1.04 1.01 0.95 0.94
+DBN + finetuning (Hinton and Salakhutdinov, 2006) DBM + finetuning (Salakhutdinov and Hinton, DBN + dropout finetuning DBM + dropout finetuning | Logistic Logistic | 500-500-2000 500-500-2000 | 1.18 0.96
+(Goodfellow et al., 2013) | Maxout | 2 layers, (5 × units |
+2009) | Logistic |  |
+|  | 500-500-2000 | 0.92
+| Logistic | 500-500-2000 | 0.79
 
-Fig. 4. Example visualization of feature attributions for a single query-document pair using the BERT-style input format, which is '[CLS] query [SEP] document [SEP]'. Important tokens are highlighted in orange.
-
-3.2.2 Attention-based Methods. Instead of using gradients, attention-based feature attribution methods use the attention weights contained in attention layers, which are a core building block of transformer models. The attention weights can be used to explain what part of the input a model attends to when making a prediction, for example, by visualizing the attention weights at certain layers [126]. However, whether attention weights actually provide explanations is subject to an ongoing debate [8, 12].
-
-Qiao et al. [95] analyze the learned attentions of BERT-based ranking models, using attention weights to measure the importance of features. They group input tokens into three categories, as visualized in Figure 5: Regular Words, Stopwords, and Markers, which are the special tokens '[CLS]' and '[SEP]'. In their experiments on the MS MARCO passage reranking dataset [86], they find that marker tokens receive the highest attention. The importance of the marker tokens is confirmed by observing a strong decrease in model performance when they are removed from the inputs. Stopwords appear to be as important as regular words; however, removing them does not appear to affect the ranking performance. Additionally, they observe that the attention scores spread more uniformly across the input sequence in deeper layers of BERT, as the embeddings become more contextualized.
+The MNIST data set consists of 28 × 28 pixel handwritten digit images. The task is to classify the images into 10 digit classes. Table 2 compares the performance of dropout with other techniques. The best performing neural networks for the permutation invariant setting that do not use dropout or unsupervised pretraining achieve an error of about 1 . 60% (Simard et al., 2003). With dropout the error reduces to 1 . 35%. Replacing logistic units with rectified linear units (ReLUs) (Jarrett et al., 2009) further reduces the error to 1 . 25%. Adding max-norm regularization again reduces it to 1 . 06%. Increasing the size of the network leads to better results. A neural net with 2 layers and 8192 units per layer gets down to 0.95% error. Note that this network has more than 65 million parameters and is being trained on a data set of size 60,000. Training a network of this size to give good generalization error is very hard with standard regularization methods and early stopping. Dropout, on the other hand, prevents overfitting, even in this case. It does not even need early stopping. Goodfellow et al. (2013) showed that results can be further improved to 0.94% by replacing ReLU units with maxout units. All dropout nets use p = 0 . 5 for hidden units and p = 0 . 8 for input units. More experimental details can be found in Appendix B.1.

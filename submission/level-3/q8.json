@@ -1,49 +1,49 @@
 {
-  "question_id": "qf439c7",
+  "question_id": "q4bb1ea",
   "level": 3,
   "question": "Summarise the contribution of each section.",
-  "answer": "Based on the provided context, the contributions across the covered sections are:\n\n- **Explicit Feature Contribution & LTR Models:** NeuralGAM aggregates isolated black-box feature scores via summation to yield transparent relevance decisions, though individual score generation remains opaque (1). This approach emphasizes explicit feature contribution as offering direct, transparent correlations between inputs and predictions beyond standard heatmaps (2). The authors note that while most methods in this area rely on anecdotal examples, NeuralGAM uniquely uses reference tree-models to justify explanation faithfulness (3).\n- **Axiomatic Analysis & Probing:** Researchers align axioms with neural approaches to build rankers, diagnose models, or regularize training to ensure robustness and interpretability (4). Methods use linear approximations to attribute relevance performance to features like term frequency and document length, confirming alignment with IR axioms (5). Additionally, studies classify probing literature by task and concept to verify whether models encode specific properties in architectural components like attention maps or exhibit general behavioral patterns (6).\n- **Rationale-Based Methods:** This framework extracts sparse rationales for task prediction, emphasizing the primary challenge of training modules with discrete outputs (7). It categorizes these approaches into pipeline or end-to-end optimization styles and references a comparative summary table (7).\n- **Limitations & Open Questions:** Current Explainable IR research disproportionately focuses on ranking tasks and system developers, largely overlooking other IR applications and the end-user as the primary stakeholder (8). The authors call for future work to expand beyond these functional biases to address broader use cases and stakeholders (8).",
+  "answer": "Based on the provided document structure and details:\n\n- **Section 2** outlines the theoretical motivation for using dropout to improve network robustness (1).\n- **Section 3** reviews relevant prior work, particularly denoising autoencoders and stochastic regularization (1).\n- **Section 4** formally defines the dropout model by modifying standard feed-forward operations with Bernoulli random variables across hidden layers (1, 2).\n- **Section 5** presents the training algorithm for dropout networks, including backpropagation adaptations (1).\n- **Section 6** reports experimental results across diverse domains to demonstrate dropout's general effectiveness and compares it against Bayesian neural networks and standard regularizers (1, 3, 4).\n- **Section 7** analyzes dropout's impact on feature quality, hidden unit sparsity, and how its benefits interact with hyperparameters like retention probability, network size, and training set size (1, 5, 6).\n- **Section 8** introduces and describes the Dropout Restricted Boltzmann Machine variant (1).\n- **Section 9** explores marginalizing dropout noise to derive deterministic regularization alternatives that avoid stochastic sampling during inference (1).\n- **Appendix A** offers a practical guide for training dropout networks, emphasizing hyperparameter tuning considerations (1, 7).\n- **Appendix B** provides detailed network architectures, training specifications, and reproduction code for the reported experiments (8, 4).",
   "conversation_id": "level-3",
   "sources": [
     {
-      "page": 21,
-      "quote": "The relevance of the input is aggregated by simply summing up all contribution scores.",
-      "score": 0.0756
+      "page": 3,
+      "quote": "In Section 6, we present our experimental results where we apply dropout to problems in different domains and compare it with other forms of regularization and model combination.",
+      "score": 0.0317
     },
     {
-      "page": 21,
-      "quote": "8.2.1 Explicit Feature Contribution. Different from the previously discussed feature-attribution methods, explicit feature contribution indicates a simple and transparent correlation between each input feature and the relevance prediction, in addition to showing importance heatmaps.",
-      "score": 0.0085
+      "page": 5,
+      "quote": "This section describes the dropout neural network model. Consider a neural network with L hidden layers. Let l∈{ 1,...,L } index the hidden layers of the network. Let z(l) denote the vector of inputs into layer l, y(l) denote the vector of outputs from layer l (y(0) = x is the input). W (l) and b(l) are the weights and biases at layer l. The feed-forward operation of a standard neural network (Figure 3a) can be described as (for l∈{ 0,...,L − 1} and any hidden unit i)",
+      "score": 0.0024
     },
     {
-      "page": 21,
-      "quote": "A summary of methods can be found in Table 5.",
-      "score": 0.0107
+      "page": 13,
+      "quote": "However, Bayesian neural nets are slow to train and difficult to scale to very large network sizes. Besides, it is expensive to get predictions from many large nets at test time. On the other hand, dropout neural nets are much faster to train and use at test time. In this section, we report experiments that compare Bayesian neural nets with dropout neural nets on a small data set where Bayesian neural networks are known to perform well and obtain state-of-the-art results. The aim is to analyze how much does dropout lose compared to Bayesian neural nets.",
+      "score": 0.0032
+    },
+    {
+      "page": 8,
+      "quote": "Alternative Splicing data set: RNA features for predicting alternative gene splicing (Xiong et al., 2011). We chose a diverse set of data sets to demonstrate that dropout is a general technique for improving neural nets and is not specific to any particular application domain. In this section, we present some key results that show the effectiveness of dropout. A more detailed description of all the experiments and data sets is provided in Appendix B.",
+      "score": 0.0024
     },
     {
       "page": 14,
-      "quote": "Although there is no general model of relevance yet, previous work aggregated axioms to build axiomatic rankers (Section 6.1), analyze and explain existing neural ranking approaches by aligning them to known axioms (Section 6.2), and use axioms to regularize the training of neural rankers (Section 6.3).",
-      "score": 0.0111
+      "quote": "The experiments described in the previous section provide strong evidence that dropout is a useful technique for improving neural networks.",
+      "score": 0.0045
     },
     {
-      "page": 17,
-      "quote": "The resulting coefficients are then used to understand the importance of the corresponding aspects.",
-      "score": 0.0291
+      "page": 16,
+      "quote": "We found that as a side-effect of doing dropout, the activations of the hidden units become sparse, even when no sparsity inducing regularizers are present. Thus, dropout automatically leads to sparse representations. To observe this effect, we take the autoencoders trained in the previous section and look at the sparsity of hidden unit activations on a random mini-batch taken from the test set. Figure 8a and Figure 8b compare the sparsity for the two models. In a good sparse model, there should only be a few highly activated units for any data case. Moreover, the average activation of any unit across data cases should be low. To assess both of these qualities, we plot two histograms for each model.",
+      "score": 0.0026
     },
     {
-      "page": 17,
-      "quote": "Table 4. Classification of the probing literature (Section 7).",
-      "score": 0.0062
-    },
-    {
-      "page": 22,
-      "quote": "We summarize the approaches in this section in Table 6.",
-      "score": 0.0041
+      "page": 3,
+      "quote": "In Section 9 we explore the idea of marginalizing dropout.",
+      "score": 0.0081
     },
     {
       "page": 25,
-      "quote": "In this section, we will discuss the limitations, challenges, and open questions in the area of explainable information retrieval.",
-      "score": 0.0048
+      "quote": "Appendix B. Detailed Description of Experiments and Data Sets . This section describes the network architectures and training details for the experimental results reported in this paper. The code for reproducing these results can be obtained from http://www.cs.toronto.edu/~nitish/dropout. The implementation is GPU-based. We used the excellent CUDA libraries—cudamat (Mnih, 2009) and cuda-convnet (Krizhevsky et al., 2012) to implement our networks.",
+      "score": 0.0029
     }
   ],
   "diagnostics": {
@@ -51,20 +51,20 @@
     "chat_model": "qwen3.6:latest",
     "embedding_model": "bge-m3",
     "retrieved_chunks": 8,
-    "retrieval_query": "Summarise the contribution of each section.",
+    "retrieval_query": "What are the contributions of each section?",
     "sub_queries": [
-      "What is the contribution of section 1?",
-      "What is the contribution of section 2?",
-      "What is the contribution of section 3?"
+      "What is the content and purpose of Section 1?",
+      "What is the content and purpose of Section 2?",
+      "What is the content and purpose of Section 3?",
+      "What is the content and purpose of Section 4?"
     ],
     "retrieval_steps": [
-      "search: 4 queries",
-      "step 1: missing 'Summaries for sections discussing axiomatic rankers, regularization of neural rankers by axioms, probing literature classification, explicit feature contribution models, transparent decision-tree models, and rationale-based methods.' → 3 more queries",
-      "step 2: missing 'Contributions of Section 6 (Axiomatic IR) and Section 7 (Probing literature)' → 2 more queries",
-      "step budget (2) reached"
+      "search: 5 queries",
+      "step 1: missing 'The contributions of Sections 5 (training algorithm) and 6 (experimental results) are not covered in the provided passages.' → 2 more queries",
+      "step 2: evidence sufficient"
     ],
     "tokens": null,
-    "latency_ms": 133502,
-    "timestamp": "2026-07-30T21:40:35Z"
+    "latency_ms": 126242,
+    "timestamp": "2026-07-30T22:43:48Z"
   }
 }

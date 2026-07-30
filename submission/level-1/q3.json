@@ -1,24 +1,24 @@
 {
-  "question_id": "q9d10da",
+  "question_id": "q6b4e31",
   "level": 1,
-  "question": "How does the survey categorise the evaluation of explanations?",
-  "answer": "The survey classifies evaluation approaches into three categories: application-grounded, human-grounded, and functionality-grounded (1). In information retrieval, most techniques focus on functionally grounded evaluations, which are often referred to as intrinsic methods that assess quality based on fidelity, validity, completeness, and human congruence (2). Additionally, human evaluations are distinguished by participant expertise (experts vs. non-experts) and methodology (anecdotal vs. fine-grained/task-based) (3).",
+  "question": "How does the paper approximate combining exponentially many networks without running them all at test time?",
+  "answer": "The paper approximates combining exponentially many networks by using a single unthinned network at test time instead of evaluating all thinned models (1). It achieves this by scaling down the trained weights so that the outgoing weights for any unit retained with probability $p$ are multiplied by $p$ during inference (2). This weight scaling preserves the expected output and effectively combines all $2^n$ thinned models into one network (3).",
   "conversation_id": "level-1",
   "sources": [
     {
-      "page": 5,
-      "quote": "Functionality-grounded evaluation does not involve humans and relies on a closed-form definition of interpretability that serves as a proxy to evaluate the explanation quality.",
-      "score": 0.7629
+      "page": 1,
+      "quote": "Large networks are also slow to use, making it difficult to deal with overfitting by combining the predictions of many different large neural nets at test time.",
+      "score": 0.9152
     },
     {
-      "page": 26,
-      "quote": "10.2.3 Evaluation of Explanations. Evaluation of explanations is a general problem in the area of interpretable machine learning.",
-      "score": 0.7451
+      "page": 3,
+      "quote": "At test time, it is not feasible to explicitly average the predictions from exponentially many thinned models. However, a very simple approximate averaging method works well in practice. The idea is to use a single neural net at test time without dropout. The weights of this network are scaled-down versions of the trained weights. If a unit is retained with probabilityp during training, the outgoing weights of that unit are multiplied by p at test time as shown in Figure 2. This ensures that for any hidden unit the expected output (under the distribution used to drop units at training time) is the same as the actual output at test time. By doing this scaling, 2 n networks with shared weights can be combined into a single neural network to be used at test time.",
+      "score": 0.967
     },
     {
-      "page": 5,
-      "quote": "Evaluations can be simply anecdotal. In this case, example explanations are shown to users, and typically binary judgments regarding the goodness of the explanations are elicited.",
-      "score": 0.4682
+      "page": 3,
+      "quote": "By doing this scaling, 2 n networks with shared weights can be combined into a single neural network to be used at test time. We found that training a network with dropout and using this approximate averaging method at test time leads to significantly lower generalization error on a wide variety of classification problems compared to training with other regularization methods. The idea of dropout is not limited to feed-forward neural nets. It can be more generally applied to graphical models such as Boltzmann Machines. In this paper, we introduce the dropout Restricted Boltzmann Machine model and compare it to standard Restricted Boltzmann Machines (RBM). Our experiments show that dropout RBMs are better than standard RBMs in certain respects.",
+      "score": 0.2781
     }
   ],
   "diagnostics": {
@@ -26,13 +26,13 @@
     "chat_model": "qwen3.6:latest",
     "embedding_model": "bge-m3",
     "retrieved_chunks": 5,
-    "retrieval_query": "How does the survey categorise the evaluation of explanations?",
+    "retrieval_query": "How does the paper approximate combining exponentially many networks without running them all at test time?",
     "sub_queries": [],
     "retrieval_steps": [
       "search: 1 query"
     ],
     "tokens": null,
-    "latency_ms": 50649,
-    "timestamp": "2026-07-30T21:34:48Z"
+    "latency_ms": 44010,
+    "timestamp": "2026-07-30T22:39:22Z"
   }
 }

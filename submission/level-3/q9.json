@@ -1,29 +1,19 @@
 {
-  "question_id": "qb2f05a",
+  "question_id": "q80820d",
   "level": 3,
-  "question": "The introduction warns that over-parameterized models learn \"shortcuts\". Tracing this concept through the attention-based feature attribution work (Section 3.2.2) and the probing of ranking models (Section 7.2), what specific token-level behavior exemplifies this, and what vulnerability does it create?",
-  "answer": "The specific token-level behavior exemplifying this shortcut learning is the concentration of high attention weights on low-information, non-semantic tokens—specifically special markers like `[CLS]` and `[SEP]`, punctuation (e.g., period tokens), and stopwords—rather than on meaningful content words. This superficial reliance is driven by the high document frequency of these tokens rather than their actual relevance to the query (1, 2). \n\nConsequently, this creates a significant vulnerability: it increases the model's susceptibility to adversarial attacks, as manipulating or removing these uninformative markers can easily degrade ranking performance or deceive the system (3). This behavior also underscores a broader disconnect between attention weights and true feature importance in over-parameterized rankers (4).",
+  "question": "Section 2 motivates dropout by analogy with sexual reproduction preventing the co-adaptation of genes. Where do the authors later show that this actually happens inside a neural network, and what do they observe?",
+  "answer": "The authors demonstrate this effect in Section 7.1 by comparing the learned features of autoencoders on MNIST trained with and without dropout (1). They observe that standard networks develop complex co-adaptations where individual units lack meaningful interpretation (2). In contrast, dropout forces hidden units to learn robust, independent representations like edges, strokes, and spots across varied contexts, confirming that dropout successfully breaks up brittle co-adaptations and improves generalization (2).",
   "conversation_id": "level-3",
   "sources": [
     {
-      "page": 8,
-      "quote": "Qiao et al. [95] analyze the learned attentions of BERT-based ranking models, using attention weights to measure the importance of features.",
-      "score": 0.2316
+      "page": 15,
+      "quote": "In a standard neural network, the derivative received by each parameter tells it how it should change so the final loss function is reduced, given what all other units are doing. Therefore, units may change in a way that they fix up the mistakes of the other units. This may lead to complex co-adaptations. This in turn leads to overfitting because these co-adaptations do not generalize to unseen data. We hypothesize that for each hidden unit, dropout prevents co-adaptation by making the presence of other hidden units unreliable. Therefore, a hidden unit cannot rely on other specific units to correct its mistakes. It must perform well in a wide variety of different contexts provided by the other hidden units.",
+      "score": 0.3896
     },
     {
-      "page": 9,
-      "quote": "[141] also use attention weights to obtain feature attributions for a BERT-based ranking model.",
-      "score": 0.1305
-    },
-    {
-      "page": 17,
-      "quote": "Several variations of the probing paradigm have also been applied to various IR tasks and models.",
-      "score": 0.8444
-    },
-    {
-      "page": 8,
-      "quote": "3.2.2 Attention-based Methods. Instead of using gradients, attention-based feature attribution methods use the attention weights contained in attention layers, which are a core building block of transformer models.",
-      "score": 0.1218
+      "page": 16,
+      "quote": "Figure 7a shows features learned by an autoencoder on MNIST with a single hidden layer of 256 rectified linear units without dropout. Figure 7b shows the features learned by an identical autoencoder which used dropout in the hidden layer with p = 0.5. Both autoencoders had similar test reconstruction errors. However, it is apparent that the features shown in Figure 7a have co-adapted in order to produce good reconstructions. Each hidden unit on its own does not seem to be detecting a meaningful feature. On the other hand, in Figure 7b, the hidden units seem to detect edges, strokes and spots in different parts of the image. This shows that dropout does break up co-adaptations, which is probably the main reason why it leads to lower generalization errors.",
+      "score": 0.2366
     }
   ],
   "diagnostics": {
@@ -31,19 +21,19 @@
     "chat_model": "qwen3.6:latest",
     "embedding_model": "bge-m3",
     "retrieved_chunks": 8,
-    "retrieval_query": "What specific token-level behavior exemplifies shortcut learning in attention-based feature attribution work (Section 3.2.2) and probing of ranking models (Section 7.2), and what vulnerability does it create?",
+    "retrieval_query": "Where do the authors show that dropout prevents co-adaptation of neurons like sexual reproduction, and what do they observe?",
     "sub_queries": [
-      "What specific token-level behavior in Section 3.2.2 demonstrates how attention-based feature attribution identifies \"shortcuts\" learned by over-parameterized models?",
-      "What specific vulnerabilities related to token-level behavior are revealed by probing ranking models in Section 7.2?"
+      "Where in the document do the authors present experimental evidence of gene co-adaptation or feature co-activation patterns within a neural network?",
+      "What specific observations regarding dropout's effect on these co-adaptations are reported in that section?"
     ],
     "retrieval_steps": [
       "search: 3 queries",
-      "step 1: missing 'How over-parameterized models specifically learn \"shortcuts\" as defined in the Introduction.' → 2 more queries",
-      "step 2: missing 'How over-parameterized models learning \"shortcuts\" specifically exemplifies token-level behavior in Section 3.2.2 and the resulting vulnerability' → 2 more queries",
+      "step 1: missing 'Specific details on where and how co-adaptation is observed inside a neural network (beyond autoencoder features) or what specific observations are made about it.' → 2 more queries",
+      "step 2: missing 'The specific experimental setup (e.g., layer type, dataset) and detailed observations of gene co-adaptation prevention in a neural network context as described in Section 3.' → 2 more queries",
       "step budget (2) reached"
     ],
     "tokens": null,
-    "latency_ms": 105611,
-    "timestamp": "2026-07-30T21:42:50Z"
+    "latency_ms": 87915,
+    "timestamp": "2026-07-30T22:45:55Z"
   }
 }

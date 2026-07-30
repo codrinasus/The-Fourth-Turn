@@ -1,19 +1,20 @@
-Raval and Verma [99] generate adversarial examples for black-box retrieval models that lower the position of a top-ranked document with minimal changes to the document text. Given the nondifferentiability of replacing discrete tokens, they optimize adversarial examples using a stochastic evolutionary algorithm with a one-token-at-a-time replacement strategy. Wu et al. [135] take a different approach by training a surrogate model based on pseudo-relevance feedback, which is used to approximate the gradient of the underlying black box ranking model. This approximated gradient is then used to find adversarial perturbations that promote a target document. Additionally, the adversarial perturbations are restricted by semantic similarity to the original document. The authors argue that the perturbations are imperceptible and evade spam detection when constraining the perturbations to semantic synonyms. Goren et al. [45] craft adversarial examples for the LambdaMART LTR model. For a given query, they use past rankings to create perturbations by replacing passages in the target document with passages from other high-ranked documents. Wang et al. [132] use gradient-based optimization to generate adversarial examples for BERTbased ranking models. They add or replace a few tokens in documents that cause significant rank promotions and demotions.
+Table 7: Phone error rate on the TIMIT core test set.
+Method | Phone Error
+NN (6 layers) (Mohamed et al., 2010) | 23.4
+Dropout NN (6 layers) | 21.8
+DBN-pretrained NN (4 layers) | 22.7
+DBN-pretrained NN (6 layers) (Mohamed et al., 2010) | 22.4
+DBN-pretrained NN (8 layers) (Mohamed et al., 2010) | 20.7
+mcRBM-DBN-pretrained NN (5 layers) (Dahl et al., 2010) | 20.5
+DBN-pretrained NN (4 layers) + dropout | 19.7
+DBN-pretrained NN (8 layers) + dropout | 19.7
 
-5.2 Universal Adversarial Triggers
+6.3 Results on a Text Data Set
 
-While adversarial examples focus on input perturbations that change the prediction of individual inputs, universal adversarial triggers [130] are input-agnostic perturbations that lead to a model making a specific prediction whenever the trigger is concatenated to any input. Starting from an initial sequence of tokens, a trigger is optimized via a gradient-based search algorithm that iteratively replaces tokens. The effect of replacing a discrete token is usually approximated using HotFlip [33]. Since the resulting triggers transfer across input examples, they can be used to explain the global behavior of a model and can reveal global patterns.
+To test the usefulness of dropout in the text domain, we used dropout networks to train a document classifier. We used a subset of the Reuters-RCV1 data set which is a collection of over 800,000 newswire articles from Reuters. These articles cover a variety of topics. The task is to take a bag of words representation of a document and classify it into 50 disjoint topics. Appendix B.5 describes the setup in more detail. Our best neural net which did not use dropout obtained an error rate of 31 . 05%. Adding dropout reduced the error to 29 . 62%. We found that the improvement was much smaller compared to that for the vision and speech data sets.
 
-5.2.1 Universal Triggers for Text Ranking. Wang et al. [132] adapt universal adversarial triggers for text-based ranking models. They propose a global ranking attack to find trigger tokens that are adversarial to all queries contained in a dataset. Specifically, they optimize a fixed-length trigger so that any document to which it is concatenated will be demoted (or promoted) as much as possible for any given query. In their experiments with BERT-based ranking models fine-tuned on ClueWeb09 [18] and MS MARCO [86], they discover topical patterns within and between datasets and expose potential dataset and model biases. For example, the trigger
+6.4 Comparison with Bayesian Neural Networks
 
-hinduism earthquakes childbirth tornadoes Wikipedia
+Dropout can be seen as a way of doing an equally-weighted averaging of exponentially many models with shared weights. On the other hand, Bayesian neural networks (Neal, 1996) are the proper way of doing model averaging over the space of neural network structures and parameters. In dropout, each model is weighted equally, whereas in a Bayesian neural network each model is weighted taking into account the prior and how well the model fits the data, which is the more correct approach. Bayesian neural nets are extremely useful for solving problems in domains where data is scarce such as medical diagnosis, genetics, drug discovery and other computational biology applications. However, Bayesian neural nets are slow to train and difficult to scale to very large network sizes. Besides, it is expensive to get predictions from many large nets at test time. On the other hand, dropout neural nets are much faster to train and use at test time. In this section, we report experiments that compare Bayesian neural nets with dropout neural nets on a small data set where Bayesian neural networks are known to perform well and obtain state-of-the-art results. The aim is to analyze how much does dropout lose compared to Bayesian neural nets.
 
-promotes a document by 63 ranks on average, and the trigger
-
-acceptable competition rayon favour ##kei
-
-demotes a document by 84 ranks on average across all queries. In general, finding triggers for which highly relevant documents get demoted appears easier than finding triggers for which low-ranked documents are promoted.
-
-6 AXIOMATIC ANALYSIS OF TEXT RANKING MODELS
-
-Unlike current data-driven, parameterized models for relevance estimation, traditional IR approaches to ranking involve probabilistic models of relevance such as BM25 [3] and axiomatic approaches. Both approaches have a top-down defined notion of relevance, allowing for some sort of interpretability. Yet, the probabilistic models are currently dominant and axiomatic approaches less popular. In contrast to the recent development of neural, and therefore less interpretable, rankers, Axiomatic IR postulates and formalizes the properties of principled rankers. The term axiom in IR
+The data set that we use (Xiong et al., 2011) comes from the domain of genetics. The task is to predict the occurrence of alternative splicing based on RNA features. Alternative splicing is a significant cause of cellular diversity in mammalian tissues. Predicting the occurrence of alternate splicing in certain tissues under different conditions is important for understanding many human diseases. Given the RNA features, the task is to predict the probability of three splicing related events that biologists care about. The evaluation metric is Code Quality which is a measure of the negative KL divergence between the target and the predicted probability distributions (higher is better). Appendix B.6 includes a detailed description of the data set and this performance metric.

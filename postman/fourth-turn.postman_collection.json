@@ -120,7 +120,7 @@
             "url": "{{base_url}}/query",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"question\": \"How many papers does the survey consider, and how many of them receive a more detailed treatment?\",\n  \"level\": 1\n}"
+              "raw": "{\n  \"question\": \"What is the biological motivation for dropout described in the paper?\",\n  \"level\": 1\n}"
             }
           }
         },
@@ -137,7 +137,7 @@
             "url": "{{base_url}}/query",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"question\": \"What is the main goal of explainable information retrieval according to the survey?\",\n  \"level\": 1\n}"
+              "raw": "{\n  \"question\": \"What dropout probabilities do the authors use for hidden units and for input units?\",\n  \"level\": 1\n}"
             }
           }
         },
@@ -154,7 +154,7 @@
             "url": "{{base_url}}/query",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"question\": \"How does the survey categorise the evaluation of explanations?\",\n  \"level\": 1\n}"
+              "raw": "{\n  \"question\": \"How does the paper approximate combining exponentially many networks without running them all at test time?\",\n  \"level\": 1\n}"
             }
           }
         },
@@ -171,7 +171,7 @@
             "url": "{{base_url}}/query",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"question\": \"What is the main limitation the authors acknowledge?\",\n  \"level\": 2\n}"
+              "raw": "{\n  \"question\": \"What drawback of dropout do the authors report?\",\n  \"level\": 2\n}"
             }
           }
         },
@@ -205,7 +205,7 @@
             "url": "{{base_url}}/query",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"question\": \"And how do they propose to address it?\",\n  \"level\": 2\n}"
+              "raw": "{\n  \"question\": \"And what benefit does that same noise bring?\",\n  \"level\": 2\n}"
             }
           }
         },
@@ -222,7 +222,7 @@
             "url": "{{base_url}}/query",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"question\": \"Across the classification tables in this survey - post-hoc methods, axiomatic methods, explainable-by-architecture models and rationale-based approaches - what is the most common way the quality of explanations is evaluated, and what do the authors themselves say about relying on that kind of evidence?\",\n  \"level\": 3\n}"
+              "raw": "{\n  \"question\": \"Across the image, speech, text and genetics experiments, which data sets is dropout evaluated on, and what does the paper report as its typical effect on the error rate?\",\n  \"level\": 3\n}"
             }
           }
         },
@@ -256,7 +256,7 @@
             "url": "{{base_url}}/query",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"question\": \"The introduction warns that over-parameterized models learn \\\"shortcuts\\\". Tracing this concept through the attention-based feature attribution work (Section 3.2.2) and the probing of ranking models (Section 7.2), what specific token-level behavior exemplifies this, and what vulnerability does it create?\",\n  \"level\": 3\n}"
+              "raw": "{\n  \"question\": \"Section 2 motivates dropout by analogy with sexual reproduction preventing the co-adaptation of genes. Where do the authors later show that this actually happens inside a neural network, and what do they observe?\",\n  \"level\": 3\n}"
             }
           }
         }

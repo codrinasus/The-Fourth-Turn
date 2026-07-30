@@ -49,6 +49,8 @@ _SYSTEM = (
     "refers to. 'Why does that happen?' must name what 'that' is.\n"
     "- Resolve an ambiguous reference to ONE thing — the main subject of the previous "
     "answer. Never expand it into a list of everything that was mentioned.\n"
+    "- If the previous answer enumerated several things, take the FIRST one it gives, "
+    "which is the one it presented as primary. Do not pick a later item.\n"
     "- If the question already stands on its own, repeat it EXACTLY as written. Do not "
     "append background, qualifiers or facts from earlier answers to it.\n"
     "- Ask about one thing. The result must be a single, short question.\n"

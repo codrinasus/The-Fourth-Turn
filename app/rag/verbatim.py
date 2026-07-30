@@ -60,12 +60,25 @@ _FOLD = {
     " ": " ",
     " ": " ",
     " ": " ",
+    # Typographic ligatures. Extractors disagree about whether to expand these, so both
+    # sides are folded to the letters. The dropout paper alone contains 121 "ﬁ" and 91
+    # "ﬀ" ("diﬀerent", "eﬀect", "overﬁtting"), so a missing "ﬀ" here would break the
+    # majority of its quotes.
+    "ﬀ": "ff",
     "ﬁ": "fi",
     "ﬂ": "fl",
+    "ﬃ": "ffi",
+    "ﬄ": "ffl",
+    "ﬅ": "st",
+    "ﬆ": "st",
     "": "Qu",
 }
 _PUA = re.compile(r"[-]")
 _WS = re.compile(r"\s+")
+_HYPHEN = re.compile(r"-")
+# A word broken across a line: letter, hyphen, line break, lowercase letter. Repaired in
+# the span we return so a quote reads as prose rather than as a page layout.
+_LINE_BREAK_HYPHEN = re.compile(r"(?<=[A-Za-z])-\s+(?=[a-z])")
 
 _MIN_ALIGNABLE = 20  # below this a match is as likely to be coincidence as evidence
 
@@ -86,17 +99,30 @@ def _fold_with_map(text: str) -> tuple[str, list[int]]:
     out: list[str] = []
     offsets: list[int] = []
     for i, ch in enumerate(text):
-        if ch.isspace():
+        # Skip exactly what `_squash` drops, so the haystack and the needle are written in
+        # the same alphabet and an index into one means the same thing in the other.
+        if ch.isspace() or ch == "-":
             continue
-        for piece in _FOLD.get(ch, "" if _PUA.match(ch) else ch):
+        folded = _FOLD.get(ch, "" if _PUA.match(ch) else ch)
+        if folded == "-":
+            continue
+        for piece in folded:
             out.append(piece)
             offsets.append(i)
     return "".join(out), offsets
 
 
 def _squash(text: str) -> str:
-    """Folded and stripped of all whitespace — the form both sides are compared in."""
-    return _WS.sub("", _fold(text))
+    """The normal form both sides are compared in: folded, de-hyphenated, whitespace-free.
+
+    Hyphens go too, and that is not laziness. A PDF breaks words across lines with a
+    hyphen, and the two extractors disagree about it: pypdf reports the layout as it
+    stands — `optimiza- tion`, `au- tomatically` — while Docling rejoins the word. Neither
+    hyphen is content; it is a typesetting artefact of where the line happened to end.
+    Dropping every hyphen makes `optimiza-tion`, `optimization` and `max-norm` versus
+    `maxnorm` all compare equal, which is the behaviour we want in both directions.
+    """
+    return _HYPHEN.sub("", _WS.sub("", _fold(text)))
 
 
 @lru_cache(maxsize=1)
@@ -121,6 +147,21 @@ def _pdf_pages() -> tuple[str, ...]:
         return ()
 
 
+def _readable(span: str) -> str:
+    """A PDF span cleaned of extraction artefacts, keeping the file's own punctuation.
+
+    Two artefacts, both of layout rather than content: a word broken across a line comes
+    back as `optimiza- tion`, and ligatures come back as single glyphs (`diﬀerent`).
+    Shipping either would put the page's typesetting into an evidence quote. The dashes,
+    curly quotes and the wording remain the PDF's.
+    """
+    joined = _LINE_BREAK_HYPHEN.sub("", span)
+    for glyph, expansion in _FOLD.items():
+        if len(expansion) > 1:  # ligatures only — not the dash/quote folds
+            joined = joined.replace(glyph, expansion)
+    return _WS.sub(" ", joined).strip()
+
+
 def _slice(needle: str, page_text: str) -> str | None:
     """The span of `page_text` matching `needle`, in the page's own characters."""
     haystack, offsets = _fold_with_map(page_text)
@@ -129,7 +170,33 @@ def _slice(needle: str, page_text: str) -> str | None:
         return None
     start = offsets[at]
     end = offsets[at + len(needle) - 1] + 1
-    return _WS.sub(" ", page_text[start:end]).strip()
+    return _readable(page_text[start:end])
+
+
+def find(quote: str, page: int) -> tuple[str, int] | None:
+    """`(the span in the PDF's characters, its real page)`, or None if it is not there.
+
+    The single lookup both `locate` and the quote-width choice in `rag/citations.py` are
+    built on, so "can this be proven verbatim?" and "what do we ship?" can never disagree.
+    """
+    pages = _pdf_pages()
+    if not pages or len(quote) < _MIN_ALIGNABLE:
+        return None
+
+    needle = _squash(quote)
+    if 1 <= page <= len(pages):
+        found = _slice(needle, pages[page - 1])
+        if found:
+            return found, page
+
+    # Nearest-first, so a page-break overflow resolves to the adjoining page rather than
+    # to some coincidentally similar text elsewhere in the document.
+    for candidate in sorted(range(1, len(pages) + 1), key=lambda p: (abs(p - page), p)):
+        found = _slice(needle, pages[candidate - 1])
+        if found:
+            log.info("quote cited to page %d is actually on page %d — corrected", page, candidate)
+            return found, candidate
+    return None
 
 
 def locate(quote: str, page: int) -> tuple[str, int]:
@@ -149,36 +216,23 @@ def locate(quote: str, page: int) -> tuple[str, int]:
     Unchanged input is returned whenever the PDF is unreadable or the quote cannot be
     found anywhere — this can only improve a citation, never invent one.
     """
-    pages = _pdf_pages()
-    if not pages or len(quote) < _MIN_ALIGNABLE:
+    found = find(quote, page)
+    if found is None:
+        log.info("quote not locatable anywhere in the PDF — returning it unaligned")
         return quote, page
-
-    needle = _squash(quote)
-    if 1 <= page <= len(pages):
-        found = _slice(needle, pages[page - 1])
-        if found:
-            return found, page
-
-    # Nearest-first, so a page-break overflow resolves to the adjoining page rather than
-    # to some coincidentally similar text elsewhere in the document.
-    for candidate in sorted(range(1, len(pages) + 1), key=lambda p: (abs(p - page), p)):
-        found = _slice(needle, pages[candidate - 1])
-        if found:
-            log.info("quote cited to page %d is actually on page %d — corrected", page, candidate)
-            return found, candidate
-
-    log.info("quote not locatable anywhere in the PDF — returning it unaligned")
-    return quote, page
+    return found
 
 
 def is_verbatim(quote: str, page: int) -> bool:
-    """Whether `quote` appears on `page` of the PDF, ignoring whitespace.
+    """Whether `quote` appears on `page` of the PDF under the documented normalisation.
 
-    The check `scripts/audit_quotes.py` uses to put a number on grounding. Punctuation and
-    case are **not** folded — only whitespace, for the reason given in the module
-    docstring — so a quote that passes matches the PDF character for character.
+    The check `scripts/audit_quotes.py` uses to put a number on grounding. Both sides are
+    normalised the same way and only for things that are artefacts of PDF extraction:
+    whitespace, line-break hyphenation, ligatures, and the dash/quote variants the two
+    extractors disagree about. **Case and wording are not touched** — a passing quote is
+    the page's own words in the page's own order, and any paraphrase fails.
     """
     pages = _pdf_pages()
     if not pages or not (1 <= page <= len(pages)) or not quote.strip():
         return False
-    return _WS.sub("", quote) in _WS.sub("", pages[page - 1])
+    return _squash(quote) in _squash(pages[page - 1])

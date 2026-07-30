@@ -1,18 +1,20 @@
-Fig. 6. Example of query expansion terms (green) as explanations. The expansion terms are chosen such that an interpretable term-based ranker best approximates the ranking of documents produced by a black-box ranking model.
-Qu ery: can you do yoga from a chair + {poses, guide, home, how, hip, sequence, learn} |  |
-Rank | Score | Document Text
-1 | 9.37 | 10 Yoga Poses You Can Do in a Chair | Chair pose yoga, Chair yoga, Yoga poses ...
-2 | 9.34 | Chair Hip Opening And Strength Flow Yoga | Yoga Sequences, Benefits ...
-3 | 9.31 | Chair Seated Twists Yoga | Yoga Sequences, Benefits, Variations, and Sanskrit ...
-4 | 9.31 | 5 Best Yoga Ball Chair for Homes and Offices (2021 Buying Guide) - Learn ...
-5 | 9.29 | Chair Yoga for Seniors: 8 Chair Yoga Poses Seniors Can Do Easily At Home ...
+(a) Street View House Numbers (SVHN)
 
-4.1.2 Generating Query Descriptions. Zhang et al. [143] introduce a Query-to-Intent-Description task for query understanding. Given a query and a set of both relevant and irrelevant documents, the goal is to generate a natural language intent description. To solve this task, they propose CtrsGen, a contrastive generation model that generates a query intent description by contrasting the relevant and irrelevant documents. The training data for CtrsGen consists of multiple TREC and SemEval [23] collections that already include query descriptions. Although not explicitly discussed by Zhang et al. [143], CtrsGen can be used to explain query intents as understood by a black-box ranker by selecting relevant and irrelevant documents based on the output of the ranking model. However, it has not yet been examined whether the generations of CtrsGen explain the underlying ranking model faithfully.
+(b) CIFAR-10
 
-4.2 Explaining Document Relevance
+Figure 5: Samples from image data sets. Each row corresponds to a different category.
+Method | CIFAR-10 | CIFAR-100
+Conv Net + max pooling (hand tuned) | 15.60 | 43.48
+Conv Net + stochastic pooling (Zeiler and Fergus, 2013) | 15.13 | 42.51
+Conv Net + max pooling (Snoek et al., 2012) | 14.98 | -
+Conv Net + max pooling + dropout fully connected layers | 14.32 | 41.26
+Conv Net + max pooling + dropout in all layers | 12.61 | 37.20
+Conv Net + maxout (Goodfellow et al., 2013) | 11.68 | 38.57
 
-A recent line of work in explainable document retrieval aims to explain why a document or a set of documents is considered relevant to a query by generating free-text explanations. Compared to other model-agnostic explanation methods, free-text explanations are not limited to explaining document relevance using features that are already contained in the input. A user study by [97] suggests that adding free-text document relevance explanations to search engine result pages can help users identify relevant documents faster and more accurately.
+Table 4: Error rates on CIFAR-10 and CIFAR-100.
 
-4.2.1 Pointwise Explanations. Rahimi et al. [97] generate document relevance explanations for individual query-document pairs. They propose GenEx, a transformer-based model that outputs free-text document relevance explanations. Given a query-document pair, GenEx learns to generate a text sequence that explains why the document is relevant to the query. The explanations consist of only a few words instead of whole snippets, and explicitly avoid reusing the terms already contained in the query. The model uses an encoder-decoder architecture, with the decoder being extended by a query-masking mechanism to decrease the probability of generating tokens that are already contained in the query. The training data consists of query-document-explanation triplets and is automatically constructed from Wikipedia articles and the ClueWeb09 dataset [18].
+6.1.4 ImageNet
 
-4.2.2 Listwise Explanations. Yu et al. [138] argue that explaining documents independently is inherently limited. Per-document explanations do not explain differences between documents, and a single document can potentially cover multiple query aspects at the same time. As a solution, they propose a listwise explanation generator (LiEGe) that for a given query jointly explains all the documents contained in a ranked result list. LiEGe is based on an encoder-decoder transformer
+ImageNet is a data set of over 15 million labeled high-resolution images belonging to roughly 22,000 categories. Starting in 2010, as part of the Pascal Visual Object Challenge, an annual competition called the ImageNet Large-Scale Visual Recognition Challenge (ILSVRC) has been held. A subset of ImageNet with roughly 1000 images in each of 1000 categories is used in this challenge. Since the number of categories is rather large, it is conventional to report two error rates: top-1 and top-5, where the top-5 error rate is the fraction of test images for which the correct label is not among the five labels considered most probable by the model. Figure 6 shows some predictions made by our model on a few test images.
+
+ILSVRC-2010 is the only version of ILSVRC for which the test set labels are available, so most of our experiments were performed on this data set. Table 5 compares the performance of different methods. Convolutional nets with dropout outperform other methods by a large margin. The architecture and implementation details are described in detail in Krizhevsky et al. (2012).

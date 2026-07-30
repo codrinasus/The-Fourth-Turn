@@ -41,6 +41,14 @@ def main() -> int:
         except Exception as e:  # noqa: BLE001 - a failed question must not stop the rest
             print(f"{q['id']}  FAILED  {e}")
             continue
+        # The pipeline degrades rather than 500s when the LLM is unreachable, which is
+        # right for the API and wrong for the deliverable: it once filed a timed-out
+        # "[LLM unavailable]" placeholder over a good q7 answer. A degraded response is
+        # reported loudly and the existing file is left alone.
+        if resp["answer"].lstrip().startswith("[LLM unavailable"):
+            print(f"{q['id']}  DEGRADED — not filed: {resp['answer'][:90]}", flush=True)
+            continue
+
         out = ROOT / "submission" / f"level-{q['level']}" / f"{q['id']}.json"
         out.write_text(json.dumps(resp, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 

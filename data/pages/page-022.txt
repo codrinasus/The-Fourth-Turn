@@ -1,19 +1,19 @@
-Table 5. Explainable-by-architecture Methods. Components indicate which component of the model architecture is explainable. Note that Colbert did not discuss or evaluate explainability. More similar datasets are used in each paper, and we choose one as representative.
-Method | Task | Components | Explanation | Dataset | Evaluation
-Colbert [63] | Text Ranking | Interaction | Soft-rule | MS MARCO | -
-Transformer-Kernel [54] | Text Ranking | Interaction | Soft-rule | MS MARCO | Anecdotal
-NeuralModel1 [15] | Text Ranking | Interaction | Soft-rule | MS MARCO | Anecdotal
-NeuralGAM [149] | LTR | Input | Feature Attr. | Yahoo | Reference
-ILMART [75] | LTR | Fully | Hard-rule | Yahoo | Anecdotal
+9.1 Linear Regression
 
-9 RATIONALE-BASED METHODS
+First we explore a very simple case of applying dropout to the classical problem of linear regression. Let X ∈ R N × D be a data matrix of N data points. y ∈ R N be a vector of targets. Linear regression tries to find a w ∈ R D that minimizes
 
-The second class of IBD methods deals to enhance the interpretability of IR models by generating rationales as an intermediate sparse input representation (see Figure 9). A rationale is defined as an extractive piece of the input text that is responsible for the decision of the model. A rationale-based method performs the task prediction two-stage. In the first feature-extraction phase, a model learns to extract the rationale from the input text. In the subsequent prediction phase, another independent task model predicts the task output solely based on the extractive explanation. Note that in such a setup, each prediction can be unambiguously attributed to the generated rationale that is both human-understandable and acts as an explanation. Examples of rationales are provided below in Figure 10.
+When the input X is dropped out such that any input dimension is retained with probability p , the input can be expressed as R ∗ X where R ∈ { 0 , 1 } N × D is a random matrix with R ij ∼ Bernoulli( p ) and ∗ denotes an element-wise product. Marginalizing the noise, the objective function becomes
 
-Fig. 10. Example of a binary rationale selection. First, a subset of tokens is selected. Then, a prediction is made based on the selected rationale tokens. Selected rationales are highlighted in orange.
+This reduces to
 
-We summarize the approaches in this section in Table 6. The feature extraction stage in rationalebased models is sometimes called the selection or rationale-generation stage [70, 146]. The major challenge in rationale-based methods is training the rationale-extraction module due to the discrete rationale output of this stage. There are essentially two types of rationale-based methods based on the optimization styles pipeline or end-to-end .
+where Γ = (diag( X ⊤ X )) 1 / 2 . Therefore, dropout with linear regression is equivalent, in expectation, to ridge regression with a particular form for Γ. This form of Γ essentially scales the weight cost for weight w i by the standard deviation of the i th dimension of the data. If a particular data dimension varies a lot, the regularizer tries to squeeze its weight more.
 
-9.1 Pipeline Approaches
+Another interesting way to look at this objective is to absorb the factor of p into w . This leads to the following form
 
-A rationale-based model is a pipeline model if the rationale-extraction module is trained separately from the task prediction module. Most pipeline methods require the presence of human-annotated, extractive rationale data to train the rationale-extraction network. The first pipeline model was proposed by Lehman et al. [68]. Their approach was proposed for the analysis of clinical trial reports, where the aim is to predict whether the clinical trial causes a significant effect compared with the control group. The reports are themselves annotated by human experts, where experts do annotate not only the significance of the trial but also the snippet of the reports as the rationale supporting such prediction. This constitutes the training data for the rationale-extraction module.
+where ˜ w = p w . This makes the dependence of the regularization constant on p explicit. For p close to 1, all the inputs are retained and the regularization constant is small. As more dropout is done (by decreasing p ), the regularization constant grows larger.
+
+9.2 Logistic Regression and Deep Networks
+
+For logistic regression and deep neural nets, it is hard to obtain a closed form marginalized model. However, Wang and Manning (2013) showed that in the context of dropout applied to logistic regression, the corresponding marginalized model can be trained approximately. Under reasonable assumptions, the distributions over the inputs to the logistic unit and over the gradients of the marginalized model are Gaussian. Their means and variances can be computed efficiently. This approximate marginalization outperforms Monte-Carlo dropout in terms of training time and generalization performance.
+
+However, the assumptions involved in this technique become successively weaker as more layers are added. Therefore, the results are not directly applicable to deep networks.

@@ -429,8 +429,23 @@ _PUA_LIGATURES = {"": "Qu"}
 _PUA_RANGE = re.compile(r"[-]")
 
 
+# Standard Unicode ligatures. These are legitimate codepoints rather than PUA slots, but
+# extractors disagree about expanding them and no reader wants "diﬀerent" in an evidence
+# quote, so they are normalised to their letters at parse time. rag/verbatim.py folds the
+# same set when matching against the PDF, so the two sides agree.
+_LIGATURES = {
+    "ﬀ": "ff",
+    "ﬁ": "fi",
+    "ﬂ": "fl",
+    "ﬃ": "ffi",
+    "ﬄ": "ffl",
+    "ﬅ": "st",
+    "ﬆ": "st",
+}
+
+
 def _expand_ligatures(text: str) -> str:
-    for glyph, expansion in _PUA_LIGATURES.items():
+    for glyph, expansion in {**_PUA_LIGATURES, **_LIGATURES}.items():
         text = text.replace(glyph, expansion)
     return _PUA_RANGE.sub("", text)
 

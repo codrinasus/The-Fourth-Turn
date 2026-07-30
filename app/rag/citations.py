@@ -5,9 +5,13 @@ Two jobs, split so that neither the model nor the code does something it is bad 
 1. **Which chunks were used** — the model tells us. Contexts are numbered in the prompt and
    the answer carries `(1)`, `(2)` markers, so only the evidence it actually leaned on ends
    up in `sources` instead of every retrieved chunk.
-2. **Which span is the evidence** — the *code* decides, by scoring the sentences of a cited
-   chunk against the question with the same cross-encoder used for reranking, then slicing
-   that sentence straight out of the chunk text.
+2. **Which span is the evidence** — the *code* decides. The sentences of a cited chunk are
+   scored against the question with the same cross-encoder used for reranking, and then
+   the quote is *widened* around the winner: we try the whole chunk, then the paragraph
+   containing it, then the sentence alone, and ship the largest one the PDF can vouch for.
+   A lone sentence read as truncated — the best-matching sentence is frequently the one
+   next to the sentence carrying the fact — so we return all the context the document
+   will actually confirm.
 
 Because the quote is sliced from indexed text rather than generated, it is verbatim by
 construction: there is no paraphrase to detect and no hallucinated quote to verify.
@@ -24,7 +28,7 @@ from __future__ import annotations
 
 import re
 
-from . import rerank
+from . import rerank, verbatim
 from .retrieve import Context
 
 # The paper's own references look like [42], so we ask for parentheses instead of brackets
@@ -144,12 +148,36 @@ def _is_heading(span: str) -> bool:
     return len(stripped) < _MIN_HEADING_PROSE and not stripped.endswith((".", "!", "?", ":"))
 
 
-def evidence_quote(question: str, context: Context) -> str:
-    """The span of `context` that best supports an answer to `question`.
+def _block_around(text: str, start: int, end: int) -> tuple[int, int]:
+    """The paragraph containing `start:end`, as offsets.
 
-    Always an exact substring of the chunk — and therefore of the page, since chunks are
-    built from page text and never span pages. We slice, never generate. Falls back to the
-    chunk's opening span if the cross-encoder is unavailable.
+    Blocks are separated by the blank line `chunking._emit` inserts between them, so this
+    is the largest unit that was contiguous prose on the page.
+    """
+    opening = text.rfind("\n\n", 0, start)
+    closing = text.find("\n\n", end)
+    return (0 if opening < 0 else opening + 2, len(text) if closing < 0 else closing)
+
+
+def evidence_quote(question: str, context: Context) -> str:
+    """The evidence from `context`, as much of it as can be proven verbatim.
+
+    We slice, never generate, so any of these is a true substring of the chunk. The
+    question is how *much* to return, and a single sentence turned out to be too little:
+    the sentence the cross-encoder picks is the one that best matches the question, which
+    is often the sentence just before or after the one carrying the actual fact, so the
+    relevant part reads as cut off.
+
+    So we widen, and let the PDF arbitrate. Three candidates are tried largest-first —
+    the whole chunk, then the paragraph around the best sentence, then the sentence — and
+    the first that `verbatim` can locate on the page wins. That gives the fullest context
+    the document can actually vouch for, and it cannot lower the verbatim rate: the
+    sentence is still there as the last resort, exactly as before.
+
+    Widest-first matters because a chunk may join blocks that were not adjacent on the
+    page — `chunking` drops page headers, footers and footnotes from between them — so
+    the whole chunk is *usually* but not always a contiguous page span. Rather than
+    predict which, we ask.
     """
     text = context.text
     bounds = _merge_short(text, _spans(text))
@@ -162,15 +190,25 @@ def evidence_quote(question: str, context: Context) -> str:
     bounds = prose or bounds
     if not bounds:
         return text.strip()
-    if len(bounds) == 1:
-        start, end = bounds[0]
-        return text[start : min(end, start + _MAX_QUOTE)].strip()
 
-    try:
-        scores = rerank.score(question, [text[s:e] for s, e in bounds])
-        best = max(range(len(bounds)), key=lambda i: scores[i])
-    except rerank.RerankError:
+    if len(bounds) == 1:
         best = 0
+    else:
+        try:
+            scores = rerank.score(question, [text[s:e] for s, e in bounds])
+            best = max(range(len(bounds)), key=lambda i: scores[i])
+        except rerank.RerankError:
+            best = 0
 
     start, end = bounds[best]
-    return text[start : min(end, start + _MAX_QUOTE)].strip()
+    sentence = text[start : min(end, start + _MAX_QUOTE)].strip()
+    block_start, block_end = _block_around(text, start, end)
+
+    for candidate in (
+        text.strip(),  # the whole chunk
+        text[block_start:block_end].strip(),  # the paragraph the best sentence sits in
+        sentence,  # the sentence itself
+    ):
+        if verbatim.find(candidate, context.page) is not None:
+            return candidate
+    return sentence
