@@ -1,19 +1,14 @@
 {
-  "question_id": "qf44b93",
+  "question_id": "q7c2c52",
   "level": 1,
   "question": "What dropout probabilities do the authors use for hidden units and for input units?",
-  "answer": "The authors state that all dropout nets use a retention probability of $p = 0.5$ for hidden units and $p = 0.8$ for input units (1, 2). They also note in section A.4 that typical values for hidden units generally range from 0.5 to 0.8, while 0.8 is standard for real-valued input layers (3).",
+  "answer": "The authors state that all dropout nets use a retention probability of p = 0.5 for hidden units and p = 0.8 for input units (1). They also note that typical values for hidden units generally range from 0.5 to 0.8, while real-valued input layers typically use 0.8 (2).",
   "conversation_id": "level-1",
   "sources": [
     {
       "page": 9,
       "quote": "06%. Increasing the size of the network leads to better results. A neural net with 2 layers and 8192 units per layer gets down to 0.95% error. Note that this network has more than 65 million parameters and is being trained on a data set of size 60,000. Training a network of this size to give good generalization error is very hard with standard regularization methods and early stopping. Dropout, on the other hand, prevents overfitting, even in this case. It does not even need early stopping. Goodfellow et al. (2013) showed that results can be further improved to 0.94% by replacing ReLU units with maxout units. All dropout nets use p = 0.5 for hidden units andp = 0.8 for input units. More experimental details can be found in Appendix B.1.",
       "score": 0.9853
-    },
-    {
-      "page": 23,
-      "quote": "5 for the hidden units and p = 0.8 for the input units.",
-      "score": 0.9647
     },
     {
       "page": 25,
@@ -32,7 +27,7 @@
       "search: 1 query"
     ],
     "tokens": null,
-    "latency_ms": 42006,
-    "timestamp": "2026-07-30T22:38:39Z"
+    "latency_ms": 51316,
+    "timestamp": "2026-07-30T23:24:41Z"
   }
 }

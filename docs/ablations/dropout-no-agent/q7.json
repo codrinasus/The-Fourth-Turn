@@ -1,14 +1,14 @@
 {
-  "question_id": "qfe1bef",
+  "question_id": "q8cca9e",
   "level": 3,
   "question": "Across the image, speech, text and genetics experiments, which data sets is dropout evaluated on, and what does the paper report as its typical effect on the error rate?",
-  "answer": "**Datasets evaluated:**\n- Image: MNIST, SVHN, CIFAR-10, CIFAR-100, and ImageNet (1, 2).\n- Speech: TIMIT (2, 3).\n- Text: Reuters-RCV1 (2, 4).\n- Genetics/Computational biology: A genetic dataset used for an alternative splicing prediction task (5).\n\n**Typical effect on error rate:**\nDropout consistently reduces error rates and improves generalization across all tested domains without requiring extensive hyperparameter tuning or external data augmentation (2, 6, 7). The magnitude of improvement varies by domain: it produces substantial reductions for vision and speech tasks (3, 8) and a more modest but positive reduction for text classification (4), frequently achieving state-of-the-art benchmark results (5, 7).",
+  "answer": "**Datasets evaluated:**\n- Image: MNIST, SVHN, CIFAR-10, CIFAR-100, and ImageNet (1, 2).\n- Speech: TIMIT (2, 3).\n- Text: Reuters-RCV1 (2, 4).\n\n**Typical effect on error rate:**\nAcross all tested domains, dropout consistently improves generalization and reduces error rates compared to standard neural networks (2, 5). The reduction is typically large for vision and speech benchmarks, frequently achieving state-of-the-art performance (1, 6). For text classification, the improvement is smaller but still notable, such as lowering the Reuters-RCV1 error from 31.05% to 29.62% (4). Overall, dropout serves as a robust regularizer that prevents overfitting across diverse architectures without requiring architecture-specific hyperparameter tuning (7).",
   "conversation_id": "level-3",
   "sources": [
     {
       "page": 8,
       "quote": "6.1 Results on Image Data Sets We used five image data sets to evaluate dropout—MNIST, SVHN, CIFAR-10, CIFAR-100 and ImageNet. These data sets include different image types and training set sizes. Models which achieve state-of-the-art results on all of these data sets use dropout.",
-      "score": 0.9354
+      "score": 0.9314
     },
     {
       "page": 7,
@@ -18,32 +18,27 @@
     {
       "page": 12,
       "quote": "Next, we applied dropout to a speech recognition task.",
-      "score": 0.4712
+      "score": 0.4723
     },
     {
       "page": 13,
       "quote": "6.3 Results on a Text Data Set To test the usefulness of dropout in the text domain, we used dropout networks to train a document classifier. We used a subset of the Reuters-RCV1 data set which is a collection of over 800,000 newswire articles from Reuters. These articles cover a variety of topics. The task is to take a bag of words representation of a document and classify it into 50 disjoint topics. Appendix B.5 describes the setup in more detail. Our best neural net which did not use dropout obtained an error rate of 31 .05%. Adding dropout reduced the error to 29.62%. We found that the improvement was much smaller compared to that for the vision and speech data sets.",
-      "score": 0.7442
-    },
-    {
-      "page": 1,
-      "quote": "At test time, it is easy to approximate the effect of averaging the predictions of all these thinned networks by simply using a single unthinned network that has smaller weights. This significantly reduces overfitting and gives major improvements over other regularization methods. We show that dropout improves the performance of neural networks on supervised learning tasks in vision, speech recognition, document classification and computational biology, obtaining state-of-the-art results on many benchmark data sets.",
-      "score": 0.512
-    },
-    {
-      "page": 9,
-      "quote": "We demonstrate the effectiveness of dropout in that setting on more interesting data sets.",
-      "score": 0.5924
+      "score": 0.7459
     },
     {
       "page": 24,
       "quote": "Methods that use dropout achieve state-of-the-art results on SVHN, ImageNet, CIFAR-100 and MNIST. Dropout considerably improved the performance of standard neural nets on other data sets as well.",
-      "score": 0.5053
+      "score": 0.5041
     },
     {
       "page": 10,
       "quote": "Goodfellow et al. (2013) showed that the error is further reduced to 11.68% by replacing ReLU units with maxout units. On CIFAR-100, dropout reduces the error from 43.48% to 37.20% which is a huge improvement. No data augmentation was used for either data set (apart from the input dropout).",
-      "score": 0.4682
+      "score": 0.473
+    },
+    {
+      "page": 9,
+      "quote": "We demonstrate the effectiveness of dropout in that setting on more interesting data sets.",
+      "score": 0.6064
     }
   ],
   "diagnostics": {
@@ -53,17 +48,14 @@
     "retrieved_chunks": 8,
     "retrieval_query": "Across the image, speech, text and genetics experiments, which data sets is dropout evaluated on, and what does the paper report as its typical effect on the error rate?",
     "sub_queries": [
-      "Which specific datasets are used to evaluate dropout in the context of speech recognition experiments?",
-      "Which specific datasets are used to evaluate dropout in the context of text classification or language modeling experiments?",
-      "Which specific datasets are used to evaluate dropout in the context of genetics or biological sequence experiments?",
-      "What is the reported effect of dropout on the error rate across these evaluated data sets?"
+      "What specific datasets are used to evaluate dropout in the provided document?",
+      "How much does dropout typically reduce the error rate according to the document?"
     ],
     "retrieval_steps": [
-      "search: 5 queries",
-      "step 1: evidence sufficient"
+      "search: 3 queries"
     ],
     "tokens": null,
-    "latency_ms": 95538,
-    "timestamp": "2026-07-30T23:28:08Z"
+    "latency_ms": 81959,
+    "timestamp": "2026-07-30T22:53:31Z"
   }
 }

@@ -1,0 +1,33 @@
+{
+  "question_id": "q43f587",
+  "level": 2,
+  "question": "Why does that happen?",
+  "answer": "The authors explain that dropout can wipe out information in pretrained weights during finetuning because its stochastic nature overwhelms optimization when learning rates are comparable to those used for randomly initialized networks (1). Additionally, dropout prevents complex co-adaptations by making other hidden units unreliable, which forces each unit to develop robust features that work across many contexts rather than relying on specific partners to correct its mistakes (2).",
+  "conversation_id": "level-2",
+  "sources": [
+    {
+      "page": 7,
+      "quote": "Pretraining followed by finetuning with backpropagation has been shown to give significant performance boosts over finetuning from random initializations in certain cases. Dropout can be applied to finetune nets that have been pretrained using these techniques. The pretraining procedure stays the same. The weights obtained from pretraining should be scaled up by a factor of 1 /p. This makes sure that for each unit, the expected output from it under random dropout will be the same as the output during pretraining. We were initially concerned that the stochastic nature of dropout might wipe out the information in the pretrained weights. This did happen when the learning rates used during finetuning were comparable to the best learning rates for randomly initialized nets.",
+      "score": 0.5519
+    },
+    {
+      "page": 15,
+      "quote": "In a standard neural network, the derivative received by each parameter tells it how it should change so the final loss function is reduced, given what all other units are doing. Therefore, units may change in a way that they fix up the mistakes of the other units. This may lead to complex co-adaptations. This in turn leads to overfitting because these co-adaptations do not generalize to unseen data. We hypothesize that for each hidden unit, dropout prevents co-adaptation by making the presence of other hidden units unreliable. Therefore, a hidden unit cannot rely on other specific units to correct its mistakes. It must perform well in a wide variety of different contexts provided by the other hidden units.",
+      "score": 0.2865
+    }
+  ],
+  "diagnostics": {
+    "provider": "ollama",
+    "chat_model": "qwen3.6:latest",
+    "embedding_model": "bge-m3",
+    "retrieved_chunks": 5,
+    "retrieval_query": "Why does that happen?",
+    "sub_queries": [],
+    "retrieval_steps": [
+      "search: 1 query"
+    ],
+    "tokens": null,
+    "latency_ms": 61790,
+    "timestamp": "2026-07-30T22:51:08Z"
+  }
+}

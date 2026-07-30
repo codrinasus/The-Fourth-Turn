@@ -1,7 +1,9 @@
 # Technical note — Team KrautWineSarmale
 
-Document: *Explainable Information Retrieval: A Survey* (Anand et al.), 35 pages, committed
-at `data/in/document.pdf`. Everything runs locally: no hosted API is used or required.
+Document: *Dropout: A Simple Way to Prevent Neural Networks from Overfitting*
+(Srivastava, Hinton, Krizhevsky, Sutskever & Salakhutdinov, JMLR 2014), 30 pages,
+committed at `data/in/srivastava14a.pdf`. 151 chunks, 34 section summaries. Everything
+runs locally: no hosted API is used or required.
 
 ## 1. System
 
@@ -27,11 +29,11 @@ question + level
 
 | Stage | What we did | Changed from the scaffold? |
 |---|---|---|
-| Extraction | Docling Serve; `page_header`/`page_footer`/`footnote` dropped; tables flattened to pipe-separated rows; PUA ligatures expanded (`U+E048` → `Qu`) | Yes — scaffold had none |
+| Extraction | Docling Serve; `page_header`/`page_footer`/`footnote` dropped; tables flattened to pipe-separated rows; ligatures expanded (`ﬀ ﬁ ﬂ ﬃ ﬄ`, and PUA slots such as `U+E048` → `Qu`) | Yes — scaffold had none |
 | Chunking | Section-aware over Docling's own `section_header` blocks; never spans a page; tables split on row boundaries; breadcrumb in `embed_text`, verbatim page text in `text` | Yes — scaffold indexed one vector per page |
-| Embeddings / index | `bge-m3` (1024-d, symmetric) via Ollama; Qdrant cosine; **second index** of 44 section summaries | Yes |
+| Embeddings / index | `bge-m3` (1024-d, symmetric) via Ollama; Qdrant cosine; **second index** of 34 section summaries | Yes |
 | Retrieval | Hybrid dense + BM25, RRF, cross-encoder rerank, history-aware rewriting, Level-3 decomposition and a reflective retrieve-judge-search loop | Yes — scaffold was single dense search |
-| Answer + citation | Model cites numbered passages; code selects the span; quote aligned to the PDF and its page verified | Yes — scaffold returned the chunk truncated to 300 chars |
+| Answer + citation | Model cites numbered passages; code widens the evidence to the largest span the PDF can vouch for; quote aligned to the PDF and its page verified | Yes — scaffold returned the chunk truncated to 300 chars |
 
 Models: `qwen3.6` (chat, thinking on), `bge-m3` (embeddings), `bge-reranker-v2-m3` (Q8_0
 GGUF via llama.cpp). Thinking is left enabled because the answers are better for it;
@@ -81,25 +83,21 @@ question` concatenated — model-free, and still far better than embedding six p
 resolved query is used for the dense search, the BM25 search, the cross-encoder, **and**
 the sentence-level quote selection, and is reported in `diagnostics.retrieval_query`.
 
-Real output from the final run, taken from `diagnostics.retrieval_query`:
+Real output, taken from `diagnostics.retrieval_query`:
 
 ```
-q4 as asked:     "What is the main limitation the authors acknowledge?"
+q4 as asked:     "What drawback of dropout do the authors report?"
 retrieval query: unchanged — the model judged it self-contained and repeated it
 
 q5 as asked:     "Why does that happen?"
-retrieval query: "Why can simple models not faithfully explain all localities of a
-                  complex model's decision boundary"
+retrieval query: "Why does dropout significantly increase training time"
 
-q6 as asked:     "And how do they propose to address it?"
-retrieval query: "How do the authors propose to address the limitation that simple
-                  models cannot faithfully explain all localities of a complex model's
-                  decision boundary?"
+q6 as asked:     "And what benefit does that same noise bring?"
+retrieval query: "What benefit does the noisy parameter updates from dropout bring"
 ```
 
-Six of the nine come back unchanged and three are resolved, which is the split the question
-set implies. The effect is measured in §4: for q5 the cross-encoder's score for the best
-passage goes from 0.054 to 0.67 and the answer stops hedging.
+Six of the nine come back unchanged and three are resolved, which is the split the
+question set implies.
 
 ## 3. Level 3 — whole-document reasoning
 
@@ -153,81 +151,97 @@ chunk index. Summaries decide *where to look*; only the document is evidence.
 
 ## 4. Measurement
 
-All numbers below are from this repository on the committed PDF, host Ollama with
-`qwen3.6` + `bge-m3`, 35 pages → 269 chunks → 44 section summaries.
+All numbers are from this repository on the committed PDF, host Ollama with `qwen3.6` +
+`bge-m3`: 30 pages → 151 chunks → 34 section summaries. Both ablations are reproducible —
+`REWRITE_ENABLED` and `AGENT_ENABLED` in `.env` are the switches, and the baseline
+responses are committed under `docs/ablations/`.
+
+Cross-encoder scores are comparable across rows because the reranker is calibrated, unlike
+the RRF scores it replaced.
 
 ### Ablation 1 — query rewriting (Level 2)
 
-The same three questions, same index, same models; the only change is whether
-`rewrite_query` resolves the follow-up before retrieval. Cross-encoder scores are
-comparable across rows because the reranker is calibrated, which RRF scores were not.
+`REWRITE_ENABLED=false` embeds the follow-up exactly as typed. Everything else is identical.
 
-| | no-op (baseline) | with rewriting |
+| | no rewriting | with rewriting |
 |---|---|---|
-| q4 (topic opener, standalone) | p25 0.011, p7 0.022 | p7 0.021 — left as asked, correctly |
-| q5 "Why does that happen?" | p25 **0.054**, p6 0.034 | p25 **0.668** |
-| q5 answer | hedges across two readings: *"If referring to the difficulty of disentangling explanations… If referring to why ranking scores drop…"* | one reading, one source, direct |
-| q6 "And how do they propose to address it?" | p11 0.20, p17 0.22, p17 0.11 — **a duplicate source**, answer drifts onto LiEGe | p7 **0.987**, p25 0.41 — answers the follow-up |
+| q4 (topic opener, standalone) | p24 **0.97** | p24 **0.97** — identical, the control |
+| q5 "Why does that happen?" | p7 0.55, p15 0.29 | p24 **1.00** |
+| q5 answer | **answers a different question**: explains why dropout wipes out information in pretrained weights during finetuning | explains why training takes 2–3× longer — what was actually asked |
+| q6 "And what benefit does that same noise bring?" | p5 0.01, p1 0.01, p7 0.09 | p7 **0.96**, p10 0.50 |
 
-The baseline answers are committed at `docs/ablations/baseline-no-rewrite/`, so this is
-reproducible rather than asserted. q4 is the control: it is standalone, the gate declines
-to rewrite it, and it is unchanged apart from retrieval-pool improvements.
+q5 is the clearest result we have. Without rewriting, "Why does that happen?" carries no
+retrievable content, so the retriever lands on an unrelated passage about finetuning and
+the model dutifully answers *that* question instead — fluently, with a real citation, and
+wrong. It is not a failure that announces itself, which is exactly why Level 2 is worth
+the 10% it carries. q4 is the control: standalone, left unrewritten, unchanged.
 
 ### Ablation 2 — quote grounding against the real PDF
 
-Checked with `scripts/audit_quotes.py`, which searches each quote on its cited page of
-`data/in/document.pdf` using pypdf — a *different* extractor from the Docling one we index
-with, so a pass means two independent readers agree the text is there. Whitespace is
-normalised; punctuation and case are not.
+`scripts/audit_quotes.py` searches every quote on its cited page using pypdf — a
+*different* extractor from the Docling one we index with, so a pass means two independent
+readers agree. Both sides are normalised only for extraction artefacts: whitespace,
+line-break hyphenation, ligatures, and the dash/quote variants the extractors disagree
+about. Case and wording are untouched, so a paraphrase fails.
 
-| | before `verbatim.locate()` | after |
+| | | |
 |---|---|---|
-| quotes verbatim on their cited page | 16/19 (84%) | **19/19 (100%)** |
-| page numbers corrected | — | 2 |
+| quotes verbatim on their cited page | **100%** | every source, every question |
+| median quote length | 150 → **580 chars** | after widening to the largest verifiable span |
+| page numbers corrected against the PDF | 2 (previous document) | Docling labels a block with the page it *starts* on |
 
-We had previously measured this at 100% by comparing quotes against our own parse. That
-number was circular and hid both defects described in §5.
+### Ablation 3 — the reflective retrieval loop (Level 3)
 
-### Ablation 3 — decomposition and the section index (Level 3)
+`AGENT_ENABLED=false` runs decomposition only. This is the ablation that went against us,
+and it is the most useful thing we measured.
 
-Same three questions, before and after multi-query decomposition plus the outline. Baseline
-responses at `docs/ablations/baseline-single-query/`.
-
-| | single query | decomposed + outline |
+| | loop off | loop on (after the fixes below) |
 |---|---|---|
-| q7 (four tables + commentary) | 2 sources, p10 0.52 / p15 0.34; answer covers Tables 1 and 3 only | split into **exactly the four sub-questions matching the four tables**; answer names the dominant evaluation mode *and* the authors' critique of it |
-| q8 "summarise each section" | p2 0.004, p14 0.011 — retrieval scores at the floor | outline supplies the structure; chunk scores stay low **and honestly so**, because no passage answers this question |
-| q9 (3-hop, pages 1/8/17) | already found all three hops | unchanged — decomposition neither helped nor hurt |
+| q7 | p8 0.93 | p8 **0.94** — unchanged, +13 s |
+| q8 | p3 0.89 | p3 **0.83** — unchanged within run-to-run noise |
+| q9 | p15 0.03, p16 **0.00** | p16 **0.78**, p15 0.61, p15 0.53 |
+| latency | 84–124 s | 95–118 s |
 
-The honest reading: q7 improved clearly, q8 became answerable at all, and **q9 shows no
-gain** — its hops share enough vocabulary that one query already ranked all three. We are
-reporting that rather than claiming three wins. q8's near-zero scores are worth dwelling on:
-they are correct. There is no passage in the paper that summarises every section, so a
-retrieval score at the floor is the system accurately reporting that the answer had to come
-from structure rather than from a passage.
+q9 is the case Level 3 exists for: it asks where the paper *shows* co-adaptation being
+broken, and one-shot decomposition retrieved essentially nothing (0.03 and 0.00). The loop
+read that, said the evidence was missing, searched for it, and found §7.1 on pages 15–16.
 
-### Ablation 4 — the reflective retrieval loop (Level 3)
+Getting there meant finding a bug the ablation exposed, and it was not the one we assumed.
+Our first measurement had the loop making q8 *worse* — p3 fell from 0.89 to 0.03. The
+mechanism: the cross-encoder scores every candidate **independently**, so extra candidates
+can never lower an existing one's score. The only way a good passage loses is by never
+reaching the reranker. The paragraph beginning *"In Section 6, we present our experimental
+results…"* was out-voted in fusion by six invented section-specific queries, fell below the
+60-candidate pool cut, and was never scored at all.
 
-Same questions and index, with `AGENT_ENABLED` off and on. The loop is what searches for
-what decomposition alone did not think to ask for.
+We had asserted in code comments that "a wasted round cannot displace an earlier hit,
+because everything is fused at the end". That was false. Two fixes made it true:
 
-| | decompose only | + reflective loop |
-|---|---|---|
-| q7 | p10 0.52, p15 0.34, p16 0.27 | p10 0.52, p15 0.33, p16 0.27 — **no gain**, 2 steps spent |
-| q8 | p21 0.08 + 7 near-zero | p21 0.08 + 7 near-zero — **no gain**, structure still comes from the outline |
-| q9 | p1 0.16, p17 0.67, p9 0.06 | p17 **0.84**, p8 0.23, p9 0.13, p8 0.12 — **finds §3.2.2 on page 8**, which the single pass missed entirely |
-| Level-3 latency | 83–105 s | 105–134 s |
+- **Weighted fusion.** The user's question votes at 1.0, its decomposition at 0.7, a
+  speculative follow-up at 0.4. Necessary but not sufficient — this alone recovered q7 and
+  left q8 broken, because a hard cut cannot be fixed by soft ordering.
+- **A reserved pool.** Half the candidate slots belong to the question and its
+  decomposition; follow-up rounds fill only the remainder. Extra retrieval is now additive
+  by construction rather than by assertion.
 
-Honestly read: **one of three improved.** q9 is a real win — the question names §3.2.2 and
-§7.2, and only the loop retrieved §3.2.2, after judging the first pass incomplete. q7 and
-q8 spent both steps and gained nothing, at ~40 s each. The loop's own trace says so: on q9
-it reports the intro/shortcut link still missing when the budget runs out, which is
-accurate — it never surfaced page 1.
+The honest sequence is worth stating plainly: the reflective loop as first written **hurt**,
+the ablation is what caught it, and the fix was a retrieval-plumbing bug rather than
+anything to do with the loop's judgement. After the fix it is a clear win on one of three
+Level-3 questions and neutral on the other two, for 15–20 % more latency.
 
-So the loop buys recall on multi-hop questions where one hop is lexically distant, and buys
-nothing on questions whose answer is structural (q8) or already well covered (q7). We kept
-it because the q9 gain is the case Level 3 is actually about, and because a wasted round
-cannot displace evidence — but it costs ~40 % latency for a benefit that is not uniform.
+### Per-question result, final run
+
+Best cross-encoder score for each question's evidence, and wall-clock latency:
+
+| | q1 | q2 | q3 | q4 | q5 | q6 | q7 | q8 | q9 |
+|---|---|---|---|---|---|---|---|---|---|
+| best source | 0.81 | 0.99 | 0.97 | 0.97 | **1.00** | 0.96 | 0.94 | 0.83 | 0.78 |
+| latency (s) | 73 | 51 | 48 | 22 | 33 | 47 | 95 | 118 | 76 |
+| sources | 2 | 2 | 2 | 1 | 1 | 2 | 8 | 7 | 3 |
+
+All nine were checked by hand against the PDF and are factually correct, including the
+numbers q7 quotes (21.8% TIMIT phone error rate, 31.05% → 29.62% on Reuters, both page 13).
+All 28 evidence quotes are verbatim on their cited page.
 
 ### Cost
 
@@ -235,85 +249,80 @@ From `diagnostics.latency_ms`, wall clock, thinking enabled:
 
 | Level | Latency | Why |
 |---|---|---|
-| 1 | 34–50 s | one rewrite call, one dense + one BM25 pass, rerank, answer |
-| 2 | 48–62 s | same, with the rewrite actually changing the query |
-| 3 | 105–134 s | plus decomposition, up to 2 judge calls and their retrieval passes, 8 passages and the outline in the prompt |
+| 1 | 48–73 s | one rewrite call, one dense + one BM25 pass, rerank, answer |
+| 2 | 22–47 s | same, with the rewrite actually changing the query |
+| 3 | 76–118 s | plus decomposition, up to 2 judge calls with their retrieval passes, 8 passages and the 34-section outline in the prompt |
 
-The rewrite now runs on every turn that has history rather than only when a gate fired,
-which adds ~2 s (thinking off) to Level-1 questions that end up unchanged. That is the
-price of not having a heuristic decide; it is small, and the gate was making wrong calls.
-
-Ingest is 3m05s end to end: 35 pages parsed, 269 chunks embedded, 44 sections summarised.
-The cross-encoder is not the expensive part anywhere — scoring a 60-candidate pool costs
-well under a second against a 30–110 s generation.
+The cross-encoder is not the expensive part anywhere: scoring a 60-candidate pool costs
+well under a second against a 20–120 s generation. Ingest is 2m50s end to end — 30 pages
+parsed, 151 chunks embedded, 34 sections summarised.
 
 ## 5. What broke
 
-**A question that could not be retrieved, and why.** Our original q1 was "What type of
-research paper is the document?" It failed on every run, including one whose own history
-contained the answer. The diagnosis is a textbook vocabulary mismatch, and it is
-deterministic — repeat runs returned identical pages and scores, so it is systematic, not
-sampling. The answer is the title on page 1, where "survey" appears 4×. But the question
-tokenises to `what type of research paper is the document`, and **none of "paper", "type"
-or "document" occurs on page 1 at all**, while they occur 43×/23×/181× elsewhere, mostly in
-`Paper | Task | …` table headers. BM25 therefore ranks page 1 near-last and the dense side
-does not rescue it. After adding the cross-encoder the pool for this question scored ≤0.007
-across the board — the reranker correctly reporting that retrieval had found nothing
-relevant, which is the calibrated-abstention signal RRF could never give us (RRF scored
-everything 0.016–0.03 whether good or garbage).
+**Two extraction defects that made correct quotes look fabricated.** Both were invisible
+until we checked against the PDF with a second extractor rather than against our own parse.
 
-We replaced the question rather than special-casing it: it is a document-level meta question
-and Level 1 asks for a fact answerable from a single passage, so it was the wrong question
-for the level. Fixing it in code would have meant a branch keyed to it, which is exactly
-what *Integrity* penalises. The diagnosis is kept here because it is the most useful thing
-we learned about our own retrieval.
+*Ligatures.* This paper contains 121 `ﬁ` and 91 `ﬀ` glyphs — "diﬀerent", "eﬀect",
+"overﬁtting". Our fold table had `ﬁ` and `ﬂ` but not `ﬀ`, so a large share of quotes would
+have failed to match the document they came from. Expanded at parse time now, and folded
+on both sides when matching.
 
-**Citations that were verbatim against the wrong thing.** Our quotes were exact substrings
-of the chunk they came from — sliced by offset, never generated — and we had measured that
-at 100%. The measurement was circular: it compared our text against our own parse. Checking
-against the PDF with an independent extractor showed the file contains 135 en-dashes, 53
-right single quotes and 32 curly double quotes that Docling folds to ASCII, so any quote
-containing an apostrophe was not findable in the document a grader actually opens. The same
-check found Docling labels a block with the page it *starts* on, so a paragraph crossing a
-page break is cited one page early — real, in our submitted answers, twice.
+*Line-break hyphenation.* pypdf reports the page as typeset — `optimiza- tion`,
+`au- tomatically` — while Docling rejoins the word. Neither hyphen is content; it records
+where the line happened to end. Before we handled it, two perfectly correct quotes were
+reported as non-verbatim. Matching now ignores hyphens on both sides and the returned span
+has the break repaired, so the quote reads as prose.
+
+**A degraded answer filed into the submission.** Level-3 generation measured up to ~135 s
+against a 120 s `REQUEST_TIMEOUT`, and one q7 run timed out. The pipeline degrades rather
+than 500s — right for the API, wrong for the deliverable: it wrote
+`[LLM unavailable: ollama chat failed: timed out]` over a good answer. The timeout is now
+300 s, and `scripts/run_questions.py` refuses to overwrite an answer with a degraded
+response. The lesson generalises: a graceful degradation is only graceful if something
+downstream knows it happened.
+
+**A retrieval claim we had asserted but never tested.** Described in §4 — the reflective
+loop was silently evicting the best passage from the candidate pool, and our own code
+comments claimed that could not happen. The ablation caught it. This is the strongest
+argument we have for measuring ablations rather than reasoning about them.
+
+**A question that could not be retrieved (previous document).** On our earlier document we
+asked "What type of research paper is the document?" and it failed on every run. The answer
+was the title on page 1, but none of "paper", "type" or "document" occurs on page 1, while
+they occur 43×/23×/181× elsewhere in table headers — so BM25 ranked page 1 near-last and
+the dense side did not rescue it. The cross-encoder scored that entire pool ≤0.007, which
+is the calibrated "nothing here" signal RRF could never give. We replaced the question
+rather than special-casing it: it was a document-level meta question, and Level 1 asks for
+a fact answerable from a single passage. Fixing it in code would have meant a branch keyed
+to one question, which is what *Integrity* penalises.
 
 ## 6. Limitations and next steps
 
 - **Memory is process-local.** A dict in `rag/memory.py`; it does not survive a restart and
   does not work across workers. Redis would be a small change and we did not make it.
-- **The rewrite gate is heuristic.** It fires on grammar, so a context-dependent question
-  phrased without a pronoun ("What about legal search?") is caught by the length rule rather
-  than by understanding, and a standalone question containing "this" is rewritten
-  unnecessarily. The rewriter is told to pass such questions through unchanged, which
-  contains the cost but does not remove it.
-- **Section summaries are only as good as one pass of an 8B model.** They are never quoted,
-  so a bad summary misdirects retrieval rather than corrupting evidence — but it can still
-  misdirect it.
+- **The reflective loop earns its keep on one question in three.** q9 goes from nothing to
+  0.78; q7 and q8 are unchanged and pay 15–20 % latency. A cheap improvement we did not
+  build: stop early when a round retrieves nothing the pool did not already contain.
+- **Level-2 answers vary between runs.** When a topic-opening answer enumerates several
+  things, "why does that happen?" is genuinely ambiguous and different runs resolve it to
+  different items. The rewriter is instructed to take the first, which makes it stable in
+  practice, but the underlying ambiguity is real and we have not measured it across many
+  runs.
+- **Section summaries are only as good as one pass of a local model.** They are never
+  quoted, so a bad summary misdirects retrieval rather than corrupting evidence — but it
+  can still misdirect it.
 - **No table-structure reasoning.** Tables are flattened to pipe-separated rows and split on
   row boundaries, which keeps rows intact but leaves the model to parse the layout. A
-  question needing a specific cell by row *and* column header is not something we handle
-  structurally.
-- **We do not abstain, and we checked before deciding not to.** The cross-encoder's scores
-  are calibrated, so an abstention threshold looks obvious: the pool for the q1 we retired
-  topped out at **0.007**, which is the system correctly saying "not in this document".
-  Then we tabulated the best score of every answer we believe is *correct*:
-
-  | | q1 | q2 | q3 | q4 | q5 | q6 | q7 | q8 | q9 |
-  |---|---|---|---|---|---|---|---|---|---|
-  | best source score | 0.998 | 0.994 | 0.763 | **0.021** | 0.668 | 0.987 | 0.519 | **0.076** | 0.844 |
-
-  Correct answers run from **0.021 (q4) to 0.998 (q1)**. q4 is the finding: a correct,
-  well-grounded answer scoring 0.021 sits essentially on top of the 0.007 that marked the
-  genuinely unanswerable question. The two distributions overlap, so no threshold both
-  keeps q4 and rejects the failure — and any constant we picked anyway would be fitted to
-  these nine questions, which is what the rules penalise.
-
-  q8 is the other instructive case: 0.076 *and right*, because no passage summarises every
-  section — its answer legitimately comes from the section index rather than from a quote,
-  so a low passage score is the correct reading of the evidence, not a warning.
-
-  A defensible threshold needs a labelled set of questions the document genuinely cannot
-  answer. We do not have one, so we ship without abstention and say so.
+  question needing a specific cell by row *and* column header is not handled structurally.
+- **We do not abstain.** The idea is sound — on our previous document a genuinely
+  unanswerable question produced a pool topping out at 0.007, exactly the "not in this
+  document" signal a calibrated reranker should give. But on the submitted document every
+  one of the nine answers scores between **0.78 and 1.00**, so we have no failing case here
+  to calibrate a threshold against, and on the previous document correct answers ran as low
+  as 0.021 — overlapping the failure outright. Picking a constant from nine observations
+  would be fitting it to our own question set. A defensible threshold needs a labelled set
+  of questions the document genuinely cannot answer; we do not have one, so we ship without
+  abstention and say so.
 
 ---
 

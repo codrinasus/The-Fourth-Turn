@@ -76,6 +76,11 @@ class Settings(BaseSettings):
     top_k: int = 5  # how many results a query retrieves
     top_k_level3: int = 8  # whole-document questions need evidence from more places
 
+    # Level 2 query rewriting (app/rag/rewrite.py). On by default; the switch exists so the
+    # ablation in TECHNICAL_NOTE.md can be reproduced by anyone, not just described.
+    # REWRITE_ENABLED=false reverts to embedding the follow-up exactly as the user typed it.
+    rewrite_enabled: bool = True
+
     # Level 3 reflective retrieval (app/rag/agent.py): after retrieving, the model reads
     # the evidence and searches again for whatever is missing. Each step costs one short
     # LLM call plus a retrieval pass. The budget is a hard stop — the loop also ends as

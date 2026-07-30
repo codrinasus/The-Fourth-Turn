@@ -1,14 +1,19 @@
 {
-  "question_id": "qd60d3d",
+  "question_id": "qba1535",
   "level": 1,
   "question": "What is the biological motivation for dropout described in the paper?",
-  "answer": "The paper draws its biological motivation from a theory of the role of sex in evolution (1). It contrasts sexual reproduction, which combines half the genes from two parents with random mutation, against asexual reproduction, which passes on a slightly mutated copy of a single parent's genes (1). This analogy illustrates how introducing randomness prevents overly specific, tightly coupled genetic combinations from being passed directly down, paralleling how dropout prevents neural network units from relying on fragile co-adaptations.",
+  "answer": "The biological motivation stems from evolutionary theory concerning the role of sex in reproduction (1). Sexual reproduction combines genetic material from two parents with random mutations, whereas asexual reproduction simply passes on a slightly mutated copy of one parent's genes (1). This perspective suggests that avoiding overly specific combinations can be more robust, which parallels dropout’s goal of preventing brittle co-adaptations in neural networks by randomly making hidden units unreliable. The paper also notes a closely related motivation using the metaphor of conspiracies, where multiple smaller groups are more likely to succeed under changing conditions than one large group requiring perfect coordination among all members (2).",
   "conversation_id": "level-1",
   "sources": [
     {
       "page": 4,
       "quote": "2. Motivation A motivation for dropout comes from a theory of the role of sex in evolution (Livnat et al., 2010). Sexual reproduction involves taking half the genes of one parent and half of the other, adding a very small amount of random mutation, and combining them to produce an offspring. The asexual alternative is to create an offspring with a slightly mutated copy of the parent’s genes. It seems plausible that asexual reproduction should be a better way to optimize individual fitness because a good set of genes that have come to work well together can be passed on directly to the offspring.",
       "score": 0.8122
+    },
+    {
+      "page": 4,
+      "quote": "A closely related, but slightly different motivation for dropout comes from thinking about successful conspiracies. Ten conspiracies each involving five people is probably a better way to create havoc than one big conspiracy that requires fifty people to all play their parts correctly. If conditions do not change and there is plenty of time for rehearsal, a big conspiracy can work well, but with non-stationary conditions, the smaller the conspiracy the greater its chance of still working. Complex co-adaptations can be trained to work well on a training set, but on novel test data they are far more likely to fail than multiple simpler co-adaptations that achieve the same thing.",
+      "score": 0.146
     }
   ],
   "diagnostics": {
@@ -22,7 +27,7 @@
       "search: 1 query"
     ],
     "tokens": null,
-    "latency_ms": 35457,
-    "timestamp": "2026-07-30T22:38:03Z"
+    "latency_ms": 73877,
+    "timestamp": "2026-07-30T23:23:26Z"
   }
 }

@@ -4,7 +4,7 @@
 To test bm25 we can do the following:
 
 ```bash
-docker compose run --rm app sh -c "PYTHONPATH=. uv run python scripts/test_bm25.py 'What type of research paper is the document?' data/chunks"
+docker compose run --rm app sh -c "PYTHONPATH=. uv run python scripts/test_bm25.py 'What is the biological motivation for dropout?' data/chunks"
 ```
 
 
@@ -70,7 +70,7 @@ cd essir2026-aim-hackathon-participants
 Copy-Item .env.example .env
 
 # 3. Put your chosen PDF in data/in/
-Copy-Item $HOME\Downloads\your-document.pdf data\in\document.pdf
+Copy-Item $HOME\Downloads\your-document.pdf data\in\   # ours: srivastava14a.pdf
 
 # 4. Pull the local Ollama model once, then bring up app + Qdrant + Ollama + Docling.
 docker compose -f docker-compose.yml -f docker-compose.ollama.yml -f docker-compose.docling.yml -f docker-compose.reranker.yml up -d ollama
@@ -105,7 +105,7 @@ app/                 the FastAPI service you build on
 ├── llm/             LM Studio · Ollama · litellm interfaces (+ how to add your own)
 ├── vectorstore/     Qdrant wrapper (list / read / write)
 └── rag/             the pipeline — see below
-data/in/             put YOUR chosen PDF here (committed)
+data/in/             the chosen PDF, committed (srivastava14a.pdf — the dropout paper)
 data/extracted/      ignored Docling parser outputs consumed by /ingest
 data/out/            every /query answer is written here (working scratch)
 submission/          your team.json + the nine answers — the deliverable (level-1/2/3)

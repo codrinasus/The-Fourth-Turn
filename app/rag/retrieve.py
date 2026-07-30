@@ -18,6 +18,14 @@ log = logging.getLogger(__name__)
 _RRF_K = 60  # the standard reciprocal-rank-fusion damping constant
 _REFERENCE_WEIGHT = 0.3  # bibliography chunks compete, but only when nothing else does
 
+# How loudly each kind of query votes in fusion. The user's own question is the only
+# string we know states what they want; a decomposition is our reading of it, and a
+# reflective follow-up is a guess about what is still missing. Ordering them this way is
+# what keeps extra retrieval rounds additive instead of disruptive.
+_PRIMARY_WEIGHT = 1.0
+_SUB_QUERY_WEIGHT = 0.7
+_FOLLOW_UP_WEIGHT = 0.4
+
 
 @dataclass
 class Context:
@@ -45,10 +53,15 @@ class Retrieval:
 def rewrite_query(question: str, history: list[Message]) -> str:
     """Resolve a follow-up into a standalone search query — the Level-2 seam.
 
-    Delegates to `rag/rewrite.py`, which gates on whether the question can be searched as
-    written and only then asks the chat model to substitute the antecedents. Standalone
-    questions come back untouched.
+    Delegates to `rag/rewrite.py`, where the model reads the conversation and writes the
+    query. Self-contained questions come back untouched — that judgement is the model's,
+    not a heuristic's.
+
+    `REWRITE_ENABLED=false` restores the un-resolved behaviour, so the Level-2 ablation in
+    TECHNICAL_NOTE.md can be reproduced rather than taken on trust.
     """
+    if not get_settings().rewrite_enabled:
+        return question
     return rewrite.standalone_query(question, history)
 
 
@@ -95,7 +108,7 @@ def _dense_search(query: str, top_k: int) -> list[Context]:
     ]
 
 
-def _fuse(rankings: list[list[Context]], top_k: int) -> list[Context]:
+def _fuse(rankings: list[tuple[float, list[Context]]], top_k: int) -> list[Context]:
     """Reciprocal-rank fusion over any number of ranked lists.
 
     Generic in the number of lists because it now merges more than two things: dense and
@@ -104,20 +117,29 @@ def _fuse(rankings: list[list[Context]], top_k: int) -> list[Context]:
     lists whose scores are on completely different scales (cosine vs BM25 vs another
     query's cosine) without any normalisation.
 
-    Bibliography entries are down-weighted rather than excluded. They are 85 of our 269
-    chunks and the cross-encoder scores them ~0.007, so left alone they crowd the pool
-    the answer is built from — but "how many papers does the survey review?" is a fair
+    Each ranking carries a weight, because not every query deserves an equal vote. The
+    question the user actually asked, and its decomposition, are what the answer must
+    address; the follow-up queries a Level-3 round invents are speculative. Weighting them
+    equally measurably hurt: with the reflective loop on, q8's top passage fell from 0.89
+    to ~0.00, because six invented section-specific queries out-voted the one paragraph
+    that actually describes the paper's structure. Adding lists shifts every RRF score, so
+    "a wasted round cannot displace an earlier hit" is only true if the extra lists count
+    for less. Now they do.
+
+    Bibliography entries are down-weighted for a related reason. In a survey they were 85
+    of 269 chunks and the cross-encoder scored them ~0.007, so left alone they crowd the
+    pool the answer is built from — but "how many papers does this review?" is a fair
     question whose evidence lives in exactly those chunks, so a hard filter would be
     wrong. A weight lets them compete when nothing in the body matches.
     """
     by_key: dict[tuple[int, str], Context] = {}
     fused: dict[tuple[int, str], float] = {}
 
-    for candidates in rankings:
+    for list_weight, candidates in rankings:
         for rank, ctx in enumerate(candidates, start=1):
             key = (ctx.page, ctx.text)
             by_key.setdefault(key, ctx)
-            weight = _REFERENCE_WEIGHT if ctx.kind == "reference" else 1.0
+            weight = list_weight * (_REFERENCE_WEIGHT if ctx.kind == "reference" else 1.0)
             fused[key] = fused.get(key, 0.0) + weight / (_RRF_K + rank)
 
     ranked = sorted(fused.items(), key=lambda item: item[1], reverse=True)[:top_k]
@@ -130,6 +152,38 @@ def _fuse(rankings: list[list[Context]], top_k: int) -> list[Context]:
         )
         for key, score in ranked
     ]
+
+
+def _pool(
+    base: list[tuple[float, list[Context]]],
+    extra: list[tuple[float, list[Context]]],
+    limit: int,
+) -> list[Context]:
+    """The candidates the cross-encoder gets to see, with the base query's best reserved.
+
+    This exists because of a measured failure. The cross-encoder scores every candidate
+    *independently*, so more candidates can never lower an existing one's score — the only
+    way a good passage loses is by never reaching the reranker at all. That is exactly what
+    the reflective loop was doing: on q8 the paragraph listing what each section does
+    scored **0.894** with the loop off, and with it on that chunk had been out-voted in
+    fusion, fell below the pool cut, and was never scored. The answer was built from
+    passages scoring 0.03.
+
+    Weighting the speculative queries down helped but could not fix it, because the
+    problem is a hard cut, not a soft ordering. So half the pool is reserved for the
+    fusion of the question and its decomposition; follow-up rounds fill the rest. Extra
+    retrieval is then genuinely additive — it can contribute a passage, never evict one.
+    """
+    # With nothing speculative to make room for, the base query gets the whole pool —
+    # reserving half of it would otherwise silently halve Levels 1 and 2, which never
+    # produce follow-ups at all.
+    if not extra:
+        return _dedup(_fuse(base, limit))[:limit]
+
+    reserved = _fuse(base, max(1, limit // 2))
+    seen = {(c.page, c.text) for c in reserved}
+    rest = [c for c in _fuse(base + extra, limit) if (c.page, c.text) not in seen]
+    return _dedup(reserved + rest)[:limit]
 
 
 def _dedup(contexts: list[Context]) -> list[Context]:
@@ -200,20 +254,23 @@ def retrieve(
     # Level 3 only: give each hop of a multi-part question its own search, so a chunk that
     # answers just one hop is not out-ranked by chunks matching the question's bulk.
     subs = decompose.sub_queries(question) if level >= 3 else []
-    rankings = [ranking for sub in subs for ranking in _arms(sub, depth)]
-    rankings.extend(_arms(query, depth))  # the question itself always gets a vote
+    base = [(_SUB_QUERY_WEIGHT, r) for sub in subs for r in _arms(sub, depth)]
+    # The question itself always gets a vote, and the loudest one: it is the only string we
+    # know states what the user wants. Everything else is our paraphrase of it.
+    base.extend((_PRIMARY_WEIGHT, r) for r in _arms(query, depth))
+    follow_up_rankings: list[tuple[float, list[Context]]] = []
 
     searched = [query, *subs]
     steps = [f"search: {len(searched)} quer{'y' if len(searched) == 1 else 'ies'}"]
 
-    # Level 3 only: read what came back and search again for whatever is missing. Every
-    # round appends to `rankings`, so a poor follow-up query wastes a round but can never
-    # displace a passage an earlier round found — the fusion below still sees all of it.
+    # Level 3 only: read what came back and search again for whatever is missing. Follow-up
+    # rounds are kept separate from `base` so `_pool` can reserve room for the question's
+    # own results — extra retrieval contributes passages, it never evicts them.
     if level >= 3 and settings.agent_enabled:
         for step in range(settings.agent_max_steps):
             # Judge against the best of what we have, not the raw union: the top of the
-            # fused pool is what the answer would actually be built from right now.
-            so_far = _dedup(_fuse(rankings, settings.max_rerank_pool))
+            # pool is what the answer would actually be built from right now.
+            so_far = _pool(base, follow_up_rankings, settings.max_rerank_pool)
             best = _rerank(query, so_far, top_k)
             enough, missing, follow_ups = agent.next_queries(
                 question, [c.text for c in best], searched
@@ -223,15 +280,16 @@ def retrieve(
                 break
             log.info("step %d: missing %r — searching %s", step + 1, missing, follow_ups)
             steps.append(f"step {step + 1}: missing '{missing}' → {len(follow_ups)} more queries")
-            rankings.extend(ranking for q in follow_ups for ranking in _arms(q, depth))
+            follow_up_rankings.extend(
+                (_FOLLOW_UP_WEIGHT, r) for q in follow_ups for r in _arms(q, depth)
+            )
             searched.extend(follow_ups)
         else:
             steps.append(f"step budget ({settings.agent_max_steps}) reached")
 
-    # Fuse the whole union and let the cross-encoder see all of it. Previously fusion cut
-    # to `depth` first, throwing away a third of the unique candidates before the only
-    # component with calibrated scores got a look at them.
-    pool = _dedup(_fuse(rankings, settings.max_rerank_pool))
+    # The cross-encoder sees the whole pool. Fusion used to cut to `depth` first, throwing
+    # away a third of the unique candidates before the only calibrated component saw them.
+    pool = _pool(base, follow_up_rankings, settings.max_rerank_pool)
 
     # Rerank against the resolved query for the same reason we searched with it: scoring
     # a chunk against "why does that happen?" tells the cross-encoder nothing either.

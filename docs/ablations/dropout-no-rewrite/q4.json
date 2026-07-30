@@ -1,14 +1,14 @@
 {
-  "question_id": "qf63b38",
+  "question_id": "q6450f9",
   "level": 2,
-  "question": "Why does that happen?",
-  "answer": "The authors explain that this occurs because parameter updates become very noisy; each training step effectively attempts to train a different random architecture, meaning the computed gradients do not correspond to the final network used at test time (1).",
+  "question": "What drawback of dropout do the authors report?",
+  "answer": "The authors report that a major drawback of dropout is increased training time, as it typically takes 2-3 times longer to train than a standard neural network of the same architecture due to noisy parameter updates (1).",
   "conversation_id": "level-2",
   "sources": [
     {
       "page": 24,
       "quote": "One of the drawbacks of dropout is that it increases training time. A dropout network typically takes 2-3 times longer to train than a standard neural network of the same architecture. A major cause of this increase is that the parameter updates are very noisy. Each training case effectively tries to train a different random architecture. Therefore, the gradients that are being computed are not gradients of the final architecture that will be used at test time. Therefore, it is not surprising that training takes a long time. However, it is likely that this stochasticity prevents overfitting. This creates a trade-off between over- fitting and training time. With more training time, one can use high dropout and suffer less overfitting.",
-      "score": 0.9963
+      "score": 0.9686
     }
   ],
   "diagnostics": {
@@ -16,13 +16,13 @@
     "chat_model": "qwen3.6:latest",
     "embedding_model": "bge-m3",
     "retrieved_chunks": 5,
-    "retrieval_query": "Why does dropout increase training time",
+    "retrieval_query": "What drawback of dropout do the authors report?",
     "sub_queries": [],
     "retrieval_steps": [
       "search: 1 query"
     ],
     "tokens": null,
-    "latency_ms": 33545,
-    "timestamp": "2026-07-30T23:26:46Z"
+    "latency_ms": 30698,
+    "timestamp": "2026-07-30T22:50:36Z"
   }
 }

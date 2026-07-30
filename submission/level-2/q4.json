@@ -1,8 +1,8 @@
 {
-  "question_id": "q1e5a0b",
+  "question_id": "q3d4966",
   "level": 2,
   "question": "What drawback of dropout do the authors report?",
-  "answer": "The authors report that dropout significantly increases training time, typically requiring two to three times longer to train than a standard neural network of the same architecture due to noisy parameter updates (1).",
+  "answer": "The authors report that dropout increases training time, typically taking 2–3 times longer to train than a standard neural network due to noisy parameter updates and the stochastic nature of training different random architectures each step (1).",
   "conversation_id": "level-2",
   "sources": [
     {
@@ -22,7 +22,7 @@
       "search: 1 query"
     ],
     "tokens": null,
-    "latency_ms": 15191,
-    "timestamp": "2026-07-30T22:40:07Z"
+    "latency_ms": 22847,
+    "timestamp": "2026-07-30T23:26:23Z"
   }
 }
