@@ -1,1 +1,33 @@
-{}
+{
+  "question_id": "q142cfc",
+  "level": 3,
+  "question": "The introduction warns that over-parameterized models learn \"shortcuts\". Tracing this concept through the attention-based feature attribution work (Section 3.2.2) and the probing of ranking models (Section 7.2), what specific token-level behavior exemplifies this, and what vulnerability does it create?",
+  "answer": "The introduction warns that transformer-based models may learn \"shortcuts\" that are \"right for the wrong reasons,\" failing to align with human understanding (1). \n\n**Specific token-level behavior:** Attention-based attribution and probing studies show these shortcuts manifest as a disproportionate focus on low-information structural tokens rather than semantic content. Specifically, large portions of attention are offloaded to punctuation (2), marker tokens like '[CLS]' and '[SEP]' capture the highest attention weights, and stopwords are treated as equally important as regular words despite having negligible impact on ranking performance (3).\n\n**Vulnerability created:** This reliance on spurious cues makes retrieval models \"brittle and sensitive to small adversarial errors\" (1) and causes an \"increased susceptibility to adversarial attacks\" due to the model's dependence on these non-semantic shortcuts instead of true relevance signals (2).",
+  "conversation_id": "level-3",
+  "sources": [
+    {
+      "page": 1,
+      "quote": "Recently developed inductive biases, pre-training procedures, and transfer learning practices might lead these statistical over-parameterized models to learn shortcuts [44].",
+      "score": 0.158
+    },
+    {
+      "page": 17,
+      "quote": "7.2 Probing Ranking Models",
+      "score": 0.565
+    },
+    {
+      "page": 8,
+      "quote": "Qiao et al. [95] analyze the learned attentions of BERT-based ranking models, using attention weights to measure the importance of features.",
+      "score": 0.1408
+    }
+  ],
+  "diagnostics": {
+    "provider": "ollama",
+    "chat_model": "qwen3.6:latest",
+    "embedding_model": "bge-m3",
+    "retrieved_chunks": 5,
+    "tokens": null,
+    "latency_ms": 45876,
+    "timestamp": "2026-07-30T16:30:30Z"
+  }
+}

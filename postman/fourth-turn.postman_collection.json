@@ -5,26 +5,43 @@
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
-    { "key": "base_url", "value": "http://localhost:8791" }
+    {
+      "key": "base_url",
+      "value": "http://localhost:8791"
+    }
   ],
   "item": [
     {
       "name": "Health",
-      "request": { "method": "GET", "url": "{{base_url}}/health" }
+      "request": {
+        "method": "GET",
+        "url": "{{base_url}}/health"
+      }
     },
     {
       "name": "Ready (checks Qdrant)",
-      "request": { "method": "GET", "url": "{{base_url}}/health/ready" }
+      "request": {
+        "method": "GET",
+        "url": "{{base_url}}/health/ready"
+      }
     },
     {
       "name": "List collections",
-      "request": { "method": "GET", "url": "{{base_url}}/collections" }
+      "request": {
+        "method": "GET",
+        "url": "{{base_url}}/collections"
+      }
     },
     {
       "name": "Ingest the PDF (from data/in)",
       "request": {
         "method": "POST",
-        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
         "url": "{{base_url}}/ingest",
         "body": {
           "mode": "raw",
@@ -37,7 +54,12 @@
       "name": "Query — Level 1 (retrieval)",
       "request": {
         "method": "POST",
-        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
         "url": "{{base_url}}/query",
         "body": {
           "mode": "raw",
@@ -50,7 +72,12 @@
       "name": "Query — Level 2 (memory / follow-up)",
       "request": {
         "method": "POST",
-        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
         "url": "{{base_url}}/query",
         "body": {
           "mode": "raw",
@@ -63,7 +90,12 @@
       "name": "Query — Level 3 (whole-document)",
       "request": {
         "method": "POST",
-        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
         "url": "{{base_url}}/query",
         "body": {
           "mode": "raw",
@@ -79,11 +111,16 @@
           "name": "q1 - Level 1",
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/query",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"question\": \"What type of research paper is the document?\",\n  \"level\": 1\n}"
+              "raw": "{\n  \"question\": \"How many papers does the survey consider, and how many of them receive a more detailed treatment?\",\n  \"level\": 1\n}"
             }
           }
         },
@@ -91,7 +128,12 @@
           "name": "q2 - Level 1",
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/query",
             "body": {
               "mode": "raw",
@@ -103,11 +145,16 @@
           "name": "q3 - Level 1",
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/query",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"question\": \"What are the defined evaluation of explanations types in IR?\",\n  \"level\": 1\n}"
+              "raw": "{\n  \"question\": \"How does the survey categorise the evaluation of explanations?\",\n  \"level\": 1\n}"
             }
           }
         },
@@ -115,7 +162,12 @@
           "name": "q4 - Level 2",
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/query",
             "body": {
               "mode": "raw",
@@ -127,7 +179,12 @@
           "name": "q5 - Level 2",
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/query",
             "body": {
               "mode": "raw",
@@ -139,11 +196,16 @@
           "name": "q6 - Level 2",
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/query",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"question\": \"What is the following section?\",\n  \"level\": 2\n}"
+              "raw": "{\n  \"question\": \"And how do they propose to address it?\",\n  \"level\": 2\n}"
             }
           }
         },
@@ -151,11 +213,16 @@
           "name": "q7 - Level 3",
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/query",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"question\": \"Table 6 classifies IDCM as a \\\"Pipeline\\\" approach. Based on Section 9.1, how does IDCM's two-stage architecture execute this pipeline concept to overcome the input length limitations of modern transformers?\",\n  \"level\": 3\n}"
+              "raw": "{\n  \"question\": \"Across the classification tables in this survey - post-hoc methods, axiomatic methods, explainable-by-architecture models and rationale-based approaches - what is the most common way the quality of explanations is evaluated, and what do the authors themselves say about relying on that kind of evidence?\",\n  \"level\": 3\n}"
             }
           }
         },
@@ -163,7 +230,12 @@
           "name": "q8 - Level 3",
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/query",
             "body": {
               "mode": "raw",
@@ -175,11 +247,16 @@
           "name": "q9 - Level 3",
           "request": {
             "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
             "url": "{{base_url}}/query",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"question\": \"The introduction warns that over-parameterized models learn \\\"shortcuts\\\". Tracing this concept through Feature Attribution (Section 3.2.2) and Probing (Section 7.2), what specific token-level behavior exemplifies this, and what vulnerability does it create?\",\n  \"level\": 3\n}"
+              "raw": "{\n  \"question\": \"The introduction warns that over-parameterized models learn \\\"shortcuts\\\". Tracing this concept through the attention-based feature attribution work (Section 3.2.2) and the probing of ranking models (Section 7.2), what specific token-level behavior exemplifies this, and what vulnerability does it create?\",\n  \"level\": 3\n}"
             }
           }
         }

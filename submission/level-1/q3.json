@@ -1,1 +1,28 @@
-{}
+{
+  "question_id": "qcf00aa",
+  "level": 1,
+  "question": "How does the survey categorise the evaluation of explanations?",
+  "answer": "The survey classifies evaluation approaches for explanations into three categories based on a cited framework: application-grounded, human-grounded, and functionality-grounded (1). It further distinguishes between functionally grounded evaluations and human-centered evaluations, noting that IR research has primarily focused on the former (2). Additionally, it groups evaluation methods that measure fidelity, validity, completeness, and human congruence under the category of \"intrinsic methods\" (2).",
+  "conversation_id": "level-1",
+  "sources": [
+    {
+      "page": 5,
+      "quote": "2.5 Evaluation of Explanations",
+      "score": 0.7629
+    },
+    {
+      "page": 26,
+      "quote": "10.2.3 Evaluation of Explanations. Evaluation of explanations is a general problem in the area of interpretable machine learning.",
+      "score": 0.7451
+    }
+  ],
+  "diagnostics": {
+    "provider": "ollama",
+    "chat_model": "qwen3.6:latest",
+    "embedding_model": "bge-m3",
+    "retrieved_chunks": 5,
+    "tokens": null,
+    "latency_ms": 55525,
+    "timestamp": "2026-07-30T16:24:14Z"
+  }
+}

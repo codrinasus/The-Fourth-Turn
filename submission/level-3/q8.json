@@ -1,1 +1,28 @@
-{}
+{
+  "question_id": "q483811",
+  "level": 3,
+  "question": "Summarise the contribution of each section.",
+  "answer": "Based on the provided context, the survey addresses the following sections and contributions:\n- **Sections 3, 4, and 5**: Cover post-hoc approaches to explanation (1).\n- **Section 6**: Focuses on grounding to axiomatic approaches (1). Specifically, it details how Section 6.1 builds axiomatic rankers by aggregating axioms (2), Section 6.2 analyzes and explains existing neural ranking models by aligning them with known axioms (2), and Section 6.3 uses axioms to regularize the training of neural rankers (2).\n- **Sections 8 and 9**: Present interpretable-by-design methods (1).\n\nThe provided excerpts do not mention or detail contributions for any other sections in the survey.",
+  "conversation_id": "level-3",
+  "sources": [
+    {
+      "page": 2,
+      "quote": "Section 8 and Section 9).",
+      "score": 0.0039
+    },
+    {
+      "page": 14,
+      "quote": "Although there is no general model of relevance yet, previous work aggregated axioms to build axiomatic rankers (Section 6.1), analyze and explain existing neural ranking approaches by aligning them to known axioms (Section 6.2), and use axioms to regularize the training of neural rankers (Section 6.3).",
+      "score": 0.0106
+    }
+  ],
+  "diagnostics": {
+    "provider": "ollama",
+    "chat_model": "qwen3.6:latest",
+    "embedding_model": "bge-m3",
+    "retrieved_chunks": 5,
+    "tokens": null,
+    "latency_ms": 53852,
+    "timestamp": "2026-07-30T16:29:36Z"
+  }
+}
