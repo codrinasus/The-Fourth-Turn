@@ -1,8 +1,8 @@
 {
-  "question_id": "q9badd3",
+  "question_id": "q538c56",
   "level": 1,
   "question": "How many papers does the survey consider, and how many of them receive a more detailed treatment?",
-  "answer": "The survey considers 68 partially relevant papers, with a subset of 32 receiving more detailed treatment (1).",
+  "answer": "The survey considers 68 partially relevant papers, and a subset of 32 papers receive a more detailed treatment (1).",
   "conversation_id": "level-1",
   "sources": [
     {
@@ -16,8 +16,10 @@
     "chat_model": "qwen3.6:latest",
     "embedding_model": "bge-m3",
     "retrieved_chunks": 5,
+    "retrieval_query": "How many papers does the survey consider, and how many of them receive a more detailed treatment?",
+    "sub_queries": [],
     "tokens": null,
-    "latency_ms": 27386,
-    "timestamp": "2026-07-30T16:22:54Z"
+    "latency_ms": 16002,
+    "timestamp": "2026-07-30T17:13:52Z"
   }
 }

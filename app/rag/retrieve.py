@@ -159,8 +159,7 @@ def _rerank(query: str, candidates: list[Context], top_k: int) -> list[Context]:
         return candidates[:top_k]
 
     rescored = [
-        Context(text=c.text, page=c.page, score=s, kind=c.kind)
-        for c, s in zip(candidates, scores)
+        Context(text=c.text, page=c.page, score=s, kind=c.kind) for c, s in zip(candidates, scores)
     ]
     rescored.sort(key=lambda c: c.score, reverse=True)
     return rescored[:top_k]

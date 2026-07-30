@@ -1,8 +1,8 @@
 {
-  "question_id": "q5b105f",
+  "question_id": "q8c111d",
   "level": 2,
   "question": "What is the main limitation the authors acknowledge?",
-  "answer": "The main limitation acknowledged is that simple models cannot faithfully explain all localities of a complex model's decision boundary, even when trained with significantly more data, highlighting the advantage of using local surrogate models (1). For completeness, the document also notes two other shortcomings: the current set of axioms is insufficient to fully capture BERT's notion of relevance (2), and rationale-extraction modules can overfit to pattern sequences rather than semantic meaning (3).",
+  "answer": "The authors explicitly acknowledge that simple models are not able to faithfully explain all localities of a complex model's decision boundary, even when trained with significantly more data (1). They also note related deficiencies across other studies: axiomatic explanations only work well when rankers are confident in their relevance estimates (2), and rationale-extraction modules can 'cheat' by overfitting to pattern sequences instead of selecting rationales based on true semantic meaning (3).",
   "conversation_id": "level-2",
   "sources": [
     {
@@ -29,7 +29,7 @@
     "retrieval_query": "What is the main limitation the authors acknowledge?",
     "sub_queries": [],
     "tokens": null,
-    "latency_ms": 64746,
-    "timestamp": "2026-07-30T16:44:06Z"
+    "latency_ms": 60935,
+    "timestamp": "2026-07-30T17:15:09Z"
   }
 }

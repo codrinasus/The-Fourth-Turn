@@ -1,0 +1,28 @@
+{
+  "question_id": "qf0d3c5",
+  "level": 3,
+  "question": "Across the classification tables in this survey - post-hoc methods, axiomatic methods, explainable-by-architecture models and rationale-based approaches - what is the most common way the quality of explanations is evaluated, and what do the authors themselves say about relying on that kind of evidence?",
+  "answer": "Based on Tables 1 and 3 in the provided context, explanation quality is evaluated using methods such as anecdotal evidence, reference comparisons, visualization, or intrinsic measures like faithfulness/fidelity (1), (2). However, the provided excerpts do not explicitly identify which evaluation method is most common across all classification tables, nor do they contain the authors' commentary on relying on that type of evidence. Therefore, I cannot answer those specific points based solely on this context.",
+  "conversation_id": "level-3",
+  "sources": [
+    {
+      "page": 10,
+      "quote": "Table 1. Overview of post-hoc explanation methods.",
+      "score": 0.523
+    },
+    {
+      "page": 15,
+      "quote": "Table 3. Classification of axiomatic methods.",
+      "score": 0.3356
+    }
+  ],
+  "diagnostics": {
+    "provider": "ollama",
+    "chat_model": "qwen3.6:latest",
+    "embedding_model": "bge-m3",
+    "retrieved_chunks": 5,
+    "tokens": null,
+    "latency_ms": 85625,
+    "timestamp": "2026-07-30T16:28:09Z"
+  }
+}

@@ -10,8 +10,14 @@ Two jobs, split so that neither the model nor the code does something it is bad 
    that sentence straight out of the chunk text.
 
 Because the quote is sliced from indexed text rather than generated, it is verbatim by
-construction: there is no paraphrase to detect and no hallucinated quote to verify. Chunks
-never span pages, so the sentence carries its chunk's page number and the pair is correct.
+construction: there is no paraphrase to detect and no hallucinated quote to verify.
+
+That guarantee is about the *chunk*, though, and the chunk is Docling's rendering of the
+page rather than the page itself — so it is not the guarantee grading actually checks.
+`rag/verbatim.py` closes that gap afterwards, re-expressing the span in the PDF's own
+characters and verifying the page number. Chunks do not span pages, but Docling labels a
+block with the page it *starts* on, so a paragraph running across a page break can carry a
+page number one too low; that is repaired there, not here.
 """
 
 from __future__ import annotations
@@ -34,6 +40,7 @@ _NUMBER = re.compile(r"\d{1,2}")
 _SENTENCE_SPLIT = re.compile(r"(?<=[.!?])\s+")
 
 _MIN_QUOTE = 40  # shorter spans are rarely evidence on their own
+_MIN_HEADING_PROSE = 80  # a span shorter than this with no terminal punctuation is a title
 _MAX_QUOTE = 400  # a whole sentence is kept even if long; this only guards runaway rows
 
 
@@ -68,9 +75,7 @@ def renumber(answer: str, order: list[int]) -> str:
     mapping = {old + 1: new + 1 for new, old in enumerate(order)}
 
     def sub(match: re.Match[str]) -> str:
-        kept = [
-            str(mapping[int(n)]) for n in _NUMBER.findall(match.group(1)) if int(n) in mapping
-        ]
+        kept = [str(mapping[int(n)]) for n in _NUMBER.findall(match.group(1)) if int(n) in mapping]
         return f"({', '.join(kept)})" if kept else ""
 
     # Removing a marker leaves the space that preceded it stranded, sometimes right before
@@ -128,6 +133,17 @@ def _merge_short(text: str, bounds: list[tuple[int, int]]) -> list[tuple[int, in
     return merged
 
 
+def _is_heading(span: str) -> bool:
+    """Whether a span looks like a section title rather than a sentence.
+
+    Short, and not ending in sentence punctuation. Numbered headings ("2.5 Evaluation of
+    Explanations") are caught by the same test without needing to recognise the numbering,
+    so this does not depend on how one publisher formats headings.
+    """
+    stripped = span.strip()
+    return len(stripped) < _MIN_HEADING_PROSE and not stripped.endswith((".", "!", "?", ":"))
+
+
 def evidence_quote(question: str, context: Context) -> str:
     """The span of `context` that best supports an answer to `question`.
 
@@ -137,6 +153,13 @@ def evidence_quote(question: str, context: Context) -> str:
     """
     text = context.text
     bounds = _merge_short(text, _spans(text))
+    # A section heading is short, has no sentence structure, and scores well against a
+    # question that echoes its words — "2.5 Evaluation of Explanations" beat the prose
+    # underneath it for "How does the survey categorise the evaluation of explanations?".
+    # It is a true span of the page but it is not evidence, so headings are set aside
+    # unless they are all the chunk has.
+    prose = [b for b in bounds if not _is_heading(text[b[0] : b[1]])]
+    bounds = prose or bounds
     if not bounds:
         return text.strip()
     if len(bounds) == 1:

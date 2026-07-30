@@ -46,8 +46,10 @@ def main() -> int:
 
         took = time.perf_counter() - started
         pages = ", ".join(f"p{s['page']}:{s['score']:.2f}" for s in resp["sources"])
-        print(f"{q['id']}  {took:6.1f}s  [{pages}]")
-        print(f"    {resp['answer'][:200].replace(chr(10), ' ')}")
+        # flush: a full run takes ~13 minutes and Python buffers stdout when it is
+        # redirected, so without this you see nothing at all until the very end.
+        print(f"{q['id']}  {took:6.1f}s  [{pages}]", flush=True)
+        print(f"    {resp['answer'][:200].replace(chr(10), ' ')}", flush=True)
     return 0
 
 

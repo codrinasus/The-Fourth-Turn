@@ -106,7 +106,72 @@ chunk index. Summaries decide *where to look*; only the document is evidence.
 
 ## 4. Measurement
 
-<!-- FILL: final table -->
+All numbers below are from this repository on the committed PDF, host Ollama with
+`qwen3.6` + `bge-m3`, 35 pages → 269 chunks → 44 section summaries.
+
+### Ablation 1 — query rewriting (Level 2)
+
+The same three questions, same index, same models; the only change is whether
+`rewrite_query` resolves the follow-up before retrieval. Cross-encoder scores are
+comparable across rows because the reranker is calibrated, which RRF scores were not.
+
+| | no-op (baseline) | with rewriting |
+|---|---|---|
+| q4 (topic opener, standalone) | p25 0.011, p7 0.022 | p7 0.021, p15 0.119, p23 0.014 |
+| q5 "Why does that happen?" | p25 **0.054**, p6 0.034 | p25 **0.50** |
+| q5 answer | hedges across two readings: *"If referring to the difficulty of disentangling explanations… If referring to why ranking scores drop…"* | one reading, one source, direct |
+| q6 "And how do they propose to address it?" | p11 0.20, p17 0.22, p17 0.11 — **a duplicate source**, answer drifts onto LiEGe | p7 **0.98**, p25 0.86, p18 0.17 — answers the follow-up |
+
+The baseline answers are committed at `docs/ablations/baseline-no-rewrite/`, so this is
+reproducible rather than asserted. q4 is the control: it is standalone, the gate declines
+to rewrite it, and it is unchanged apart from retrieval-pool improvements.
+
+### Ablation 2 — quote grounding against the real PDF
+
+Checked with `scripts/audit_quotes.py`, which searches each quote on its cited page of
+`data/in/document.pdf` using pypdf — a *different* extractor from the Docling one we index
+with, so a pass means two independent readers agree the text is there. Whitespace is
+normalised; punctuation and case are not.
+
+| | before `verbatim.locate()` | after |
+|---|---|---|
+| quotes verbatim on their cited page | 16/19 (84%) | **19/19 (100%)** |
+| page numbers corrected | — | 2 |
+
+We had previously measured this at 100% by comparing quotes against our own parse. That
+number was circular and hid both defects described in §5.
+
+### Ablation 3 — decomposition and the section index (Level 3)
+
+Same three questions, before and after multi-query decomposition plus the outline. Baseline
+responses at `docs/ablations/baseline-single-query/`.
+
+| | single query | decomposed + outline |
+|---|---|---|
+| q7 (four tables + commentary) | 2 sources, p10 0.52 / p15 0.34; answer covers Tables 1 and 3 only | split into **exactly the four sub-questions matching the four tables**; answer names the dominant evaluation mode *and* the authors' critique of it |
+| q8 "summarise each section" | p2 0.004, p14 0.011 — retrieval scores at the floor | outline supplies the structure; chunk scores stay low **and honestly so**, because no passage answers this question |
+| q9 (3-hop, pages 1/8/17) | already found all three hops | unchanged — decomposition neither helped nor hurt |
+
+The honest reading: q7 improved clearly, q8 became answerable at all, and **q9 shows no
+gain** — its hops share enough vocabulary that one query already ranked all three. We are
+reporting that rather than claiming three wins. q8's near-zero scores are worth dwelling on:
+they are correct. There is no passage in the paper that summarises every section, so a
+retrieval score at the floor is the system accurately reporting that the answer had to come
+from structure rather than from a passage.
+
+### Cost
+
+From `diagnostics.latency_ms`, wall clock, thinking enabled:
+
+| Level | Latency | Why |
+|---|---|---|
+| 1 | 29–57 s | one dense + one BM25 pass, rerank, answer |
+| 2 | 58–75 s | plus one rewrite call (thinking off, ~2 s) |
+| 3 | 72–115 s | plus decomposition and 2–4 extra retrieval passes, 8 passages and the outline in the prompt |
+
+Ingest is 3m05s end to end: 35 pages parsed, 269 chunks embedded, 44 sections summarised.
+The cross-encoder is not the expensive part anywhere — scoring a 60-candidate pool costs
+well under a second against a 30–110 s generation.
 
 ## 5. What broke
 
@@ -154,9 +219,23 @@ page break is cited one page early — real, in our submitted answers, twice.
   row boundaries, which keeps rows intact but leaves the model to parse the layout. A
   question needing a specific cell by row *and* column header is not something we handle
   structurally.
-- **We do not abstain.** The cross-encoder's calibrated scores would support it — a pool
-  topping out at 0.007 means "not in this document" — but we currently answer from the best
-  available context regardless. This is the single change we would make with another day.
+- **We do not abstain, and we checked before deciding not to.** The cross-encoder's scores
+  are calibrated, so an abstention threshold looks obvious: the pool for the q1 we retired
+  topped out at **0.007**, which is the system correctly saying "not in this document".
+  Then we tabulated the best score of every answer we believe is *correct*:
+
+  | | q1 | q2 | q3 | q4 | q5 | q6 | q7 | q8 | q9 |
+  |---|---|---|---|---|---|---|---|---|---|
+  | best source score | 0.998 | 0.994 | 0.763 | **0.119** | 0.503 | 0.979 | 0.262 | **0.028** | 0.178 |
+
+  Correct answers run from 0.028 to 0.998. The only gap available is between the failing
+  0.007 and q8's correct 0.028 — and setting a threshold in a window that narrow, chosen
+  from nine observations, is fitting the constant to our own question set rather than
+  measuring anything. It would also be exactly the kind of tuning-to-the-questions the
+  rules penalise. A defensible threshold needs a labelled set of questions the document
+  genuinely cannot answer; we do not have one, so we ship without abstention and say so.
+  q8 is the instructive case: it scores 0.028 *and is right*, because no passage summarises
+  every section — the answer legitimately comes from the section index, not from a quote.
 
 ---
 

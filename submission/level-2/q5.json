@@ -1,14 +1,14 @@
 {
-  "question_id": "q0cec96",
+  "question_id": "q4cd685",
   "level": 2,
   "question": "Why does that happen?",
-  "answer": "This happens because complex retrieval models often rely on multiple, sometimes conflicting relevance factors to rank documents, such as direct term matching for one document and query term proximity for another (1). Because these underlying factors vary across a single ranking, a simple surrogate model cannot accurately approximate or capture them all simultaneously, which prevents it from achieving high fidelity (1).",
+  "answer": "This occurs because rankings produced by complex retrieval models often involve multiple and sometimes conflicting relevance factors that a single simple surrogate model cannot accurately approximate (1). For example, one document might be deemed relevant based on term matching with the query, while another in the exact same ranking is considered relevant due to query term proximity, which prevents high-fidelity explanations. (1)",
   "conversation_id": "level-2",
   "sources": [
     {
       "page": 25,
       "quote": "Therefore, rankings with multiple and sometimes conflicting relevance factors for a single simple surrogate model might not be able to provide high fidelity.",
-      "score": 0.5026
+      "score": 0.6999
     }
   ],
   "diagnostics": {
@@ -16,10 +16,10 @@
     "chat_model": "qwen3.6:latest",
     "embedding_model": "bge-m3",
     "retrieved_chunks": 5,
-    "retrieval_query": "Why do simple models cannot faithfully explain all localities of a complex model's decision boundary, even when trained with significantly more data?",
+    "retrieval_query": "Why are simple models not able to faithfully explain all localities of a complex model's decision boundary, and why do axiomatic explanations only work well when rankers are confident in their relevance estimates, and why can rationale-extraction modules 'cheat' by overfitting to pattern sequences instead of selecting rationales based on true semantic meaning?",
     "sub_queries": [],
     "tokens": null,
-    "latency_ms": 57778,
-    "timestamp": "2026-07-30T16:45:13Z"
+    "latency_ms": 59171,
+    "timestamp": "2026-07-30T17:16:10Z"
   }
 }

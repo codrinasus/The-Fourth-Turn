@@ -1,14 +1,24 @@
 {
-  "question_id": "q8c014e",
+  "question_id": "q8a944f",
   "level": 3,
   "question": "The introduction warns that over-parameterized models learn \"shortcuts\". Tracing this concept through the attention-based feature attribution work (Section 3.2.2) and the probing of ranking models (Section 7.2), what specific token-level behavior exemplifies this, and what vulnerability does it create?",
-  "answer": "Based on the provided text, the shortcut manifests when transformer-based rankers disproportionately **offload attention or feature importance onto low-information, high-frequency tokens** (e.g., special markers like `[CLS]` and `[SEP]`, punctuation, or stopwords) rather than semantically meaningful query terms (6; 1). Instead of capturing true relevance, these models exploit statistical document frequencies to generate predictions that are ultimately \"right for the wrong reasons\" (1). \n\nThis reliance on superficial token patterns creates a clear vulnerability: it makes the models **brittle and highly susceptible to adversarial attacks**, as their decisions hinge on easily manipulatable positional or frequency-based correlations rather than robust semantic understanding (1; 2).",
+  "answer": "The introduction notes that over-parameterized models learn superficial statistical patterns or “shortcuts” rather than human-aligned relevance signals (1). This behavior is exemplified by the finding that these models offload significant attention weights to low-information tokens, specifically punctuation and special markers like '[CLS]' and '[SEP]' (2, 3). Relying on these spurious cues creates a vulnerability where the ranking model becomes highly susceptible to small adversarial perturbations or targeted attacks (2, 1).",
   "conversation_id": "level-3",
   "sources": [
     {
       "page": 1,
       "quote": "Recently developed inductive biases, pre-training procedures, and transfer learning practices might lead these statistical over-parameterized models to learn shortcuts [44].",
-      "score": 0.1784
+      "score": 0.1648
+    },
+    {
+      "page": 17,
+      "quote": "Several variations of the probing paradigm have also been applied to various IR tasks and models.",
+      "score": 0.6719
+    },
+    {
+      "page": 9,
+      "quote": "[141] also use attention weights to obtain feature attributions for a BERT-based ranking model.",
+      "score": 0.0586
     }
   ],
   "diagnostics": {
@@ -16,13 +26,13 @@
     "chat_model": "qwen3.6:latest",
     "embedding_model": "bge-m3",
     "retrieved_chunks": 8,
-    "retrieval_query": "The introduction warns that over-parameterized models learn \"shortcuts\". Tracing this concept through the attention-based feature attribution work described in Section 3.2.2 and the probing of ranking models described in Section 7.2, what specific token-level behavior exemplifies this, and what vulnerability does it create?",
+    "retrieval_query": "The introduction warns that over-parameterized models learn \"shortcuts\". Tracing this concept through the attention-based feature attribution work in Section 3.2.2 and the probing of ranking models in Section 7.2, what specific token-level behavior exemplifies this, and what vulnerability does it create?",
     "sub_queries": [
-      "What specific token-level behavior in Section 3.2.2 exemplifies the \"shortcuts\" learned by over-parameterized models according to attention-based feature attribution?",
-      "What vulnerability in ranking models created by this shortcut behavior is described in Section 7.2?"
+      "What specific token-level behavior in attention-based feature attribution from Section 3.2.2 demonstrates that over-parameterized models learn shortcuts?",
+      "What vulnerability does this shortcut learning behavior create as described in the probing of ranking models in Section 7.2?"
     ],
     "tokens": null,
-    "latency_ms": 71974,
-    "timestamp": "2026-07-30T17:00:11Z"
+    "latency_ms": 77182,
+    "timestamp": "2026-07-30T17:21:29Z"
   }
 }

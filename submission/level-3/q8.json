@@ -1,14 +1,24 @@
 {
-  "question_id": "q9ac7ed",
+  "question_id": "q580c2d",
   "level": 3,
   "question": "Summarise the contribution of each section.",
-  "answer": "Based on the provided context, the contributions of each covered section are:\n\n- **ExIR Landscape & Categorization:** The field has shifted from early adaptations of general feature-attribution tools (e.g., LIME, SHAP) to developing specialized IR techniques across post-hoc, axiomatic, and interpretable-by-design paradigms (1).\n- **Axiomatic Grounding (Section 6):** These works aggregate established retrieval principles to construct transparent rankers, diagnose neural models by aligning them with known axioms, and regularize training to enhance robustness, generalization, and interpretability (2).\n- **Probing & Attribution Studies:** Researchers use linear approximations and behavioral-probing setups to attribute ranking performance to latent concepts like term frequency and document length, verifying that model behavior conforms to established IR constraints (3).\n- **Interpretable-by-Design & Rationale Methods (Sections 8–9):** Contributions include explicit feature contribution models that sum transparent importance scores to directly induce relevance decisions, alongside rationale-based frameworks that address discrete output training through pipeline or end-to-end optimization strategies (5; 7).\n- **Evaluation Practices:** While most interpretable-by-design methods validate explanations using anecdotal examples, specific approaches explicitly compare generated feature contributions against referenced tree models to justify faithfulness (4).\n- **Limitations & Open Questions (Section 10):** The field is critiqued for overemphasizing ranking tasks and system developers while neglecting other IR applications and end-user stakeholders, framing key directions for broader, user-centric research (5).",
+  "answer": "Based on the provided context, the contributions of each surveyed section are:\n\n- **Feature Attribution & Post-hoc Methods:** Assigns importance scores to input features using isolated black-box components or linear approximations to identify model sensitivity and explain relevance (1, 2). Evaluations typically rely on anecdotal examples rather than rigorous fidelity metrics (3).\n- **Axiomatic Analysis:** Aggregates established IR axioms to build interpretable rankers, align neural models with known relevance constraints for diagnostic analysis, and regularize training to enhance robustness and generalization (4).\n- **Probing & Parametric Analysis:** Uses linear approximators or behavioral-probing setups to attribute ranking performance to specific concepts like term frequency, document length, and semantic similarity, verifying how effectively models capture these underlying properties (2).\n- **Explainable-by-Architecture Models:** Introduces explicit feature contribution methods and transparent decision-tree approaches with reduced input spaces for Learning-to-Rank tasks, utilizing \"soft-rule\" explanations that differ from hard rule paths (3, 5).\n- **Rationale-Based Methods:** Employs a two-stage process to extract sparse, human-understandable rationales, addressing discrete output training challenges through pipeline or end-to-end optimization frameworks (6).\n- **Survey Categorization & Landscape:** Subdivides Interpretable-by-Design approaches into partially/fully interpretable architectural components and feature-sparsity-enforcing rationale methods, while tracing the field's evolution from adapted feature-attribution tools to specialized post-hoc, axiomatic, and design-based techniques (7, 8).",
   "conversation_id": "level-3",
   "sources": [
     {
-      "page": 2,
-      "quote": "Section 8 and Section 9).",
-      "score": 0.0038
+      "page": 21,
+      "quote": "The relevance of the input is aggregated by simply summing up all contribution scores.",
+      "score": 0.0756
+    },
+    {
+      "page": 17,
+      "quote": "The resulting coefficients are then used to understand the importance of the corresponding aspects.",
+      "score": 0.0264
+    },
+    {
+      "page": 21,
+      "quote": "A summary of methods can be found in Table 5.",
+      "score": 0.0111
     },
     {
       "page": 14,
@@ -16,19 +26,24 @@
       "score": 0.0106
     },
     {
-      "page": 17,
-      "quote": "The resulting coefficients are then used to understand the importance of the corresponding aspects.",
-      "score": 0.028
-    },
-    {
       "page": 21,
-      "quote": "A summary of methods can be found in Table 5.",
-      "score": 0.0106
+      "quote": "8.2.1 Explicit Feature Contribution. Different from the previously discussed feature-attribution methods, explicit feature contribution indicates a simple and transparent correlation between each input feature and the relevance prediction, in addition to showing importance heatmaps.",
+      "score": 0.0085
     },
     {
-      "page": 25,
-      "quote": "In this section, we will discuss the limitations, challenges, and open questions in the area of explainable information retrieval.",
-      "score": 0.005
+      "page": 22,
+      "quote": "We summarize the approaches in this section in Table 6.",
+      "score": 0.004
+    },
+    {
+      "page": 2,
+      "quote": "Section 8 and Section 9).",
+      "score": 0.0038
+    },
+    {
+      "page": 4,
+      "quote": "Section 8) where components of the model architecture are partially or fully interpretable.",
+      "score": 0.0029
     }
   ],
   "diagnostics": {
@@ -38,13 +53,13 @@
     "retrieved_chunks": 8,
     "retrieval_query": "Summarise the contribution of each section.",
     "sub_queries": [
-      "What is the main point of the first section?",
-      "What is the main point of the second section?",
-      "What is the main point of the third section?",
-      "What is the main point of the fourth section?"
+      "What is the main contribution of the first section?",
+      "What is the main contribution of the second section?",
+      "What is the main contribution of the third section?",
+      "What is the main contribution of the final section?"
     ],
     "tokens": null,
-    "latency_ms": 90143,
-    "timestamp": "2026-07-30T16:58:40Z"
+    "latency_ms": 104598,
+    "timestamp": "2026-07-30T17:19:43Z"
   }
 }

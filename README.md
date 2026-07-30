@@ -104,7 +104,7 @@ app/                 the FastAPI service you build on
 ├── models.py        request/response schemas — QueryResponse IS the graded format
 ├── llm/             LM Studio · Ollama · litellm interfaces (+ how to add your own)
 ├── vectorstore/     Qdrant wrapper (list / read / write)
-└── rag/             chunking · embeddings · ingest · retrieve · memory · pipeline  <- the challenge
+└── rag/             the pipeline — see below
 data/in/             put YOUR chosen PDF here (committed)
 data/extracted/      ignored Docling parser outputs consumed by /ingest
 data/out/            every /query answer is written here (working scratch)
@@ -116,10 +116,32 @@ ai_skill/            VALIDATE_SUBMISSION.md — an AI skill to check your submis
 docs/                everything below, in depth
 ```
 
-Everywhere worth improving is marked with a `TODO(level-N)` comment. The baseline has a **local
-embedding model** and a simple paragraph-aware chunker; hybrid retrieval and reranking are the
-next things to improve.
-Start in `app/rag/`.
+Inside `app/rag/`, in the order a question passes through them:
+
+| Module | What it does |
+|---|---|
+| `docling_parser.py` | PDF → labelled blocks in reading order, via the local Docling service |
+| `chunking.py` | section-aware, page-bounded chunks; tables split on row boundaries |
+| `sections.py` | **second index** — one LLM summary per section, the Level-3 document map |
+| `ingest.py` | parse → chunk → embed → Qdrant, plus the section index |
+| `memory.py` | per-level conversation history |
+| `rewrite.py` | **Level 2** — resolves a follow-up into a standalone query *before* retrieval |
+| `decompose.py` | **Level 3** — splits a whole-document question into sub-questions |
+| `retrieve.py` | dense + BM25 per query, RRF over all arms, dedup, cross-encoder rerank |
+| `rerank.py` | `bge-reranker-v2-m3` client; calibrated 0–1 scores |
+| `citations.py` | which passages the answer used, and which span of each is the evidence |
+| `verbatim.py` | re-expresses each quote in the PDF's own characters and verifies its page |
+| `pipeline.py` | ties it together and builds the graded `QueryResponse` |
+
+Two checks worth knowing about:
+
+```bash
+uv run python scripts/audit_quotes.py     # every quote verbatim on its cited page? (exits non-zero if not)
+uv run python scripts/run_questions.py    # ask the nine and file them into submission/
+```
+
+Design decisions, ablations with numbers, and the failures we diagnosed are in
+[`TECHNICAL_NOTE.md`](TECHNICAL_NOTE.md).
 
 ## Read next (`docs/`)
 

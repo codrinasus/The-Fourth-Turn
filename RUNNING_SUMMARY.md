@@ -228,3 +228,78 @@ Those two hedged/duplicated baseline answers are preserved in
 asserted.
 
 Quote audit after the change: **19/19 (100%)** verbatim on the cited page.
+
+---
+
+## 7. Final run — all nine, on the finished pipeline
+
+| Q | Level | Latency | Sources | Behaviour |
+|---|---|---|---|---|
+| q1 | 1 | 16.0 s | 1 | p2 **1.00** — correct (68 / 32) |
+| q2 | 1 | 24.0 s | 2 | p1 0.99 / 0.95 — correct |
+| q3 | 1 | 34.7 s | 1 | p5 0.76 — correct |
+| q4 | 2 | 60.9 s | 3 | standalone, **not rewritten** (the gate declining correctly) |
+| q5 | 2 | 59.2 s | 1 | **rewritten** → p25 **0.70** |
+| q6 | 2 | 68.0 s | 5 | **rewritten** → p7 **0.99** |
+| q7 | 3 | 83.3 s | 3 | **2 sub-queries**; now cites 3 tables, not 2 |
+| q8 | 3 | 104.6 s | 8 | **4 sub-queries** + outline; per-section summary answer |
+| q9 | 3 | 77.2 s | 3 | **2 sub-queries**; all three hops (p1 → p8 → p17) |
+
+Final gate: `scripts/audit_quotes.py` reports **27/27 (100%)** quotes verbatim on their
+cited page, zero empty files, `ruff check` and `ruff format --check` both clean.
+
+A late catch worth knowing about, because it was silently corrupting Level-3 answers: the
+model writes grouped citations like `(2; 6)` when one claim rests on two passages, and the
+marker regex only matched a lone `(1)`. So q7 leaned on four passages, **returned one
+source**, and shipped markers pointing at nothing. Now parsed and renumbered as a group, and
+the system prompt asks for `(2, 6)` explicitly. You can see it working in q2's answer above.
+
+Also fixed: evidence quotes could be a bare section heading. "2.5 Evaluation of
+Explanations" out-scored the prose beneath it for q3, because the heading echoes the
+question's words. Headings are now set aside unless a chunk has nothing else, and q3's quote
+is real supporting prose.
+
+---
+
+## 8. What I deliberately did NOT do — and why
+
+**Abstention on a weak retrieval pool.** This was top of my list: the cross-encoder is
+calibrated, and the q1 we retired had a pool topping out at 0.007, which is the system
+correctly saying "not in this document". Then I tabulated the best score of every answer
+that is *correct*:
+
+| q1 | q2 | q3 | q4 | q5 | q6 | q7 | q8 | q9 |
+|---|---|---|---|---|---|---|---|---|
+| 0.998 | 0.994 | 0.763 | **0.119** | 0.503 | 0.979 | 0.262 | **0.028** | 0.178 |
+
+Correct answers run from 0.028 to 0.998. The only gap available is between the failing
+0.007 and q8's correct 0.028 — and choosing a constant inside a window that narrow, from
+nine observations, is fitting to our own question set, which is what the rules penalise. It
+would also have made q8 abstain, and q8 is right. **Shipping this would have made the
+submission worse.** The reasoning and the table are in `TECHNICAL_NOTE.md` §6 and `TODO.md`,
+which is a better rigor story than a feature that misfires.
+
+---
+
+## 9. Where things stand, and what's left for you
+
+Everything is committed and pushed to `feat/reranker-and-citations`.
+
+**→ YOUR CALL — the one thing I did not do:** grading reads **`main`**, and this work is
+still on the feature branch. You asked me to push the branch and leave the merge to you:
+
+```bash
+git checkout main && git merge feat/reranker-and-citations && git push origin main
+```
+
+Remote `main` was also one commit behind your local `main` before I started, so the push
+will carry that along too.
+
+Open items, in the order I would do them, are in `TODO.md`. The honest summary: the
+pipeline answers all nine questions correctly, every quote verifies against the PDF, and
+the two things I would most want next are persistent memory (`rag/memory.py` is a dict that
+dies with the container) and a labelled set of unanswerable questions so abstention can be
+built on evidence rather than on a guessed constant.
+
+Read `TECHNICAL_NOTE.md` before Friday — it is what the jury reads, and §5 ("what broke")
+is the part worth being able to defend out loud.

@@ -43,16 +43,31 @@ log = logging.getLogger(__name__)
 # Folded to a common form on both sides before matching. These are exactly the
 # substitutions that lose information going from PDF to Docling text.
 _FOLD = {
-    "–": "-", "—": "-", "‐": "-", "‑": "-", "−": "-",
-    "‘": "'", "’": "'", "‛": "'", "ʼ": "'",
-    "“": '"', "”": '"', "„": '"',
-    " ": " ", " ": " ", " ": " ", " ": " ", " ": " ",
-    "ﬁ": "fi", "ﬂ": "fl", "": "Qu",
+    "–": "-",
+    "—": "-",
+    "‐": "-",
+    "‑": "-",
+    "−": "-",
+    "‘": "'",
+    "’": "'",
+    "‛": "'",
+    "ʼ": "'",
+    "“": '"',
+    "”": '"',
+    "„": '"',
+    " ": " ",
+    " ": " ",
+    " ": " ",
+    " ": " ",
+    " ": " ",
+    "ﬁ": "fi",
+    "ﬂ": "fl",
+    "": "Qu",
 }
 _PUA = re.compile(r"[-]")
 _WS = re.compile(r"\s+")
 
-_MIN_ALIGNABLE = 20   # below this a match is as likely to be coincidence as evidence
+_MIN_ALIGNABLE = 20  # below this a match is as likely to be coincidence as evidence
 
 
 def _fold(text: str) -> str:
