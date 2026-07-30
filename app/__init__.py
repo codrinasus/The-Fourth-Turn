@@ -1,9 +1,13 @@
-"""The Fourth Turn — a RAG-over-PDF backend scaffold.
+"""The Fourth Turn — a RAG-over-PDF backend. Team KrautWineSarmale, ESSIR 2026.
 
-You fork this repository and build your system inside `app/`. The skeleton runs
-as-is (a naive baseline), and every place worth improving is marked with a
-`TODO(level-N)` comment pointing at the challenge level it unlocks. Start with
-`app/rag/` and `app/llm/`.
+Answers questions about one committed PDF at three levels: retrieval, conversational
+memory, and whole-document reasoning. Everything runs locally.
+
+    app/llm/          provider abstraction (Ollama · LM Studio · litellm)
+    app/vectorstore/  Qdrant wrapper — the chunk index and the section index
+    app/rag/          the pipeline; start there, its __init__ lists the reading order
+
+Design decisions, ablations and diagnosed failures: TECHNICAL_NOTE.md.
 """
 
 __version__ = "0.1.0"

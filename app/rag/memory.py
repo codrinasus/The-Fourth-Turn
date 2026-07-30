@@ -4,8 +4,11 @@ A Level-2 question is a follow-up: *"and how large is its test split?"* only mak
 sense given the earlier turn it refers to. To answer it you need the history of the
 conversation it belongs to.
 
-The baseline stores history in a process-local dict, which is enough to demonstrate
-the idea but forgets everything on restart and does not scale past one worker.
+History is stored in a process-local dict. That is honestly a weakness: it forgets
+everything on restart and does not scale past one worker. It is enough for the graded
+flow, where a level's three questions arrive in order against one process, and replacing
+it with Redis would not change how Level 2 actually works — the interesting part is
+`rag/rewrite.py`, which turns this history into a retrievable query.
 """
 
 from __future__ import annotations
@@ -34,9 +37,10 @@ def reset(conversation_id: str) -> None:
     _STORE.pop(conversation_id, None)
 
 
-# TODO(level-2): history alone is not enough. The retrieval step still embeds the
-#   raw follow-up ("and the test split?"), which has no searchable content. The high-
-#   leverage fix is to REWRITE the question into a standalone query using this history
-#   BEFORE retrieving — see rag/retrieve.py::rewrite_query.
-# TODO(level-2): a persistent, shared store (Redis, Postgres, ...) if you run more
-#   than one worker or want memory to survive a restart.
+# History alone is not enough, and that gap is now closed: the retriever never sees this
+# store, so a raw follow-up ("and the test split?") would be embedded with no searchable
+# content in it. `rag/rewrite.py` resolves the question against this history BEFORE
+# retrieval — see rag/retrieve.py::rewrite_query.
+#
+# TODO(level-2): a persistent, shared store (Redis, Postgres, ...). This dict dies with the
+#   process and does not work across workers — the main remaining weakness at this level.

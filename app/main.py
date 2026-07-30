@@ -21,23 +21,33 @@ DESCRIPTION = """
 A retrieval-augmented-generation backend over **one PDF you choose**, for the AI Multimedia
 Lab hackathon at ESSIR 2026 (*The Fourth Turn*).
 
+Team **KrautWineSarmale**. Everything runs locally — Ollama (`qwen3.6`, `bge-m3`), a
+self-hosted Docling for parsing, `bge-reranker-v2-m3` in llama.cpp, and Qdrant. No hosted
+API is used.
+
 ### Flow
 
-1. Put your document in `data/in/`.
-2. **`POST /ingest`** — parse it, embed it, index it in Qdrant. (Out of the box: one vector
-   per page, local Ollama embeddings. No chunking yet — that is yours to add.)
-3. **`POST /query`** — ask a question at a level (1, 2 or 3). You get an answer with its
-   sources, and a copy is written to `data/out/`.
+1. The document is committed at `data/in/document.pdf`.
+2. **`POST /ingest`** — Docling parses it into labelled blocks; a section-aware chunker
+   produces page-bounded chunks (269 here); `bge-m3` embeds them into Qdrant. A **second
+   index** of one summary per section (44) is built alongside, for Level 3.
+3. **`POST /query`** — ask a question at a level (1, 2 or 3). You get an answer, the
+   passages it actually cited, and a copy is written to `data/out/`.
 
 ### The three levels
 
-- **1 · retrieval** — a standalone question. The baseline handles these.
-- **2 · memory** — a follow-up; level-2 questions share a conversation so your system can
-  use the history. Resolve the follow-up *before* retrieval.
-- **3 · reasoning** — questions no single passage answers. This is where you build.
+- **1 · retrieval** — a standalone question. Hybrid dense + BM25, fused with RRF and
+  reranked by a cross-encoder.
+- **2 · memory** — a follow-up. Level-2 questions share a conversation, and the follow-up is
+  resolved into a standalone query **before** retrieval — the prompt gets the history, but
+  the retriever only ever sees the query. See `diagnostics.retrieval_query`.
+- **3 · reasoning** — questions no single passage answers. The question is decomposed into
+  sub-questions retrieved separately (`diagnostics.sub_queries`), and the section outline is
+  supplied as a document map.
 
-Everything worth improving is marked `TODO(level-N)` in `app/rag/` and `app/rag/embeddings.py`.
-This is an **open-source** challenge — any model you can host on your own machine is fair game.
+Every `sources[].quote` is *sliced* from indexed page text, never generated, then located in
+the PDF itself so it is returned in the file's own characters with its page verified.
+`uv run python scripts/audit_quotes.py` checks all of them against a second PDF extractor.
 """
 
 

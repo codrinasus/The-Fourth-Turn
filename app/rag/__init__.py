@@ -1,6 +1,16 @@
 """The RAG pipeline: chunk -> embed -> store -> retrieve -> answer.
 
-This is where the challenge is won. The baseline here answers Level-1 questions
-tolerably and Level-2/3 questions badly. Every module carries `TODO(level-N)`
-markers showing what to build. See docs/03_tasks.md.
+Reading order, following a question through the system:
+
+    rewrite.py    a level-2 follow-up becomes a standalone query (before embedding)
+    decompose.py  a level-3 question becomes several sub-questions
+    retrieve.py   dense + BM25 per query, RRF over all arms, dedup, cross-encoder rerank
+    sections.py   the second index: one summary per section, the level-3 document map
+    citations.py  which passages the answer used, and which span of each is the evidence
+    verbatim.py   that span, re-expressed in the PDF's own characters, page verified
+    pipeline.py   assembles the prompt and the graded QueryResponse
+
+Two invariants hold across all of it: an evidence quote is only ever *sliced* from indexed
+page text, never generated; and the generated section summaries are a navigation aid that
+can never become a citation. See TECHNICAL_NOTE.md.
 """
