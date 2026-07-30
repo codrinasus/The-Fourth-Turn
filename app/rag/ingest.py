@@ -8,6 +8,7 @@ HTTP service directly.
 
 from __future__ import annotations
 
+import logging
 import shutil
 import uuid
 from pathlib import Path
@@ -17,6 +18,7 @@ from qdrant_client import models
 from ..config import get_settings
 from ..models import IngestResponse
 from ..vectorstore.qdrant_store import get_store
+from . import sections
 from .chunking import Chunk, chunk_blocks, chunk_pages
 from .embeddings import get_embedder
 from .pdf_parser import active_parser_name, extract_blocks, extract_pages
@@ -25,6 +27,8 @@ from .retrieve import reset_retrieval_indexes
 # A fixed namespace so re-ingesting the same document overwrites its points
 # (idempotent ids) instead of duplicating them.
 _NAMESPACE = uuid.UUID("6f0d9b1e-3b7a-4c2e-9a1d-000000000000")
+
+log = logging.getLogger(__name__)
 
 
 def _find_pdf(filename: str | None) -> Path:
@@ -116,6 +120,14 @@ def ingest(filename: str | None = None, reset: bool = False) -> IngestResponse:
         for c, vec in zip(chunks, vectors)
     ]
     store.upsert(points)
+
+    # The Level-3 second index: one summary per section, over the same chunks. Built last
+    # so a failure here still leaves a complete, queryable chunk index behind.
+    try:
+        n_sections = sections.build_index(chunks, source=path.name, reset=reset)
+        log.info("indexed %d section summaries", n_sections)
+    except Exception as e:  # noqa: BLE001 - the chunk index is what /query needs to work
+        log.warning("section index failed (%s) — level-3 outline will be empty", e)
 
     return IngestResponse(
         document=path.name,

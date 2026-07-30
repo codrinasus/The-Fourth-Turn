@@ -38,8 +38,14 @@ class Message(TypedDict):
 
 
 class ChatModel(Protocol):
-    def chat(self, messages: list[Message]) -> str:
-        """Return the assistant's reply to a list of chat messages."""
+    def chat(self, messages: list[Message], *, thinking: bool | None = None) -> str:
+        """Return the assistant's reply to a list of chat messages.
+
+        `thinking` overrides the configured reasoning mode for this call only. Answer
+        generation wants it on; the mechanical calls around retrieval (rewriting a
+        follow-up, decomposing a question) do not, and turning it off there saves most
+        of their latency. `None` means "use the configured default".
+        """
         ...
 
 

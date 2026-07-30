@@ -12,9 +12,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(
-        env_file=".env", env_file_encoding="utf-8", extra="ignore"
-    )
+    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 
     # --- Chat provider (the model that writes answers) ----------------------
     # One of: "lmstudio", "ollama", "litellm". This team uses local Ollama.
@@ -28,8 +26,8 @@ class Settings(BaseSettings):
     # graded `answer` field. Set false only to trade quality for speed.
     ollama_thinking: bool = True
 
-    ollama_base_url: str = "http://localhost:11434"     # keep Ollama's default port
-    lmstudio_base_url: str = "http://localhost:1234"    # keep LM Studio's default port
+    ollama_base_url: str = "http://localhost:11434"  # keep Ollama's default port
+    lmstudio_base_url: str = "http://localhost:1234"  # keep LM Studio's default port
     litellm_api_base: str | None = None
     litellm_api_key: str | None = None
 
@@ -67,18 +65,24 @@ class Settings(BaseSettings):
     reranker_enabled: bool = True
     reranker_base_url: str = "http://localhost:8792"
     reranker_timeout: float = 90.0
-    rerank_candidates: int = 20    # size of the pool handed to the cross-encoder
+    rerank_candidates: int = 20  # depth of each individual dense/BM25 search
+    # Ceiling on the fused union the cross-encoder rescores. One query yields ~30-39
+    # unique chunks from two arms; a decomposed Level-3 question yields several times
+    # that. Scoring 60 pairs costs the reranker well under a second, so the cap is here
+    # to bound the worst case rather than to save time.
+    max_rerank_pool: int = 60
 
     # --- Retrieval ----------------------------------------------------------
-    top_k: int = 5                 # how many results a query retrieves
+    top_k: int = 5  # how many results a query retrieves
+    top_k_level3: int = 8  # whole-document questions need evidence from more places
 
     # The Docling pages are split into page-grounded chunks before indexing.
-    chunk_size: int = 800          # target characters per chunk
-    chunk_overlap: int = 0         # neighbour context will come from retrieval expansion later
+    chunk_size: int = 800  # target characters per chunk
+    chunk_overlap: int = 0  # neighbour context will come from retrieval expansion later
 
     # --- Data folders -------------------------------------------------------
-    in_dir: str = "data/in"        # put the PDF here; /ingest reads from it
-    out_dir: str = "data/out"      # every /query answer is written here as JSON
+    in_dir: str = "data/in"  # put the PDF here; /ingest reads from it
+    out_dir: str = "data/out"  # every /query answer is written here as JSON
 
     request_timeout: float = 120.0
 

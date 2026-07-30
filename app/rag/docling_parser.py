@@ -12,10 +12,11 @@ embeds, retrieves, reasons, cites, and writes the graded answer files.
 
 from __future__ import annotations
 
-import io
 import base64
 import hashlib
+import io
 import json
+import re
 import shutil
 import zipfile
 from dataclasses import dataclass
@@ -25,7 +26,6 @@ from typing import Any
 import httpx
 
 from ..config import get_settings
-
 
 _SKIP_LABELS = {
     "page_header",
@@ -44,10 +44,10 @@ class Block:
     """
 
     text: str
-    page: int          # 1-indexed
+    page: int  # 1-indexed
     label: str
-    level: int | None = None    # heading depth, `section_header` only
-    caption: str = ""           # tables/pictures: their caption, already resolved
+    level: int | None = None  # heading depth, `section_header` only
+    caption: str = ""  # tables/pictures: their caption, already resolved
 
 
 def _load_document(pdf_path: Path) -> dict[str, Any]:
@@ -100,7 +100,10 @@ def _convert_with_docling(pdf_path: Path, output_dir: Path) -> dict[str, Any]:
         ("to_formats", (None, "md")),
         ("do_ocr", (None, str(settings.docling_do_ocr).lower())),
         ("table_mode", (None, settings.docling_table_mode)),
-        ("image_export_mode", (None, _docling_request_image_mode(settings.docling_image_export_mode))),
+        (
+            "image_export_mode",
+            (None, _docling_request_image_mode(settings.docling_image_export_mode)),
+        ),
         ("include_images", (None, "true")),
     ]
 
@@ -417,6 +420,21 @@ def _table_to_markdown(data: Any) -> str:
     return "\n".join(rows)
 
 
+# Private-use-area codepoints are font-internal ligature slots with no Unicode meaning.
+# This PDF's font puts the "Qu" ligature at U+E048, so Docling hands back "ery:"
+# where the page reads "Query:" — and one such glyph had already leaked into a saved
+# answer. Known slots are expanded; anything else in the PUA range is dropped rather than
+# shipped, because an unrenderable glyph in an evidence quote is worse than a missing one.
+_PUA_LIGATURES = {"": "Qu"}
+_PUA_RANGE = re.compile(r"[-]")
+
+
+def _expand_ligatures(text: str) -> str:
+    for glyph, expansion in _PUA_LIGATURES.items():
+        text = text.replace(glyph, expansion)
+    return _PUA_RANGE.sub("", text)
+
+
 def _normalize(text: str) -> str:
-    lines = [" ".join(line.split()) for line in text.splitlines()]
+    lines = [" ".join(line.split()) for line in _expand_ligatures(text).splitlines()]
     return "\n".join(line for line in lines if line).strip()

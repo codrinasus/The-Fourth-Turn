@@ -9,6 +9,8 @@ ReDoc:       http://localhost:8791/redoc
 
 from __future__ import annotations
 
+import logging
+
 from fastapi import FastAPI
 from fastapi.responses import RedirectResponse
 
@@ -39,7 +41,30 @@ This is an **open-source** challenge — any model you can host on your own mach
 """
 
 
+def _configure_logging() -> None:
+    """Let the pipeline's own INFO logs reach the console.
+
+    uvicorn configures only its own loggers, so without this every `log.info` in
+    `app/rag/` is swallowed — including the ones that make the interesting steps
+    observable: what a follow-up was rewritten to, how a Level-3 question was decomposed,
+    and when a citation's page number was corrected against the PDF. Those lines are the
+    cheapest evidence that the system is doing what the technical note claims.
+    """
+    # Attach to our own package logger rather than calling basicConfig: uvicorn configures
+    # the root logger *before* importing this module, so basicConfig would find handlers
+    # already present and silently do nothing.
+    logger = logging.getLogger("app")
+    logger.setLevel(logging.INFO)
+    if not logger.handlers:
+        handler = logging.StreamHandler()
+        handler.setFormatter(logging.Formatter("%(levelname)s %(name)s | %(message)s"))
+        logger.addHandler(handler)
+    logger.propagate = False
+    logging.getLogger("httpx").setLevel(logging.WARNING)
+
+
 def create_app() -> FastAPI:
+    _configure_logging()
     app = FastAPI(
         title="The Fourth Turn — AIMultimediaLab @ ESSIR 2026",
         version=__version__,

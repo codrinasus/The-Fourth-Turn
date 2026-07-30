@@ -7,7 +7,7 @@ Query Aspect | AND [148] | Prefer documents containing all query terms Given �
 
 was first coined by Bruza and Huibers [16], who proposed to describe retrieval mechanisms using axioms expressed through concepts in the field of IR.
 
-Axiom TFC1 : Prefer documents with more query term occurences.  ery: are dogs great ? d i : We have all kinds of dogs. Because dogs are superior pets. d j : Cats are way better than dogs. We love our cute cats. d i > TFC1 d j
+Axiom TFC1 : Prefer documents with more query term occurences. Qu ery: are dogs great ? d i : We have all kinds of dogs. Because dogs are superior pets. d j : Cats are way better than dogs. We love our cute cats. d i > TFC1 d j
 
 An example axiom is TFC1 [36] which proposes to prefer documents having more query terms occurrences (Figure 7). Formally, given a query 𝑞 = 𝑡 and two documents 𝑑 1 , 𝑑 2 with | 𝑑 1 | = | 𝑑 2 | , TFC1 is defined as
 

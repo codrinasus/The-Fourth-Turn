@@ -1,28 +1,50 @@
 {
-  "question_id": "q483811",
+  "question_id": "q9ac7ed",
   "level": 3,
   "question": "Summarise the contribution of each section.",
-  "answer": "Based on the provided context, the survey addresses the following sections and contributions:\n- **Sections 3, 4, and 5**: Cover post-hoc approaches to explanation (1).\n- **Section 6**: Focuses on grounding to axiomatic approaches (1). Specifically, it details how Section 6.1 builds axiomatic rankers by aggregating axioms (2), Section 6.2 analyzes and explains existing neural ranking models by aligning them with known axioms (2), and Section 6.3 uses axioms to regularize the training of neural rankers (2).\n- **Sections 8 and 9**: Present interpretable-by-design methods (1).\n\nThe provided excerpts do not mention or detail contributions for any other sections in the survey.",
+  "answer": "Based on the provided context, the contributions of each covered section are:\n\n- **ExIR Landscape & Categorization:** The field has shifted from early adaptations of general feature-attribution tools (e.g., LIME, SHAP) to developing specialized IR techniques across post-hoc, axiomatic, and interpretable-by-design paradigms (1).\n- **Axiomatic Grounding (Section 6):** These works aggregate established retrieval principles to construct transparent rankers, diagnose neural models by aligning them with known axioms, and regularize training to enhance robustness, generalization, and interpretability (2).\n- **Probing & Attribution Studies:** Researchers use linear approximations and behavioral-probing setups to attribute ranking performance to latent concepts like term frequency and document length, verifying that model behavior conforms to established IR constraints (3).\n- **Interpretable-by-Design & Rationale Methods (Sections 8–9):** Contributions include explicit feature contribution models that sum transparent importance scores to directly induce relevance decisions, alongside rationale-based frameworks that address discrete output training through pipeline or end-to-end optimization strategies (5; 7).\n- **Evaluation Practices:** While most interpretable-by-design methods validate explanations using anecdotal examples, specific approaches explicitly compare generated feature contributions against referenced tree models to justify faithfulness (4).\n- **Limitations & Open Questions (Section 10):** The field is critiqued for overemphasizing ranking tasks and system developers while neglecting other IR applications and end-user stakeholders, framing key directions for broader, user-centric research (5).",
   "conversation_id": "level-3",
   "sources": [
     {
       "page": 2,
       "quote": "Section 8 and Section 9).",
-      "score": 0.0039
+      "score": 0.0038
     },
     {
       "page": 14,
       "quote": "Although there is no general model of relevance yet, previous work aggregated axioms to build axiomatic rankers (Section 6.1), analyze and explain existing neural ranking approaches by aligning them to known axioms (Section 6.2), and use axioms to regularize the training of neural rankers (Section 6.3).",
       "score": 0.0106
+    },
+    {
+      "page": 17,
+      "quote": "The resulting coefficients are then used to understand the importance of the corresponding aspects.",
+      "score": 0.028
+    },
+    {
+      "page": 21,
+      "quote": "A summary of methods can be found in Table 5.",
+      "score": 0.0106
+    },
+    {
+      "page": 25,
+      "quote": "In this section, we will discuss the limitations, challenges, and open questions in the area of explainable information retrieval.",
+      "score": 0.005
     }
   ],
   "diagnostics": {
     "provider": "ollama",
     "chat_model": "qwen3.6:latest",
     "embedding_model": "bge-m3",
-    "retrieved_chunks": 5,
+    "retrieved_chunks": 8,
+    "retrieval_query": "Summarise the contribution of each section.",
+    "sub_queries": [
+      "What is the main point of the first section?",
+      "What is the main point of the second section?",
+      "What is the main point of the third section?",
+      "What is the main point of the fourth section?"
+    ],
     "tokens": null,
-    "latency_ms": 53852,
-    "timestamp": "2026-07-30T16:29:36Z"
+    "latency_ms": 90143,
+    "timestamp": "2026-07-30T16:58:40Z"
   }
 }

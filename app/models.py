@@ -21,10 +21,13 @@ class Source(BaseModel):
 
     page: int = Field(..., description="1-indexed PDF page the quote is on", examples=[14])
     quote: str = Field(
-        ..., description="verbatim span from the PDF that supports the answer",
+        ...,
+        description="verbatim span from the PDF that supports the answer",
         examples=["we evaluate on the MS MARCO passage ranking collection"],
     )
-    score: float | None = Field(None, description="retrieval score, if you have one", examples=[0.83])
+    score: float | None = Field(
+        None, description="retrieval score, if you have one", examples=[0.83]
+    )
 
 
 class Diagnostics(BaseModel):
@@ -32,12 +35,42 @@ class Diagnostics(BaseModel):
     be able to explain these numbers in your technical note and defence."""
 
     provider: str = Field(..., description="chat provider used", examples=["lmstudio"])
-    chat_model: str = Field(..., description="the model that wrote the answer", examples=["google/gemma-4-e2b"])
-    embedding_model: str = Field(..., description="the model that produced the vectors", examples=["intfloat/multilingual-e5-large"])
+    chat_model: str = Field(
+        ..., description="the model that wrote the answer", examples=["google/gemma-4-e2b"]
+    )
+    embedding_model: str = Field(
+        ...,
+        description="the model that produced the vectors",
+        examples=["intfloat/multilingual-e5-large"],
+    )
     retrieved_chunks: int = Field(..., description="how many passages were retrieved", examples=[5])
-    tokens: int | None = Field(None, description="total tokens for this turn, if known", examples=[3200])
-    latency_ms: int | None = Field(None, description="wall-clock time to produce the answer", examples=[1840])
-    timestamp: str = Field(..., description="ISO-8601 UTC time the answer was produced", examples=["2026-07-31T09:41:12Z"])
+    retrieval_query: str | None = Field(
+        None,
+        description=(
+            "the query actually sent to the retriever. Differs from `question` when a "
+            "level-2 follow-up was resolved against the conversation before searching."
+        ),
+        examples=["How large is the test split of the MS MARCO collection?"],
+    )
+    sub_queries: list[str] = Field(
+        default_factory=list,
+        description=(
+            "the sub-questions a level-3 question was decomposed into, each retrieved "
+            "separately. Empty when the question was retrieved as one query."
+        ),
+        examples=[["What token-level behavior do attention weights reveal?"]],
+    )
+    tokens: int | None = Field(
+        None, description="total tokens for this turn, if known", examples=[3200]
+    )
+    latency_ms: int | None = Field(
+        None, description="wall-clock time to produce the answer", examples=[1840]
+    )
+    timestamp: str = Field(
+        ...,
+        description="ISO-8601 UTC time the answer was produced",
+        examples=["2026-07-31T09:41:12Z"],
+    )
 
 
 class QueryRequest(BaseModel):
@@ -60,18 +93,25 @@ class QueryRequest(BaseModel):
         ),
         examples=[1],
     )
-    top_k: int | None = Field(None, description="override the configured retrieval depth", examples=[5])
+    top_k: int | None = Field(
+        None, description="override the configured retrieval depth", examples=[5]
+    )
 
 
 class QueryResponse(BaseModel):
     """The answer. This is the graded object; it is also saved to `data/out/`."""
 
-    question_id: str = Field(..., description="auto-generated id for this question", examples=["q7f3a1"])
+    question_id: str = Field(
+        ..., description="auto-generated id for this question", examples=["q7f3a1"]
+    )
     level: int = Field(..., description="the level you asked at", examples=[1])
     question: str
-    answer: str = Field(..., description="the system's answer", examples=["They evaluate on MS MARCO."])
+    answer: str = Field(
+        ..., description="the system's answer", examples=["They evaluate on MS MARCO."]
+    )
     conversation_id: str = Field(
-        ..., description="auto-assigned; level-2 follow-ups share one so memory carries across",
+        ...,
+        description="auto-assigned; level-2 follow-ups share one so memory carries across",
         examples=["level-2"],
     )
     sources: list[Source] = Field(default_factory=list, description="evidence grounding the answer")
@@ -80,7 +120,8 @@ class QueryResponse(BaseModel):
 
 class IngestRequest(BaseModel):
     filename: str | None = Field(
-        None, description="a PDF under data/in/; defaults to the first *.pdf found there",
+        None,
+        description="a PDF under data/in/; defaults to the first *.pdf found there",
         examples=["paper.pdf"],
     )
     reset: bool = Field(False, description="drop and recreate the collection before ingesting")

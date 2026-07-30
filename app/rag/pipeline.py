@@ -18,7 +18,7 @@ from ..config import get_settings
 from ..llm.base import LLMError, Message
 from ..llm.factory import get_client
 from ..models import Diagnostics, QueryRequest, QueryResponse, Source
-from . import citations, memory
+from . import citations, memory, sections, verbatim
 from .retrieve import Context, retrieve
 
 SYSTEM_PROMPT = (
@@ -27,21 +27,43 @@ SYSTEM_PROMPT = (
     "Be specific and concise.\n"
     "The context passages are numbered (1), (2), (3). Cite the passage you took each claim "
     "from by writing its number in parentheses right after the claim — for example: "
-    "'The authors evaluate on MS MARCO (2).' Cite only passages you actually used; do not "
-    "cite a passage you did not rely on, and do not invent numbers."
+    "'The authors evaluate on MS MARCO (2).' For several passages supporting one claim, put "
+    "them in a single pair of parentheses separated by commas: '(2, 6)'. Put nothing else "
+    "inside a citation's parentheses — no section numbers, no words.\n"
+    "Cite only numbered passages you actually used; do not cite a passage you did not rely "
+    "on, and do not invent numbers. If an outline of the document is provided, it is "
+    "orientation only: it has no number and must never be cited."
 )
 
 
-def _build_messages(question: str, contexts: list[Context], history: list[Message]) -> list[Message]:
+def _build_messages(
+    question: str,
+    contexts: list[Context],
+    history: list[Message],
+    outline: str = "",
+) -> list[Message]:
     context_block = citations.number_contexts(contexts)
     messages: list[Message] = [{"role": "system", "content": SYSTEM_PROMPT}]
     # Prior turns give the model the conversation so far (Level 2). Retrieval still
     # needs the rewritten query — history in the prompt is necessary but not sufficient.
     messages.extend(history)
+
+    # The Level-3 outline goes in unnumbered and explicitly labelled as generated. Only
+    # the numbered passages can be cited, so a summary can orient the answer but can
+    # never end up as a quote — see rag/sections.py on that boundary.
+    outline_block = (
+        "Outline of the whole document (generated section summaries — use this to orient "
+        f"yourself; it is NOT quotable evidence and has no citation number):\n{outline}\n\n"
+        if outline
+        else ""
+    )
     messages.append(
         {
             "role": "user",
-            "content": f"Context from the document:\n{context_block}\n\nQuestion: {question}",
+            "content": (
+                f"{outline_block}Context from the document:\n{context_block}"
+                f"\n\nQuestion: {question}"
+            ),
         }
     )
     return messages
@@ -58,13 +80,11 @@ def _sources_from(question: str, contexts: list[Context], cited: list[int]) -> l
     out: list[Source] = []
     for i in chosen:
         c = contexts[i]
-        out.append(
-            Source(
-                page=c.page,
-                quote=citations.evidence_quote(question, c),
-                score=round(c.score, 4),
-            )
-        )
+        # Sliced from the chunk (so it cannot be generated), then located in the PDF
+        # itself: the text comes back in the file's own characters and the page number is
+        # verified — and corrected — against where the span actually sits.
+        quote, page = verbatim.locate(citations.evidence_quote(question, c), c.page)
+        out.append(Source(page=page, quote=quote, score=round(c.score, 4)))
     return out
 
 
@@ -91,8 +111,15 @@ def answer(req: QueryRequest) -> QueryResponse:
     now = datetime.now(UTC)
     started = time.perf_counter()
 
-    contexts = retrieve(req.question, top_k, history)
-    messages = _build_messages(req.question, contexts, history)
+    # A whole-document question needs more evidence in front of it than a lookup does,
+    # and the sub-queries have supplied candidates from more of the paper to fill it.
+    if req.level >= 3 and not req.top_k:
+        top_k = max(top_k, settings.top_k_level3)
+
+    retrieval = retrieve(req.question, top_k, history, level=req.level)
+    contexts = retrieval.contexts
+    outline = sections.outline() if req.level >= 3 else ""
+    messages = _build_messages(req.question, contexts, history, outline)
 
     try:
         answer_text = client.chat(messages)
@@ -100,8 +127,7 @@ def answer(req: QueryRequest) -> QueryResponse:
         # Degrade rather than 500: return the retrieved evidence so the pipeline is
         # still usable (and debuggable) without a running LLM.
         answer_text = (
-            f"[LLM unavailable: {e}] Retrieved context is attached as sources; "
-            "no generated answer."
+            f"[LLM unavailable: {e}] Retrieved context is attached as sources; no generated answer."
         )
 
     # The model cites the prompt's numbering; keep only what it used and renumber so
@@ -118,13 +144,17 @@ def answer(req: QueryRequest) -> QueryResponse:
         question=req.question,
         answer=answer_text,
         conversation_id=conversation_id,
-        sources=_sources_from(req.question, contexts, cited),
+        # Evidence is picked against the resolved query for the same reason retrieval used
+        # it: "why does that happen?" cannot tell one sentence of a chunk from another.
+        sources=_sources_from(retrieval.query, contexts, cited),
         diagnostics=Diagnostics(
             provider=settings.llm_provider,
             chat_model=settings.chat_model,
             embedding_model=settings.embedding_model,
             retrieved_chunks=len(contexts),
-            tokens=None,          # TODO: report real token usage if your provider returns it
+            retrieval_query=retrieval.query,
+            sub_queries=retrieval.sub_queries,
+            tokens=None,  # TODO: report real token usage if your provider returns it
             latency_ms=latency_ms,
             timestamp=now.strftime("%Y-%m-%dT%H:%M:%SZ"),
         ),

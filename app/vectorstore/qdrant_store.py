@@ -51,21 +51,38 @@ class VectorStore:
     def upsert(self, points: list[models.PointStruct]) -> None:
         self.client.upsert(collection_name=self.collection, points=points)
 
+    def scroll_all(self, limit: int = 10_000) -> list[models.Record]:
+        """Every point in the collection, payload only. Used to read the section index back."""
+        if not self.exists():
+            return []
+        records, _ = self.client.scroll(
+            collection_name=self.collection, limit=limit, with_payload=True, with_vectors=False
+        )
+        return records
+
     # --- read ---------------------------------------------------------------
-    def search(self, vector: list[float], top_k: int) -> list[models.ScoredPoint]:
-        # TODO(level-1): plain dense search. Consider hybrid (dense + sparse/BM25),
-        #                which Qdrant supports with named vectors + Query API.
-        # TODO(level-3): pass a query_filter to scope retrieval to part of the doc.
+    def search(
+        self,
+        vector: list[float],
+        top_k: int,
+        query_filter: models.Filter | None = None,
+    ) -> list[models.ScoredPoint]:
         # client.search() was removed in qdrant-client 1.15; the Query API replaces it.
         return self.client.query_points(
             collection_name=self.collection,
             query=vector,
             limit=top_k,
+            query_filter=query_filter,
             with_payload=True,
         ).points
 
 
 @lru_cache
-def get_store() -> VectorStore:
+def get_store(collection: str | None = None) -> VectorStore:
+    """The store for `collection`, defaulting to the chunk index.
+
+    Cached per collection name so the section index (Level 3) gets its own client
+    without the rest of the app having to thread one through.
+    """
     s = get_settings()
-    return VectorStore(s.qdrant_url, s.qdrant_collection)
+    return VectorStore(s.qdrant_url, collection or s.qdrant_collection)

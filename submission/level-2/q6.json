@@ -1,24 +1,24 @@
 {
-  "question_id": "qcb762b",
+  "question_id": "q20f098",
   "level": 2,
   "question": "And how do they propose to address it?",
-  "answer": "To address the limitation that per-document explanations cannot capture differences between ranked items, they propose a listwise explanation generator (LiEGe) that jointly explains all documents in a result list for a given query (1). To address model biases and verify what linguistic or factual concepts are actually retained, they also recommend applying careful interventions on linguistic properties during training (2) and utilizing behavioral-probing setups alongside manipulation-sensitivity analyses to test concept retention (3).",
+  "answer": "Based on the provided context, the authors propose addressing this limitation through the following approaches:\n- Shifting from pointwise to listwise or pairwise explanations for retrieval tasks (1).\n- Utilizing local surrogate models rather than global ones, as they can more effectively approximate complex rankers within specific query localities (2).\n- Employing behavioral-probing setups or linear models to attribute relevance predictions to specific, disentangled concepts—such as relevance, document length, and term frequency—instead of relying on single explanations that fail to separate correlated underlying factors (3).",
   "conversation_id": "level-2",
   "sources": [
     {
-      "page": 11,
-      "quote": "As a solution, they propose a listwise explanation generator (LiEGe) that for a given query jointly explains all the documents contained in a ranked result list.",
-      "score": 0.1977
+      "page": 25,
+      "quote": "Therefore, rankings with multiple and sometimes conflicting relevance factors for a single simple surrogate model might not be able to provide high fidelity.",
+      "score": 0.8619
     },
     {
-      "page": 17,
-      "quote": "They also propose to probe for a large set of lexical, syntactic, and semantic concepts such as named entities or coreference resolution ability.",
-      "score": 0.2231
+      "page": 7,
+      "quote": "This showcases the limitation that simple models, even when trained with a much larger quantity of training data, are not able to faithfully explain all localities of the decision boundary of a complex model and that using local surrogate models can be advantageous.",
+      "score": 0.979
     },
     {
-      "page": 17,
-      "quote": "They also propose to probe for a large set of lexical, syntactic, and semantic concepts such as named entities or coreference resolution ability.",
-      "score": 0.1138
+      "page": 18,
+      "quote": "They devise a behavioral-probing setup that verifies to what extent the model could capture these concepts.",
+      "score": 0.1722
     }
   ],
   "diagnostics": {
@@ -26,8 +26,10 @@
     "chat_model": "qwen3.6:latest",
     "embedding_model": "bge-m3",
     "retrieved_chunks": 5,
+    "retrieval_query": "How do they propose to address the limitation that simple models cannot faithfully explain all localities of a complex model's decision boundary due to conflicting relevance factors?",
+    "sub_queries": [],
     "tokens": null,
-    "latency_ms": 58303,
-    "timestamp": "2026-07-30T16:27:10Z"
+    "latency_ms": 74481,
+    "timestamp": "2026-07-30T16:46:11Z"
   }
 }

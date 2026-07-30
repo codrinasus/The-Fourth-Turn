@@ -28,7 +28,8 @@ class LiteLLMClient:
         self.api_key = api_key or None
         self.timeout = timeout
 
-    def chat(self, messages: list[Message]) -> str:
+    def chat(self, messages: list[Message], *, thinking: bool | None = None) -> str:
+        # Accepted and ignored — litellm fronts many providers with no common switch.
         import litellm  # imported lazily so local-only setups need not install it
 
         try:

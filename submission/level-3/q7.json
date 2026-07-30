@@ -1,28 +1,30 @@
 {
-  "question_id": "qf0d3c5",
+  "question_id": "qe160bb",
   "level": 3,
   "question": "Across the classification tables in this survey - post-hoc methods, axiomatic methods, explainable-by-architecture models and rationale-based approaches - what is the most common way the quality of explanations is evaluated, and what do the authors themselves say about relying on that kind of evidence?",
-  "answer": "Based on Tables 1 and 3 in the provided context, explanation quality is evaluated using methods such as anecdotal evidence, reference comparisons, visualization, or intrinsic measures like faithfulness/fidelity (1), (2). However, the provided excerpts do not explicitly identify which evaluation method is most common across all classification tables, nor do they contain the authors' commentary on relying on that type of evidence. Therefore, I cannot answer those specific points based solely on this context.",
+  "answer": "Across the classification tables, explanations are most commonly evaluated using **anecdotal examples or reference-based comparisons** (frequently listed as \"Anecdotal,\" \"Reference,\" or omitted entirely with a \"-\"), while only a handful of studies employ formal metrics like fidelity or faithfulness (2; 6). \n\nThe authors explicitly critique this reliance on informal evidence, stating that \"little formal evaluation... has been done from an interpretability perspective\" and noting that researchers predominantly substitute rigorous faithfulness measures with anecdotal justifications (1). They frame this pattern as a systemic limitation, arguing that the field must move away from anecdotal validation and instead adopt established interpretability metrics, causal counterfactual representations, and human-centered acceptance studies to properly assess explanation quality (7; outline sections 6.4, 7.4).",
   "conversation_id": "level-3",
   "sources": [
     {
-      "page": 10,
-      "quote": "Table 1. Overview of post-hoc explanation methods.",
-      "score": 0.523
-    },
-    {
-      "page": 15,
-      "quote": "Table 3. Classification of axiomatic methods.",
-      "score": 0.3356
+      "page": 16,
+      "quote": "In addition, only Völske et al. [128] use established interpretability evaluation metrics and measure the fidelity of their generated (post-hoc) explanations.",
+      "score": 0.2622
     }
   ],
   "diagnostics": {
     "provider": "ollama",
     "chat_model": "qwen3.6:latest",
     "embedding_model": "bge-m3",
-    "retrieved_chunks": 5,
+    "retrieved_chunks": 8,
+    "retrieval_query": "Across the classification tables in this survey - post-hoc methods, axiomatic methods, explainable-by-architecture models and rationale-based approaches - what is the most common way the quality of explanations is evaluated, and what do the authors themselves say about relying on that kind of evidence?",
+    "sub_queries": [
+      "How is the quality of explanations evaluated in post-hoc methods according to the survey's classification tables?",
+      "How is the quality of explanations evaluated in axiomatic methods according to the survey's classification tables?",
+      "How is the quality of explanations evaluated in explainable-by-architecture models according to the survey's classification tables?",
+      "How is the quality of explanations evaluated in rationale-based approaches according to the survey's classification tables?"
+    ],
     "tokens": null,
-    "latency_ms": 85625,
-    "timestamp": "2026-07-30T16:28:09Z"
+    "latency_ms": 114262,
+    "timestamp": "2026-07-30T16:56:45Z"
   }
 }

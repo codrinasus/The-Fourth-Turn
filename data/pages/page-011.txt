@@ -1,5 +1,5 @@
 Fig. 6. Example of query expansion terms (green) as explanations. The expansion terms are chosen such that an interpretable term-based ranker best approximates the ranking of documents produced by a black-box ranking model.
- ery: can you do yoga from a chair + {poses, guide, home, how, hip, sequence, learn} |  |
+Qu ery: can you do yoga from a chair + {poses, guide, home, how, hip, sequence, learn} |  |
 Rank | Score | Document Text
 1 | 9.37 | 10 Yoga Poses You Can Do in a Chair | Chair pose yoga, Chair yoga, Yoga poses ...
 2 | 9.34 | Chair Hip Opening And Strength Flow Yoga | Yoga Sequences, Benefits ...

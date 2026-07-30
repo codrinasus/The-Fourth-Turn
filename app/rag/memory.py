@@ -33,6 +33,7 @@ def append(conversation_id: str | None, user: str, assistant: str) -> None:
 def reset(conversation_id: str) -> None:
     _STORE.pop(conversation_id, None)
 
+
 # TODO(level-2): history alone is not enough. The retrieval step still embeds the
 #   raw follow-up ("and the test split?"), which has no searchable content. The high-
 #   leverage fix is to REWRITE the question into a standalone query using this history

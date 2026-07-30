@@ -1,19 +1,24 @@
 {
-  "question_id": "qe23b99",
+  "question_id": "q5b105f",
   "level": 2,
   "question": "What is the main limitation the authors acknowledge?",
-  "answer": "Based on the provided context, the authors acknowledge multiple limitations in facilitating interpretable approaches for information retrieval tasks (1). Specifically:\n- Document retrieval requires listwise or pairwise explanations rather than pointwise ones (1).\n- Simple models can only be faithfully learned for certain query localities and cannot fully explain all decision boundary localities of complex models (2).",
+  "answer": "The main limitation acknowledged is that simple models cannot faithfully explain all localities of a complex model's decision boundary, even when trained with significantly more data, highlighting the advantage of using local surrogate models (1). For completeness, the document also notes two other shortcomings: the current set of axioms is insufficient to fully capture BERT's notion of relevance (2), and rationale-extraction modules can overfit to pattern sequences rather than semantic meaning (3).",
   "conversation_id": "level-2",
   "sources": [
     {
-      "page": 25,
-      "quote": "There are multiple limitations and challenges in facilitating and developing interpretable approaches for information retrieval tasks.",
-      "score": 0.0108
-    },
-    {
       "page": 7,
       "quote": "This showcases the limitation that simple models, even when trained with a much larger quantity of training data, are not able to faithfully explain all localities of the decision boundary of a complex model and that using local surrogate models can be advantageous.",
-      "score": 0.0217
+      "score": 0.0212
+    },
+    {
+      "page": 15,
+      "quote": "The authors conclude that the current set of axioms is insufficient to understand BERT’s notion of relevance.",
+      "score": 0.1194
+    },
+    {
+      "page": 23,
+      "quote": "Despite the reasonable performance benefits of such select-and-predict approaches, they suffer from a crucial deficiency.",
+      "score": 0.0143
     }
   ],
   "diagnostics": {
@@ -21,8 +26,10 @@
     "chat_model": "qwen3.6:latest",
     "embedding_model": "bge-m3",
     "retrieved_chunks": 5,
+    "retrieval_query": "What is the main limitation the authors acknowledge?",
+    "sub_queries": [],
     "tokens": null,
-    "latency_ms": 59700,
-    "timestamp": "2026-07-30T16:25:11Z"
+    "latency_ms": 64746,
+    "timestamp": "2026-07-30T16:44:06Z"
   }
 }

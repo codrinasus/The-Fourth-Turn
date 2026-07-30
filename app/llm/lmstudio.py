@@ -19,7 +19,9 @@ class LMStudioClient:
         self.embedding_model = embedding_model
         self.timeout = timeout
 
-    def chat(self, messages: list[Message]) -> str:
+    def chat(self, messages: list[Message], *, thinking: bool | None = None) -> str:
+        # OpenAI-shaped API: no server-side thinking switch, so the flag is accepted and
+        # ignored. strip_thinking() below still removes an inline <think> block.
         try:
             resp = httpx.post(
                 f"{self.base_url}/v1/chat/completions",

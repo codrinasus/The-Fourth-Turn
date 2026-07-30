@@ -1,5 +1,5 @@
 Fig. 2. Example ranking result showing top-5 ranked documents with predicted relevance scores for the query ' can you do yoga from a chair '. Query and Documents are selected from TREC-DL (2021) [28] and MS MARCO [86], respectively.
- ery: can you do yoga from a chair |  |
+Qu ery: can you do yoga from a chair |  |
 Rank | Score | Document Text
 1 | 9.37 | 10 Yoga Poses You Can Do in a Chair | Chair pose yoga, Chair yoga, Yoga poses ...
 2 | 9.34 | Chair Hip Opening And Strength Flow Yoga | Yoga Sequences, Benefits ...

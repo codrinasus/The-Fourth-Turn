@@ -12,6 +12,10 @@ dependencies = [
     "qdrant-client>=1.11",
     "python-multipart>=0.0.9",
     "rank-bm25>=0.2.2",
+    # A second, independent read of the PDF. Docling is what we index; pypdf is what we
+    # check our own evidence quotes against in app/rag/verbatim.py, so grounding is
+    # verified against a different extractor rather than against ourselves.
+    "pypdf>=5.0",
 ]
 
 # `uv sync` installs these too; `uv sync --no-dev` skips them in the Docker image.

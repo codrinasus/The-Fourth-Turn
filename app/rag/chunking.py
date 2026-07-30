@@ -35,8 +35,8 @@ _BACK_MATTER = {"references", "bibliography", "acknowledgments", "acknowledgemen
 @dataclass
 class Chunk:
     text: str
-    page: int      # 1-indexed
-    index: int     # position within the document
+    page: int  # 1-indexed
+    index: int  # position within the document
     section: str = ""
     kind: str = "text"
     # What gets embedded. The breadcrumb is prepended here rather than to `text` so the
@@ -342,8 +342,14 @@ def chunk_blocks(blocks: list[Block]) -> list[Chunk]:
             prefix = take_heading(block.page)
             for piece, context in _split_table(block, max_chars):
                 idx = _emit(
-                    chunks, prefix + [piece], block.page, idx, _breadcrumb(heading_path),
-                    "table", heading_path, context,
+                    chunks,
+                    prefix + [piece],
+                    block.page,
+                    idx,
+                    _breadcrumb(heading_path),
+                    "table",
+                    heading_path,
+                    context,
                 )
                 prefix = []
             drop_stale_heading(block.page)
@@ -353,8 +359,13 @@ def chunk_blocks(blocks: list[Block]) -> list[Chunk]:
             flush()
             pending, pending_len, pending_page = [], 0, None
             idx = _emit(
-                chunks, take_heading(block.page) + [block.text], block.page, idx,
-                _breadcrumb(heading_path), "caption", heading_path,
+                chunks,
+                take_heading(block.page) + [block.text],
+                block.page,
+                idx,
+                _breadcrumb(heading_path),
+                "caption",
+                heading_path,
             )
             drop_stale_heading(block.page)
             continue

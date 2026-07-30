@@ -23,29 +23,35 @@ from .retrieve import Context
 
 # The paper's own references look like [42], so we ask for parentheses instead of brackets
 # to keep the model's markers distinguishable from text it may quote.
-_MARKER = re.compile(r"\((\d{1,2})\)")
+#
+# Grouped markers are matched, not just lone ones. Asked to cite (2) and (6) for the same
+# claim, the model writes "(2; 6)" — and a lone-number pattern silently misses it. That
+# failed loudly on our Level-3 answers: q7 leaned on four passages, three of the markers
+# went unparsed, and the answer shipped citing numbers that had no matching source. The
+# marker set and the returned sources have to be derived from the same parse or they drift.
+_MARKER = re.compile(r"\(\s*(\d{1,2}(?:\s*[;,]\s*\d{1,2})*)\s*\)")
+_NUMBER = re.compile(r"\d{1,2}")
 _SENTENCE_SPLIT = re.compile(r"(?<=[.!?])\s+")
 
-_MIN_QUOTE = 40      # shorter spans are rarely evidence on their own
-_MAX_QUOTE = 400     # a whole sentence is kept even if long; this only guards runaway rows
+_MIN_QUOTE = 40  # shorter spans are rarely evidence on their own
+_MAX_QUOTE = 400  # a whole sentence is kept even if long; this only guards runaway rows
 
 
 def number_contexts(contexts: list[Context]) -> str:
     """Render the numbered context block the citation markers refer to."""
     if not contexts:
         return "(no context retrieved)"
-    return "\n\n".join(
-        f"({i}) [page {c.page}] {c.text}" for i, c in enumerate(contexts, start=1)
-    )
+    return "\n\n".join(f"({i}) [page {c.page}] {c.text}" for i, c in enumerate(contexts, start=1))
 
 
 def parse_markers(answer: str, n_contexts: int) -> list[int]:
     """0-based context indices cited in the answer, in order of first appearance."""
     seen: list[int] = []
     for match in _MARKER.finditer(answer):
-        idx = int(match.group(1)) - 1
-        if 0 <= idx < n_contexts and idx not in seen:
-            seen.append(idx)
+        for number in _NUMBER.findall(match.group(1)):
+            idx = int(number) - 1
+            if 0 <= idx < n_contexts and idx not in seen:
+                seen.append(idx)
     return seen
 
 
@@ -54,14 +60,24 @@ def renumber(answer: str, order: list[int]) -> str:
 
     The model cites the prompt's numbering; the response only carries the chunks it used,
     so without this a reader would follow `(3)` to a source that is no longer third.
+
+    A number with no mapping is dropped rather than left in place — it would point past
+    the end of `sources`. If that empties a marker, the marker goes too, so the answer
+    never carries a citation the response cannot back up.
     """
     mapping = {old + 1: new + 1 for new, old in enumerate(order)}
 
     def sub(match: re.Match[str]) -> str:
-        old = int(match.group(1))
-        return f"({mapping[old]})" if old in mapping else match.group(0)
+        kept = [
+            str(mapping[int(n)]) for n in _NUMBER.findall(match.group(1)) if int(n) in mapping
+        ]
+        return f"({', '.join(kept)})" if kept else ""
 
-    return _MARKER.sub(sub, answer)
+    # Removing a marker leaves the space that preceded it stranded, sometimes right before
+    # a full stop; tidy that up so a dropped citation is invisible rather than conspicuous.
+    cleaned = _MARKER.sub(sub, answer)
+    cleaned = re.sub(r"[ \t]{2,}", " ", cleaned)
+    return re.sub(r"\s+([.,;:])", r"\1", cleaned)
 
 
 def _spans(text: str) -> list[tuple[int, int]]:
