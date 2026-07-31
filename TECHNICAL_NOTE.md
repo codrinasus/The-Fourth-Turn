@@ -365,6 +365,27 @@ to one question, which is what *Integrity* penalises.
   of questions the document genuinely cannot answer. We do not have one, so we ship without
   abstention and say so.
 
+## 7. Tools and assistance
+
+The rules ask how coding assistants were used, so: this system was built with **Claude Code**
+(Opus 5) working in the repository alongside the team, and that is visible in the git history —
+commits are co-authored and the messages record the reasoning.
+
+What that looked like in practice is worth being precise about, because it is the difference
+between a generated repository and an engineered one. The assistant wrote most of the code and
+prose, but the direction was the team's: which document to use, which nine questions to ask,
+that evidence quotes should be whole passages rather than single sentences, that the query
+rewriter should have no heuristic gate, that Level 3 should use a ReAct-style loop, and that
+the step budget should be 3. Several of those instructions overturned an earlier choice the
+assistant had defended.
+
+The measurements were not taken on trust. Every ablation in §4 is reproducible from a switch
+in `.env`, and two of them were wrong the first time — once because a stale container meant a
+run labelled "no rewriting" still had rewriting on, and once because the reflective loop was
+silently evicting the best passage before the reranker saw it. Both were caught by looking at
+the numbers and the traces rather than by reading the code, and `scripts/set_flag.sh` exists
+because of the first.
+
 ---
 
 **Repository**: https://github.com/codrinasus/The-Fourth-Turn
