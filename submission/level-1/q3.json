@@ -1,19 +1,24 @@
 {
-  "question_id": "qdb60e8",
+  "question_id": "q39dda7",
   "level": 1,
   "question": "How does the paper approximate combining exponentially many networks without running them all at test time?",
-  "answer": "The paper approximates this combination by using a single unthinned neural network at test time (1, 2). To match the expected activations from training, it scales down the weights by multiplying each unit's outgoing weights by the retention probability p (1). This scaling effectively combines all $2^n$ thinned networks into one model that approximates their averaged predictions without running them individually (1, 2).",
+  "answer": "The paper approximates this by using a single unthinned network at test time rather than averaging all thinned models (1). This is achieved by scaling down the trained weights so that the expected output during training matches the actual output at inference (2). Specifically, if a unit was retained with probability $p$ during training, its outgoing weights are multiplied by $p$ at test time (2). This weight scaling effectively combines $2^n$ networks into a single model for efficient deployment (3).",
   "conversation_id": "level-1",
   "sources": [
     {
-      "page": 3,
-      "quote": "At test time, it is not feasible to explicitly average the predictions from exponentially many thinned models. However, a very simple approximate averaging method works well in practice. The idea is to use a single neural net at test time without dropout. The weights of this network are scaled-down versions of the trained weights. If a unit is retained with probabilityp during training, the outgoing weights of that unit are multiplied by p at test time as shown in Figure 2. This ensures that for any hidden unit the expected output (under the distribution used to drop units at training time) is the same as the actual output at test time. By doing this scaling, 2 n networks with shared weights can be combined into a single neural network to be used at test time.",
-      "score": 0.967
+      "page": 1,
+      "quote": "Deep neural nets with a large number of parameters are very powerful machine learning systems. However, overfitting is a serious problem in such networks. Large networks are also slow to use, making it difficult to deal with overfitting by combining the predictions of many different large neural nets at test time. Dropout is a technique for addressing this problem. The key idea is to randomly drop units (along with their connections) from the neural network during training. This prevents units from co-adapting too much.",
+      "score": 0.9138
     },
     {
-      "page": 1,
-      "quote": "Large networks are also slow to use, making it difficult to deal with overfitting by combining the predictions of many different large neural nets at test time.",
-      "score": 0.9152
+      "page": 3,
+      "quote": "At test time, it is not feasible to explicitly average the predictions from exponentially many thinned models. However, a very simple approximate averaging method works well in practice. The idea is to use a single neural net at test time without dropout. The weights of this network are scaled-down versions of the trained weights. If a unit is retained with probabilityp during training, the outgoing weights of that unit are multiplied by p at test time as shown in Figure 2. This ensures that for any hidden unit the expected output (under the distribution used to drop units at training time) is the same as the actual output at test time. By doing this scaling, 2 n networks with shared weights can be combined into a single neural network to be used at test time.",
+      "score": 0.9663
+    },
+    {
+      "page": 3,
+      "quote": "By doing this scaling, 2 n networks with shared weights can be combined into a single neural network to be used at test time. We found that training a network with dropout and using this approximate averaging method at test time leads to significantly lower generalization error on a wide variety of classification problems compared to training with other regularization methods. The idea of dropout is not limited to feed-forward neural nets. It can be more generally applied to graphical models such as Boltzmann Machines. In this paper, we introduce the dropout Restricted Boltzmann Machine model and compare it to standard Restricted Boltzmann Machines (RBM). Our experiments show that dropout RBMs are better than standard RBMs in certain respects.",
+      "score": 0.2726
     }
   ],
   "diagnostics": {
@@ -27,7 +32,7 @@
       "search: 1 query"
     ],
     "tokens": null,
-    "latency_ms": 48809,
-    "timestamp": "2026-07-30T23:25:33Z"
+    "latency_ms": 45171,
+    "timestamp": "2026-07-31T06:38:53Z"
   }
 }

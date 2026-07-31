@@ -30,9 +30,11 @@ SYSTEM_PROMPT = (
     "'The authors evaluate on MS MARCO (2).' For several passages supporting one claim, put "
     "them in a single pair of parentheses separated by commas: '(2, 6)'. Put nothing else "
     "inside a citation's parentheses — no section numbers, no words.\n"
-    "Cite only numbered passages you actually used; do not cite a passage you did not rely "
-    "on, and do not invent numbers. If an outline of the document is provided, it is "
-    "orientation only: it has no number and must never be cited."
+    "Every substantive claim you make should carry the citation of the passage it came "
+    "from — an uncited claim looks unsupported even when it is correct. Cite only numbered "
+    "passages you actually used; do not cite a passage you did not rely on, and do not "
+    "invent numbers. The document outline, when one is provided, has no number and must "
+    "never be cited."
 )
 
 
@@ -52,8 +54,11 @@ def _build_messages(
     # the numbered passages can be cited, so a summary can orient the answer but can
     # never end up as a quote — see rag/sections.py on that boundary.
     outline_block = (
-        "Outline of the whole document (generated section summaries — use this to orient "
-        f"yourself; it is NOT quotable evidence and has no citation number):\n{outline}\n\n"
+        "Outline of the whole document, one summary per section. This is a reliable map of "
+        "what the document contains: use it to structure your answer and to say what a "
+        "section covers, including sections no passage below happens to quote. It carries "
+        "no citation number, so cite only the numbered passages — but do not refuse to "
+        f"answer for want of a passage when the outline already tells you:\n{outline}\n\n"
         if outline
         else ""
     )

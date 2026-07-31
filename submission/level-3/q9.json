@@ -1,24 +1,24 @@
 {
-  "question_id": "q8e71e6",
+  "question_id": "qecff3f",
   "level": 3,
-  "question": "Section 2 motivates dropout by analogy with sexual reproduction preventing the co-adaptation of genes. Where do the authors later show that this actually happens inside a neural network, and what do they observe?",
-  "answer": "The authors demonstrate this effect by analyzing first-level features learned by autoencoders trained on visual tasks (1, 2). Specifically, they compare models on MNIST data with and without dropout (3). They observe that standard networks develop complex co-adaptations to produce good reconstructions, meaning individual hidden units do not detect meaningful features on their own. When dropout is applied, these co-adaptations are broken up; hidden units instead learn robust, interpretable features like edges, strokes, and spots in varied contexts independently. The authors identify this direct breakdown of co-adaptation as the primary reason dropout reduces generalization error (3).",
+  "question": "How is dropout motivated? Does this motivation actually happen inside a neural network, and what do they observe?",
+  "answer": "The authors motivate dropout by drawing an analogy to sexual reproduction, arguing that breaking up complex co-adaptations improves a model's robustness in non-stationary conditions (1). By randomly removing units during training, the technique forces each hidden unit to work with random samples of other units, making it more robust and driving it toward creating useful features independently rather than relying on redundant partners to correct its mistakes (2).\n\nThe authors confirm that this motivation does indeed manifest inside trained neural networks through direct feature analysis (3). They observe that standard networks typically develop complex co-adaptations where individual hidden units lack meaningful interpretation (3). In contrast, dropout successfully prevents this by forcing units to learn robust, interpretable features—such as edges and strokes—and ensuring they perform reliably across the wide variety of contexts provided by other randomly retained units (3, 2).",
   "conversation_id": "level-3",
   "sources": [
     {
-      "page": 15,
-      "quote": "In a standard neural network, the derivative received by each parameter tells it how it should change so the final loss function is reduced, given what all other units are doing. Therefore, units may change in a way that they fix up the mistakes of the other units. This may lead to complex co-adaptations. This in turn leads to overfitting because these co-adaptations do not generalize to unseen data. We hypothesize that for each hidden unit, dropout prevents co-adaptation by making the presence of other hidden units unreliable. Therefore, a hidden unit cannot rely on other specific units to correct its mistakes. It must perform well in a wide variety of different contexts provided by the other hidden units.",
-      "score": 0.6076
+      "page": 4,
+      "quote": "2. Motivation A motivation for dropout comes from a theory of the role of sex in evolution (Livnat et al., 2010). Sexual reproduction involves taking half the genes of one parent and half of the other, adding a very small amount of random mutation, and combining them to produce an offspring. The asexual alternative is to create an offspring with a slightly mutated copy of the parent’s genes. It seems plausible that asexual reproduction should be a better way to optimize individual fitness because a good set of genes that have come to work well together can be passed on directly to the offspring.",
+      "score": 0.4742
+    },
+    {
+      "page": 4,
+      "quote": "Similarly, each hidden unit in a neural network trained with dropout must learn to work with a randomly chosen sample of other units. This should make each hidden unit more robust and drive it towards creating useful features on its own without relying on other hidden units to correct its mistakes. However, the hidden units within a layer will still learn to do different things from each other. One might imagine that the net would become robust against dropout by making many copies of each hidden unit, but this is a poor solution for exactly the same reason as replica codes are a poor way to deal with a noisy channel.",
+      "score": 0.2562
     },
     {
       "page": 15,
       "quote": "It must perform well in a wide variety of different contexts provided by the other hidden units. To observe this effect directly, we look at the first level features learned by neural networks trained on visual tasks with and without dropout.",
-      "score": 0.5304
-    },
-    {
-      "page": 16,
-      "quote": "Figure 7a shows features learned by an autoencoder on MNIST with a single hidden layer of 256 rectified linear units without dropout. Figure 7b shows the features learned by an identical autoencoder which used dropout in the hidden layer with p = 0.5. Both autoencoders had similar test reconstruction errors. However, it is apparent that the features shown in Figure 7a have co-adapted in order to produce good reconstructions. Each hidden unit on its own does not seem to be detecting a meaningful feature. On the other hand, in Figure 7b, the hidden units seem to detect edges, strokes and spots in different parts of the image. This shows that dropout does break up co-adaptations, which is probably the main reason why it leads to lower generalization errors.",
-      "score": 0.7825
+      "score": 0.6964
     }
   ],
   "diagnostics": {
@@ -26,19 +26,18 @@
     "chat_model": "qwen3.6:latest",
     "embedding_model": "bge-m3",
     "retrieved_chunks": 8,
-    "retrieval_query": "Where do the authors show that randomly dropping hidden units breaks co-adaptations in a neural network and what do they observe?",
+    "retrieval_query": "How is dropout motivated, does this motivation happen inside a neural network, and what do they observe",
     "sub_queries": [
-      "Where in the paper do the authors present experimental evidence that dropout prevents co-adaptation of features within a neural network?",
-      "What specific observations do the authors make regarding feature representation or specialization when comparing models trained with and without dropout?"
+      "What is the theoretical motivation for using dropout in neural networks?",
+      "Does the dropout mechanism actively prevent complex co-adaptations among neurons during training?",
+      "What empirical evidence or observations support the claim that dropout prevents co-adaptation?"
     ],
     "retrieval_steps": [
-      "search: 3 queries",
-      "step 1: missing 'The specific section or text where the authors demonstrate that dropout prevents co-adaptation of genes (or similar units) inside a neural network and what they observe.' → 1 more queries",
-      "step 2: missing 'The specific section or paragraph where the authors explicitly show and describe the breakdown of co-adaptation using a neural network experiment (beyond just the autoencoder feature visualization) and what they observe in terms of individual unit robustness.' → 2 more queries",
-      "step budget (2) reached"
+      "search: 4 queries",
+      "step 1: evidence sufficient"
     ],
     "tokens": null,
-    "latency_ms": 76423,
-    "timestamp": "2026-07-30T23:31:45Z"
+    "latency_ms": 94457,
+    "timestamp": "2026-07-31T06:46:25Z"
   }
 }

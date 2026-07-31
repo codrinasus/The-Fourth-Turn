@@ -1,0 +1,38 @@
+{
+  "question_id": "q3cd93e",
+  "level": 2,
+  "question": "And what benefit does that same noise bring?",
+  "answer": "The noise introduced by dropout provides several benefits: it acts as a regularizer that helps reduce overfitting (1, 2), effectively functions as a form of model averaging (2), and allows the optimization process to explore different regions of the weight space that would otherwise be difficult to reach (3).",
+  "conversation_id": "level-2",
+  "sources": [
+    {
+      "page": 24,
+      "quote": "This creates a trade-off between over- fitting and training time. With more training time, one can use high dropout and suffer less overfitting. However, one way to obtain some of the benefits of dropout without stochasticity is to marginalize the noise to obtain a regularizer that does the same thing as the dropout procedure, in expectation. We showed that for linear regression this regularizer is a modified form of L2 regularization. For more complicated models, it is not obvious how to obtain an equivalent regularizer. Speeding up dropout is an interesting direction for future work.",
+      "score": 0.2131
+    },
+    {
+      "page": 5,
+      "quote": "is added to the input units of an autoencoder and the network is trained to reconstruct the noise-free input. Our work extends this idea by showing that dropout can be effectively applied in the hidden layers as well and that it can be interpreted as a form of model averaging. We also show that adding noise is not only useful for unsupervised feature learning but can also be extended to supervised learning problems. In fact, our method can be applied to other neuron-based architectures, for example, Boltzmann Machines.",
+      "score": 0.0059
+    },
+    {
+      "page": 7,
+      "quote": "Although dropout alone gives significant improvements, using dropout along with maxnorm regularization, large decaying learning rates and high momentum provides a significant boost over just using dropout. A possible justification is that constraining weight vectors to lie inside a ball of fixed radius makes it possible to use a huge learning rate without the possibility of weights blowing up. The noise provided by dropout then allows the optimization process to explore different regions of the weight space that would have otherwise been difficult to reach. As the learning rate decays, the optimization takes shorter steps, thereby doing less exploration and eventually settles into a minimum.",
+      "score": 0.0871
+    }
+  ],
+  "diagnostics": {
+    "provider": "ollama",
+    "chat_model": "qwen3.6:latest",
+    "embedding_model": "bge-m3",
+    "retrieved_chunks": 5,
+    "retrieval_query": "And what benefit does that same noise bring?",
+    "sub_queries": [],
+    "retrieval_steps": [
+      "search: 1 query"
+    ],
+    "tokens": null,
+    "latency_ms": 52504,
+    "timestamp": "2026-07-31T07:05:18Z"
+  }
+}

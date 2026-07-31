@@ -104,12 +104,13 @@ question set implies.
 Three additions, because whole-document questions fail in more than one way.
 
 **Multi-query decomposition** (`rag/decompose.py`), which writes the loop's opening moves.
-q9 chains shortcut learning (page 1),
-attention-based feature attribution (page 8) and probing (page 17) — topics sharing almost
-no vocabulary. Embedded as one string it is a mediocre match for all three, and `top_k` goes
-to whichever hop dominates. The model splits it into 2–4 standalone sub-questions, each
-gets its own dense + BM25 pass, and every ranking is fused **together** (not pairwise, which
-would apply RRF twice and bury a chunk only one sub-query found).
+q9 asks how dropout is motivated *and* whether that motivation is borne out inside a
+network — the motivation is the sexual-reproduction analogy on page 4, the evidence is the
+autoencoder features on pages 15–16, and the two share almost no vocabulary. Embedded as
+one string it is a mediocre match for both and `top_k` goes to whichever half dominates.
+The model splits it into 2–4 standalone sub-questions, each gets its own dense + BM25 pass,
+and every ranking is fused **together** (not pairwise, which would apply RRF twice and bury
+a chunk only one sub-query found).
 
 **A ReAct-style retrieval loop** (`rag/agent.py`). Decomposition writes its sub-questions
 *before* anything has been retrieved, from the question alone — so if a hop comes back
@@ -153,8 +154,9 @@ chunk index. Summaries decide *where to look*; only the document is evidence.
 
 All numbers are from this repository on the committed PDF, host Ollama with `qwen3.6` +
 `bge-m3`: 30 pages → 151 chunks → 34 section summaries. Both ablations are reproducible —
-`REWRITE_ENABLED` and `AGENT_ENABLED` in `.env` are the switches, and the baseline
-responses are committed under `docs/ablations/`.
+`REWRITE_ENABLED` and `AGENT_ENABLED` in `.env` are the switches, `scripts/set_flag.sh`
+applies one and proves the container picked it up, and every baseline response is committed
+under `docs/ablations/`.
 
 Cross-encoder scores are comparable across rows because the reranker is calibrated, unlike
 the RRF scores it replaced.
@@ -166,15 +168,21 @@ the RRF scores it replaced.
 | | no rewriting | with rewriting |
 |---|---|---|
 | q4 (topic opener, standalone) | p24 **0.97** | p24 **0.97** — identical, the control |
-| q5 "Why does that happen?" | p7 0.55, p15 0.29 | p24 **1.00** |
-| q5 answer | **answers a different question**: explains why dropout wipes out information in pretrained weights during finetuning | explains why training takes 2–3× longer — what was actually asked |
-| q6 "And what benefit does that same noise bring?" | p5 0.01, p1 0.01, p7 0.09 | p7 **0.96**, p10 0.50 |
+| q5 "Why does that happen?" | p7 0.55, p15 0.29, p16 0.10 | p24 **1.00** |
+| q5 answer | **"The provided context does not discuss increased training time or noisy gradients"** — then answers an unrelated question about finetuning | explains the noisy parameter updates, which is what was asked |
+| q6 "And what benefit does that same noise bring?" | p24 0.21, p7 0.09, p5 0.01 | p24 **0.86**, p10 0.69, p7 0.47 |
 
 q5 is the clearest result we have. Without rewriting, "Why does that happen?" carries no
-retrievable content, so the retriever lands on an unrelated passage about finetuning and
-the model dutifully answers *that* question instead — fluently, with a real citation, and
-wrong. It is not a failure that announces itself, which is exactly why Level 2 is worth
-the 10% it carries. q4 is the control: standalone, left unrewritten, unchanged.
+retrievable content; the retriever lands elsewhere and the model says outright that the
+context does not cover the question — then answers a different one it *can* support. q4 is
+the control: standalone, left unrewritten by the model's own judgement, and identical in
+both columns.
+
+Verified rather than assumed: every response in the baseline carries
+`diagnostics.retrieval_query` equal to the question asked, which is how we know the switch
+actually took effect. We lost one earlier ablation to a stale container and reported it as
+real for a few minutes — `scripts/set_flag.sh` now sets a flag and *proves* the running
+container picked it up before any measurement is taken.
 
 ### Ablation 2 — quote grounding against the real PDF
 
@@ -195,53 +203,50 @@ about. Case and wording are untouched, so a paraphrase fails.
 `AGENT_ENABLED=false` runs decomposition only. This is the ablation that went against us,
 and it is the most useful thing we measured.
 
-| | loop off | loop on (after the fixes below) |
+| | loop off | loop on (shipped) |
 |---|---|---|
-| q7 | p8 0.93 | p8 **0.94** — unchanged, +13 s |
-| q8 | p3 0.89 | p3 **0.83** — unchanged within run-to-run noise |
-| q9 | p15 0.03, p16 **0.00** | p16 **0.78**, p15 0.61, p15 0.53 |
-| latency | 84–124 s | 95–118 s |
+| q7 (Gaussian vs Bernoulli dropout) | p23 0.72 | p23 **0.73** — unchanged |
+| q8 (summarise every section) | p3 **0.03**, rest 0.00 | p3 0.39, p23 **0.41**, p23 0.51 |
+| q9 (motivation, and does it happen) | p4 0.43, p14 0.38, p23 0.35 | p4 0.47, p15 **0.70** |
+| latency | 84–190 s | 116–196 s |
 
-q9 is the case Level 3 exists for: it asks where the paper *shows* co-adaptation being
-broken, and one-shot decomposition retrieved essentially nothing (0.03 and 0.00). The loop
-read that, said the evidence was missing, searched for it, and found §7.1 on pages 15–16.
+Both columns run with rewriting on and differ only in `AGENT_ENABLED`, confirmed from the
+`retrieval_steps` trace in each response. The loop is neutral on q7, whose evidence is all
+on one page, and helps on the two questions that genuinely span the document: q8 gains
+scoreable passages instead of a pool of zeros, and q9 reaches §7.1 on page 15 — the place
+the paper actually *shows* co-adaptation being broken, which is half of what that question
+asks.
 
-Getting there meant finding a bug the ablation exposed, and it was not the one we assumed.
-Our first measurement had the loop making q8 *worse* — p3 fell from 0.89 to 0.03. The
-mechanism: the cross-encoder scores every candidate **independently**, so extra candidates
-can never lower an existing one's score. The only way a good passage loses is by never
-reaching the reranker. The paragraph beginning *"In Section 6, we present our experimental
-results…"* was out-voted in fusion by six invented section-specific queries, fell below the
-60-candidate pool cut, and was never scored at all.
+Getting here meant finding a bug the ablation exposed, and it was not the one we assumed.
+An earlier measurement had the loop making q8 *worse*, dropping its best passage from 0.89
+to 0.03. The mechanism: the cross-encoder scores every candidate **independently**, so
+extra candidates can never lower an existing one's score. The only way a good passage loses
+is by never reaching the reranker. The paragraph describing what each section does was
+out-voted in fusion by invented section-specific queries, fell below the 60-candidate pool
+cut, and was never scored at all.
 
 We had asserted in code comments that "a wasted round cannot displace an earlier hit,
 because everything is fused at the end". That was false. Two fixes made it true:
 
 - **Weighted fusion.** The user's question votes at 1.0, its decomposition at 0.7, a
-  speculative follow-up at 0.4. Necessary but not sufficient — this alone recovered q7 and
-  left q8 broken, because a hard cut cannot be fixed by soft ordering.
+  speculative follow-up at 0.4. Necessary but not sufficient — a hard cut cannot be fixed
+  by soft ordering.
 - **A reserved pool.** Half the candidate slots belong to the question and its
   decomposition; follow-up rounds fill only the remainder. Extra retrieval is now additive
   by construction rather than by assertion.
 
-The honest sequence is worth stating plainly: the reflective loop as first written **hurt**,
-the ablation is what caught it, and the fix was a retrieval-plumbing bug rather than
-anything to do with the loop's judgement. After the fix it is a clear win on one of three
-Level-3 questions and neutral on the other two, for 15–20 % more latency.
-
 ### Per-question result, final run
-
-Best cross-encoder score for each question's evidence, and wall-clock latency:
 
 | | q1 | q2 | q3 | q4 | q5 | q6 | q7 | q8 | q9 |
 |---|---|---|---|---|---|---|---|---|---|
-| best source | 0.81 | 0.99 | 0.97 | 0.97 | **1.00** | 0.96 | 0.94 | 0.83 | 0.78 |
-| latency (s) | 73 | 51 | 48 | 22 | 33 | 47 | 95 | 118 | 76 |
-| sources | 2 | 2 | 2 | 1 | 1 | 2 | 8 | 7 | 3 |
+| best source | 0.9 | 0.99 | 0.97 | 0.97 | 1.0 | 0.86 | 0.73 | 0.51 | 0.7 |
+| latency (s) | 76 | 50 | 45 | 29 | 31 | 26 | 116 | 196 | 94 |
+| sources | 2 | 3 | 3 | 1 | 1 | 3 | 3 | 8 | 3 |
 
 All nine were checked by hand against the PDF and are factually correct, including the
-numbers q7 quotes (21.8% TIMIT phone error rate, 31.05% → 29.62% on Reuters, both page 13).
-All 28 evidence quotes are verbatim on their cited page.
+details q7 turns on — that Gaussian noise has the higher entropy of the two, that the
+comparison is "preliminary", and that Table 10 covers MNIST and CIFAR-10 over 10 seeds.
+All 27 evidence quotes are verbatim on their cited page, median 676 characters.
 
 ### Cost
 
@@ -249,9 +254,9 @@ From `diagnostics.latency_ms`, wall clock, thinking enabled:
 
 | Level | Latency | Why |
 |---|---|---|
-| 1 | 48–73 s | one rewrite call, one dense + one BM25 pass, rerank, answer |
-| 2 | 22–47 s | same, with the rewrite actually changing the query |
-| 3 | 76–118 s | plus decomposition, up to 2 judge calls with their retrieval passes, 8 passages and the 34-section outline in the prompt |
+| 1 | 45–76 s | one rewrite call, one dense + one BM25 pass, rerank, answer |
+| 2 | 26–31 s | same, with the rewrite actually changing the query |
+| 3 | 94–196 s | plus decomposition, up to 2 judge calls with their retrieval passes, 8 passages and the 34-section outline in the prompt |
 
 The cross-encoder is not the expensive part anywhere: scoring a 60-candidate pool costs
 well under a second against a 20–120 s generation. Ingest is 2m50s end to end — 30 pages
@@ -300,9 +305,10 @@ to one question, which is what *Integrity* penalises.
 
 - **Memory is process-local.** A dict in `rag/memory.py`; it does not survive a restart and
   does not work across workers. Redis would be a small change and we did not make it.
-- **The reflective loop earns its keep on one question in three.** q9 goes from nothing to
-  0.78; q7 and q8 are unchanged and pay 15–20 % latency. A cheap improvement we did not
-  build: stop early when a round retrieves nothing the pool did not already contain.
+- **The reflective loop helps two Level-3 questions of three, and costs latency on all of
+  them.** q7's evidence is all on one page, so the extra rounds buy nothing there. A cheap
+  improvement we did not build: stop early when a round retrieves nothing the pool did not
+  already contain.
 - **Level-2 answers vary between runs.** When a topic-opening answer enumerates several
   things, "why does that happen?" is genuinely ambiguous and different runs resolve it to
   different items. The rewriter is instructed to take the first, which makes it stable in
@@ -317,7 +323,7 @@ to one question, which is what *Integrity* penalises.
 - **We do not abstain.** The idea is sound — on our previous document a genuinely
   unanswerable question produced a pool topping out at 0.007, exactly the "not in this
   document" signal a calibrated reranker should give. But on the submitted document every
-  one of the nine answers scores between **0.78 and 1.00**, so we have no failing case here
+  one of the nine answers scores between **0.51 and 1.00**, so we have no failing case here
   to calibrate a threshold against, and on the previous document correct answers ran as low
   as 0.021 — overlapping the failure outright. Picking a constant from nine observations
   would be fitting it to our own question set. A defensible threshold needs a labelled set

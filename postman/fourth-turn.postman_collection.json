@@ -120,7 +120,7 @@
             "url": "{{base_url}}/query",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"question\": \"What is the biological motivation for dropout described in the paper?\",\n  \"level\": 1\n}"
+              "raw": "{\n  \"question\": \"What is the motivation for dropout described in the paper?\",\n  \"level\": 1\n}"
             }
           }
         },
@@ -222,7 +222,7 @@
             "url": "{{base_url}}/query",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"question\": \"Across the image, speech, text and genetics experiments, which data sets is dropout evaluated on, and what does the paper report as its typical effect on the error rate?\",\n  \"level\": 3\n}"
+              "raw": "{\n  \"question\": \"What do the authors conclude about Gaussian and Bernoulli dropout? Based on what experiments and which datasets do they reach that conclusion?\",\n  \"level\": 3\n}"
             }
           }
         },
@@ -256,7 +256,7 @@
             "url": "{{base_url}}/query",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"question\": \"Section 2 motivates dropout by analogy with sexual reproduction preventing the co-adaptation of genes. Where do the authors later show that this actually happens inside a neural network, and what do they observe?\",\n  \"level\": 3\n}"
+              "raw": "{\n  \"question\": \"How is dropout motivated? Does this motivation actually happen inside a neural network, and what do they observe?\",\n  \"level\": 3\n}"
             }
           }
         }

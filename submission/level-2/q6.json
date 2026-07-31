@@ -1,19 +1,24 @@
 {
-  "question_id": "q9ebc6e",
+  "question_id": "q8e1f9a",
   "level": 2,
   "question": "And what benefit does that same noise bring?",
-  "answer": "The noise allows the optimization process to explore different regions of the weight space that would otherwise be difficult to reach (1). It also helps prevent overfitting by providing noisy inputs that stop higher fully connected layers from memorizing the training data (2).",
+  "answer": "The noise primarily helps prevent overfitting (1, 2). Additionally, it allows the optimization process to explore different regions of the weight space that would otherwise be difficult to reach (3).",
   "conversation_id": "level-2",
   "sources": [
     {
-      "page": 7,
-      "quote": "Although dropout alone gives significant improvements, using dropout along with maxnorm regularization, large decaying learning rates and high momentum provides a significant boost over just using dropout. A possible justification is that constraining weight vectors to lie inside a ball of fixed radius makes it possible to use a huge learning rate without the possibility of weights blowing up. The noise provided by dropout then allows the optimization process to explore different regions of the weight space that would have otherwise been difficult to reach. As the learning rate decays, the optimization takes shorter steps, thereby doing less exploration and eventually settles into a minimum.",
-      "score": 0.9574
+      "page": 24,
+      "quote": "One of the drawbacks of dropout is that it increases training time. A dropout network typically takes 2-3 times longer to train than a standard neural network of the same architecture. A major cause of this increase is that the parameter updates are very noisy. Each training case effectively tries to train a different random architecture. Therefore, the gradients that are being computed are not gradients of the final architecture that will be used at test time. Therefore, it is not surprising that training takes a long time. However, it is likely that this stochasticity prevents overfitting. This creates a trade-off between over- fitting and training time. With more training time, one can use high dropout and suffer less overfitting.",
+      "score": 0.8587
     },
     {
       "page": 10,
       "quote": "The additional gain in performance obtained by adding dropout in the convolutional layers (3.02% to 2.55%) is worth noting. One may have presumed that since the convolutional layers don’t have a lot of parameters, overfitting is not a problem and therefore dropout would not have much effect. However, dropout in the lower layers still helps because it provides noisy inputs for the higher fully connected layers which prevents them from overfitting.",
-      "score": 0.5037
+      "score": 0.6855
+    },
+    {
+      "page": 7,
+      "quote": "Although dropout alone gives significant improvements, using dropout along with maxnorm regularization, large decaying learning rates and high momentum provides a significant boost over just using dropout. A possible justification is that constraining weight vectors to lie inside a ball of fixed radius makes it possible to use a huge learning rate without the possibility of weights blowing up. The noise provided by dropout then allows the optimization process to explore different regions of the weight space that would have otherwise been difficult to reach. As the learning rate decays, the optimization takes shorter steps, thereby doing less exploration and eventually settles into a minimum.",
+      "score": 0.471
     }
   ],
   "diagnostics": {
@@ -21,13 +26,13 @@
     "chat_model": "qwen3.6:latest",
     "embedding_model": "bge-m3",
     "retrieved_chunks": 5,
-    "retrieval_query": "What benefit does the noise brought by dropout bring?",
+    "retrieval_query": "What benefit does the noisy parameter updates from dropout bring",
     "sub_queries": [],
     "retrieval_steps": [
       "search: 1 query"
     ],
     "tokens": null,
-    "latency_ms": 47969,
-    "timestamp": "2026-07-30T23:27:20Z"
+    "latency_ms": 26373,
+    "timestamp": "2026-07-31T06:40:40Z"
   }
 }

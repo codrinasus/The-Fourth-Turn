@@ -1,0 +1,38 @@
+{
+  "question_id": "q48b281",
+  "level": 2,
+  "question": "Why does that happen?",
+  "answer": "The provided context does not discuss increased training time or noisy gradients. Regarding phenomena that are covered, information in pretrained weights can be lost during finetuning if the learning rates are too large, because this causes stochastic updates to overwrite the saved parameters (1). Additionally, dropout prevents complex co-adaptations by randomly deactivating units, which makes other hidden units unreliable at each step and forces remaining units to perform well across many contexts rather than relying on specific neighbors to fix mistakes (2). This disruption of co-adapted features allows units to detect meaningful patterns instead of redundant correlations, likely causing the observed reduction in generalization error (3).",
+  "conversation_id": "level-2",
+  "sources": [
+    {
+      "page": 7,
+      "quote": "Pretraining followed by finetuning with backpropagation has been shown to give significant performance boosts over finetuning from random initializations in certain cases. Dropout can be applied to finetune nets that have been pretrained using these techniques. The pretraining procedure stays the same. The weights obtained from pretraining should be scaled up by a factor of 1 /p. This makes sure that for each unit, the expected output from it under random dropout will be the same as the output during pretraining. We were initially concerned that the stochastic nature of dropout might wipe out the information in the pretrained weights. This did happen when the learning rates used during finetuning were comparable to the best learning rates for randomly initialized nets.",
+      "score": 0.5519
+    },
+    {
+      "page": 15,
+      "quote": "In a standard neural network, the derivative received by each parameter tells it how it should change so the final loss function is reduced, given what all other units are doing. Therefore, units may change in a way that they fix up the mistakes of the other units. This may lead to complex co-adaptations. This in turn leads to overfitting because these co-adaptations do not generalize to unseen data. We hypothesize that for each hidden unit, dropout prevents co-adaptation by making the presence of other hidden units unreliable. Therefore, a hidden unit cannot rely on other specific units to correct its mistakes. It must perform well in a wide variety of different contexts provided by the other hidden units.",
+      "score": 0.2865
+    },
+    {
+      "page": 16,
+      "quote": "Figure 7a shows features learned by an autoencoder on MNIST with a single hidden layer of 256 rectified linear units without dropout. Figure 7b shows the features learned by an identical autoencoder which used dropout in the hidden layer with p = 0.5. Both autoencoders had similar test reconstruction errors. However, it is apparent that the features shown in Figure 7a have co-adapted in order to produce good reconstructions. Each hidden unit on its own does not seem to be detecting a meaningful feature. On the other hand, in Figure 7b, the hidden units seem to detect edges, strokes and spots in different parts of the image. This shows that dropout does break up co-adaptations, which is probably the main reason why it leads to lower generalization errors.",
+      "score": 0.1007
+    }
+  ],
+  "diagnostics": {
+    "provider": "ollama",
+    "chat_model": "qwen3.6:latest",
+    "embedding_model": "bge-m3",
+    "retrieved_chunks": 5,
+    "retrieval_query": "Why does that happen?",
+    "sub_queries": [],
+    "retrieval_steps": [
+      "search: 1 query"
+    ],
+    "tokens": null,
+    "latency_ms": 94485,
+    "timestamp": "2026-07-31T07:03:42Z"
+  }
+}

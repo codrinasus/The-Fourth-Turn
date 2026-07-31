@@ -1,8 +1,8 @@
 {
-  "question_id": "q7c2c52",
+  "question_id": "q9ebdc6",
   "level": 1,
   "question": "What dropout probabilities do the authors use for hidden units and for input units?",
-  "answer": "The authors state that all dropout nets use a retention probability of p = 0.5 for hidden units and p = 0.8 for input units (1). They also note that typical values for hidden units generally range from 0.5 to 0.8, while real-valued input layers typically use 0.8 (2).",
+  "answer": "The authors state that standard dropout nets use p = 0.5 for hidden units and p = 0.8 for input units (1). They also note that typical probabilities for hidden units generally fall between 0.5 and 0.8, while real-valued input layers typically use p = 0.8 (2). For specific architectures like the CIFAR-10 model, they vary the retention probability across layers, applying p = (0.9, 0.75, 0.75, 0.5, 0.5, 0.5) from input to top (3).",
   "conversation_id": "level-1",
   "sources": [
     {
@@ -14,6 +14,11 @@
       "page": 25,
       "quote": "A.4 Dropout Rate Dropout introduces an extra hyperparameter—the probability of retaining a unit p. This hyperparameter controls the intensity of dropout. p = 1, implies no dropout and low values of p mean more dropout. Typical values of p for hidden units are in the range 0 .5 to 0.8. For input layers, the choice depends on the kind of input. For real-valued inputs (image patches or speech frames), a typical value is 0.8. For hidden layers, the choice ofp is coupled with the choice of number of hidden units n. Smaller p requires big n which slows down the training and leads to underfitting. Large p may not produce enough dropout to prevent overfitting.",
       "score": 0.9503
+    },
+    {
+      "page": 23,
+      "quote": "Table 10: Comparison of classification error % with Bernoulli and Gaussian dropout. For MNIST, the Bernoulli model uses p = 0.5 for the hidden units and p = 0.8 for the input units. For CIFAR-10, we usep = (0.9, 0.75, 0.75, 0.5, 0.5, 0.5) going from the input layer to the top. The value of σ for the Gaussian dropout models was set to be √ 1−p p . Results were averaged over 10 different random seeds.",
+      "score": 0.9647
     }
   ],
   "diagnostics": {
@@ -27,7 +32,7 @@
       "search: 1 query"
     ],
     "tokens": null,
-    "latency_ms": 51316,
-    "timestamp": "2026-07-30T23:24:41Z"
+    "latency_ms": 50216,
+    "timestamp": "2026-07-31T06:38:02Z"
   }
 }

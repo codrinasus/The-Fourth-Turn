@@ -1,12 +1,18 @@
 """Ask the nine chosen questions and file the answers into `submission/`.
 
-    uv run python scripts/run_questions.py            # all nine
-    uv run python scripts/run_questions.py 2          # just level 2
+    uv run python scripts/run_questions.py                        # all nine
+    uv run python scripts/run_questions.py 2                      # just level 2
+    uv run python scripts/run_questions.py 2 --out docs/ablations/x   # somewhere else
 
 Questions come from `questions/chosen.json` — the same nine as the Postman collection.
 Each level is sent **in order** so the level-2 follow-ups see the earlier turns, and the
-raw `POST /query` response is written verbatim to `submission/level-<n>/q<i>.json`. Nothing
-is hand-edited on the way: what the pipeline returned is what gets submitted.
+raw `POST /query` response is written verbatim to `<out>/level-<n>/q<i>.json`. Nothing is
+hand-edited on the way: what the pipeline returned is what gets submitted.
+
+`--out` exists because ablation runs are *supposed* to produce worse answers. Writing them
+to `submission/` by default is one forgotten restore away from shipping a deliberately
+crippled baseline as the graded answer, so a run with `REWRITE_ENABLED=false` should always
+be pointed somewhere else.
 """
 
 from __future__ import annotations
@@ -29,8 +35,15 @@ def ask(question: str, level: int) -> dict:
 
 
 def main() -> int:
-    wanted = {int(a) for a in sys.argv[1:]} or {1, 2, 3}
+    args = sys.argv[1:]
+    out_root = ROOT / "submission"
+    if "--out" in args:
+        i = args.index("--out")
+        out_root = ROOT / args[i + 1]
+        args = args[:i] + args[i + 2 :]
+    wanted = {int(a) for a in args} or {1, 2, 3}
     questions = json.loads((ROOT / "questions" / "chosen.json").read_text())
+    print(f"writing to {out_root.relative_to(ROOT)}/", flush=True)
 
     for q in questions:
         if q["level"] not in wanted:
@@ -49,7 +62,8 @@ def main() -> int:
             print(f"{q['id']}  DEGRADED — not filed: {resp['answer'][:90]}", flush=True)
             continue
 
-        out = ROOT / "submission" / f"level-{q['level']}" / f"{q['id']}.json"
+        out = out_root / f"level-{q['level']}" / f"{q['id']}.json"
+        out.parent.mkdir(parents=True, exist_ok=True)
         out.write_text(json.dumps(resp, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 
         took = time.perf_counter() - started

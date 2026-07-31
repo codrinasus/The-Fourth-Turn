@@ -7,11 +7,12 @@ Two jobs, split so that neither the model nor the code does something it is bad 
    up in `sources` instead of every retrieved chunk.
 2. **Which span is the evidence** — the *code* decides. The sentences of a cited chunk are
    scored against the question with the same cross-encoder used for reranking, and then
-   the quote is *widened* around the winner: we try the whole chunk, then the paragraph
-   containing it, then the sentence alone, and ship the largest one the PDF can vouch for.
-   A lone sentence read as truncated — the best-matching sentence is frequently the one
-   next to the sentence carrying the fact — so we return all the context the document
-   will actually confirm.
+   the quote is *widened* around the winner: the whole chunk, else the paragraph
+   containing it, else — when the chunk straddles a page break and neither fits on one
+   page — the largest window around that sentence which the page still contains, trimmed
+   back to a complete sentence. A lone sentence read as truncated, because the
+   best-matching sentence is frequently the one *beside* the sentence carrying the fact,
+   so we return all the context the document will actually vouch for.
 
 Because the quote is sliced from indexed text rather than generated, it is verbatim by
 construction: there is no paraphrase to detect and no hallucinated quote to verify.
@@ -42,6 +43,9 @@ from .retrieve import Context
 _MARKER = re.compile(r"\(\s*(\d{1,2}(?:\s*[;,]\s*\d{1,2})*)\s*\)")
 _NUMBER = re.compile(r"\d{1,2}")
 _SENTENCE_SPLIT = re.compile(r"(?<=[.!?])\s+")
+# The last sentence terminator in a string, used to trim a page-bounded window back
+# to complete prose.
+_SENTENCE_END = re.compile(r"^.*[.!?]", re.DOTALL)
 
 _MIN_QUOTE = 40  # shorter spans are rarely evidence on their own
 _MIN_HEADING_PROSE = 80  # a span shorter than this with no terminal punctuation is a title
@@ -148,6 +152,53 @@ def _is_heading(span: str) -> bool:
     return len(stripped) < _MIN_HEADING_PROSE and not stripped.endswith((".", "!", "?", ":"))
 
 
+def _grow(text: str, start: int, end: int, page: int, limit_start: int, limit_end: int) -> str:
+    """Widen `text[start:end]` as far as `page` will still vouch for it.
+
+    Used when neither the chunk nor its paragraph verifies, which happens whenever the
+    chunk straddles a page break: the conclusion chunk of the dropout paper begins on page
+    23 and finishes on page 24, so no single page contains the whole of it and the quote
+    fell all the way back to one sentence. Giving up there is wrong — most of that
+    paragraph *is* on page 23 and is exactly the context a reader wants.
+
+    So we grow outward from the evidence sentence, binary-searching the furthest end the
+    page still contains and then the furthest start, and stop at the page boundary instead
+    of at the paragraph boundary. Every intermediate candidate is checked against the PDF,
+    so the result is the largest window that is genuinely verbatim on the cited page.
+    """
+
+    def ok(a: int, b: int) -> bool:
+        return verbatim.find(text[a:b].strip(), page) is not None
+
+    lo, hi = end, limit_end
+    while lo < hi:  # furthest end that still verifies
+        mid = (lo + hi + 1) // 2
+        if ok(start, mid):
+            lo = mid
+        else:
+            hi = mid - 1
+    end = lo
+
+    lo, hi = limit_start, start
+    while lo < hi:  # furthest start that still verifies
+        mid = (lo + hi) // 2
+        if ok(mid, end):
+            hi = mid
+        else:
+            lo = mid + 1
+    window = text[lo:end].strip()
+
+    # The page boundary rarely falls on a sentence boundary, so the window usually ends
+    # mid-clause — which reads as exactly the truncation this widening exists to avoid.
+    # Trim back to the last complete sentence when one is left.
+    trimmed = _SENTENCE_END.search(window)
+    if trimmed:
+        candidate = window[: trimmed.end()].strip()
+        if len(candidate) >= _MIN_QUOTE:
+            return candidate
+    return window
+
+
 def _block_around(text: str, start: int, end: int) -> tuple[int, int]:
     """The paragraph containing `start:end`, as offsets.
 
@@ -207,8 +258,12 @@ def evidence_quote(question: str, context: Context) -> str:
     for candidate in (
         text.strip(),  # the whole chunk
         text[block_start:block_end].strip(),  # the paragraph the best sentence sits in
-        sentence,  # the sentence itself
     ):
         if verbatim.find(candidate, context.page) is not None:
             return candidate
-    return sentence
+
+    # Neither fits on one page — usually because the chunk straddles a page break. Grow
+    # outward from the sentence to the largest window the page *does* contain, instead of
+    # falling back to the sentence alone and losing the paragraph around it.
+    grown = _grow(text, start, end, context.page, block_start, block_end)
+    return grown if len(grown) >= len(sentence) else sentence
