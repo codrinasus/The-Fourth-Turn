@@ -1,24 +1,24 @@
 {
-  "question_id": "qe89cc8",
+  "question_id": "q8f1232",
   "level": 3,
   "question": "What do the authors conclude about Gaussian and Bernoulli dropout? Based on what experiments and which datasets do they reach that conclusion?",
-  "answer": "The authors conclude that multiplicative Gaussian dropout performs just as well as, or potentially slightly better than, standard Bernoulli dropout (1). They note that while both methods can be configured to share identical mean and variance, the Gaussian variant has higher entropy, which preliminary results suggest may yield a marginal performance advantage (2). \n\nThis conclusion is drawn from preliminary experiments comparing classification error rates on two datasets: MNIST and CIFAR-10 (3). The authors evaluated both noise types on specific architectures—a 2-layer network for MNIST and a 3-convolutional/2-fully-connected network for CIFAR-10—and observed that Gaussian dropout achieved slightly lower test errors than Bernoulli dropout across both benchmarks (3).",
+  "answer": "The authors conclude that both Gaussian and Bernoulli dropout can be configured to share identical mean and variance, and while both perform well, Gaussian multiplicative noise might yield slightly better results due to its higher entropy (1). They also note that multiplying activations by Gaussian-distributed random variables works just as well, or perhaps better, than standard Bernoulli noise (2). These conclusions are drawn from comparative classification error experiments on the MNIST and CIFAR-10 datasets, where Table 10 reports marginally lower error rates for Gaussian dropout across both benchmarks (3).",
   "conversation_id": "level-3",
   "sources": [
     {
       "page": 23,
-      "quote": "10. Multiplicative Gaussian Noise Dropout involves multiplying hidden activations by Bernoulli distributed random variables which take the value 1 with probability p and 0 otherwise. This idea can be generalized by multiplying the activations with random variables drawn from other distributions. We recently discovered that multiplying by a random variable drawn from N (1, 1) works just as well, or perhaps better than using Bernoulli noise. This new form of dropout amounts to adding a Gaussian distributed random variable with zero mean and standard deviation equal to the activation of the unit. That is, each hidden activation hi is perturbed to hi +hir where r∼N (0, 1), or equivalently hir′ where r′∼N (1, 1).",
-      "score": 0.3721
+      "quote": "Therefore, dropout can be seen as multiplying hi by a Bernoulli random variablerb that takes the value 1/p with probability p and 0 otherwise. E[rb] = 1 and Var [rb] = (1−p)/p. For the Gaussian multiplicative noise, if we set σ2 = (1−p)/p, we end up multiplying hi by a random variable rg, where E[rg] = 1 and Var [rg] = (1 −p)/p. Therefore, both forms of dropout can be set up so that the random variable being multiplied by has the same mean and variance. However, given these first and second order moments, rg has the highest entropy andrb has the lowest. Both these extremes work well, although preliminary experimental results shown in Table 10 suggest that the high entropy case might work slightly better.",
+      "score": 0.7319
     },
     {
       "page": 23,
-      "quote": "Therefore, dropout can be seen as multiplying hi by a Bernoulli random variablerb that takes the value 1/p with probability p and 0 otherwise. E[rb] = 1 and Var [rb] = (1−p)/p. For the Gaussian multiplicative noise, if we set σ2 = (1−p)/p, we end up multiplying hi by a random variable rg, where E[rg] = 1 and Var [rg] = (1 −p)/p. Therefore, both forms of dropout can be set up so that the random variable being multiplied by has the same mean and variance. However, given these first and second order moments, rg has the highest entropy andrb has the lowest. Both these extremes work well, although preliminary experimental results shown in Table 10 suggest that the high entropy case might work slightly better.",
-      "score": 0.7189
+      "quote": "10. Multiplicative Gaussian Noise Dropout involves multiplying hidden activations by Bernoulli distributed random variables which take the value 1 with probability p and 0 otherwise. This idea can be generalized by multiplying the activations with random variables drawn from other distributions. We recently discovered that multiplying by a random variable drawn from N (1, 1) works just as well, or perhaps better than using Bernoulli noise. This new form of dropout amounts to adding a Gaussian distributed random variable with zero mean and standard deviation equal to the activation of the unit. That is, each hidden activation hi is perturbed to hi +hir where r∼N (0, 1), or equivalently hir′ where r′∼N (1, 1).",
+      "score": 0.3673
     },
     {
       "page": 23,
       "quote": "Table 10: Comparison of classification error % with Bernoulli and Gaussian dropout. For MNIST, the Bernoulli model uses p = 0.5 for the hidden units and p = 0.8 for the input units. For CIFAR-10, we usep = (0.9, 0.75, 0.75, 0.5, 0.5, 0.5) going from the input layer to the top. The value of σ for the Gaussian dropout models was set to be √ 1−p p . Results were averaged over 10 different random seeds.",
-      "score": 0.4225
+      "score": 0.4264
     }
   ],
   "diagnostics": {
@@ -28,15 +28,15 @@
     "retrieved_chunks": 8,
     "retrieval_query": "What do the authors conclude about Gaussian and Bernoulli dropout? Based on what experiments and which datasets do they reach that conclusion?",
     "sub_queries": [
-      "What conclusions do the authors draw regarding the performance of Gaussian versus Bernoulli dropout?",
-      "What specific experiments were conducted to compare Gaussian and Bernoulli dropout in the study?",
-      "Which datasets were used in the experiments comparing Gaussian and Bernoulli dropout?"
+      "What are the authors' conclusions regarding the performance differences between Gaussian and Bernoulli dropout?",
+      "Which experimental setup or training regime is used to compare Gaussian and Bernoulli dropout?",
+      "Which specific datasets are used in the experiments evaluating Gaussian and Bernoulli dropout?"
     ],
     "retrieval_steps": [
       "search: 4 queries"
     ],
     "tokens": null,
-    "latency_ms": 81407,
-    "timestamp": "2026-07-31T07:14:48Z"
+    "latency_ms": 58640,
+    "timestamp": "2026-07-31T07:47:59Z"
   }
 }

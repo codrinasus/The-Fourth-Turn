@@ -1,24 +1,19 @@
 {
-  "question_id": "qecff3f",
+  "question_id": "q16e2dd",
   "level": 3,
-  "question": "How is dropout motivated? Does this motivation actually happen inside a neural network, and what do they observe?",
-  "answer": "The authors motivate dropout by drawing an analogy to sexual reproduction, arguing that breaking up complex co-adaptations improves a model's robustness in non-stationary conditions (1). By randomly removing units during training, the technique forces each hidden unit to work with random samples of other units, making it more robust and driving it toward creating useful features independently rather than relying on redundant partners to correct its mistakes (2).\n\nThe authors confirm that this motivation does indeed manifest inside trained neural networks through direct feature analysis (3). They observe that standard networks typically develop complex co-adaptations where individual hidden units lack meaningful interpretation (3). In contrast, dropout successfully prevents this by forcing units to learn robust, interpretable features—such as edges and strokes—and ensuring they perform reliably across the wide variety of contexts provided by other randomly retained units (3, 2).",
+  "question": "How large are the train and test set of CIFAR-10 and CIFAR-100 and did the authors apply augmentations to their experiments?",
+  "answer": "The authors state that both CIFAR-10 and CIFAR-100 consist of 50,000 training images and 10,000 test images (1). They explicitly note that no data augmentation was used for either dataset in their experiments, apart from the input dropout itself (2).",
   "conversation_id": "level-3",
   "sources": [
     {
-      "page": 4,
-      "quote": "2. Motivation A motivation for dropout comes from a theory of the role of sex in evolution (Livnat et al., 2010). Sexual reproduction involves taking half the genes of one parent and half of the other, adding a very small amount of random mutation, and combining them to produce an offspring. The asexual alternative is to create an offspring with a slightly mutated copy of the parent’s genes. It seems plausible that asexual reproduction should be a better way to optimize individual fitness because a good set of genes that have come to work well together can be passed on directly to the offspring.",
-      "score": 0.4742
+      "page": 26,
+      "quote": "B.3 CIFAR-10 and CIFAR-100 The CIFAR-10 and CIFAR-100 data sets consists of 50,000 training and 10,000 test images each. They have 10 and 100 image categories respectively. These are 32 × 32 color images. We used 5,000 of the training images for validation. We followed the procedure similar to MNIST, where we found the best hyperparameters using the validation set and then combined it with the training set. The images were preprocessed by doing global contrast normalization in each color channel followed by ZCA whitening. Global contrast normalization means that for image and each color channel in that image, we compute the mean of the pixel intensities and subtract it from the channel.",
+      "score": 0.9915
     },
     {
-      "page": 4,
-      "quote": "Similarly, each hidden unit in a neural network trained with dropout must learn to work with a randomly chosen sample of other units. This should make each hidden unit more robust and drive it towards creating useful features on its own without relying on other hidden units to correct its mistakes. However, the hidden units within a layer will still learn to do different things from each other. One might imagine that the net would become robust against dropout by making many copies of each hidden unit, but this is a poor solution for exactly the same reason as replica codes are a poor way to deal with a noisy channel.",
-      "score": 0.2562
-    },
-    {
-      "page": 15,
-      "quote": "It must perform well in a wide variety of different contexts provided by the other hidden units. To observe this effect directly, we look at the first level features learned by neural networks trained on visual tasks with and without dropout.",
-      "score": 0.6964
+      "page": 10,
+      "quote": "Goodfellow et al. (2013) showed that the error is further reduced to 11.68% by replacing ReLU units with maxout units. On CIFAR-100, dropout reduces the error from 43.48% to 37.20% which is a huge improvement. No data augmentation was used for either data set (apart from the input dropout).",
+      "score": 0.6707
     }
   ],
   "diagnostics": {
@@ -26,18 +21,18 @@
     "chat_model": "qwen3.6:latest",
     "embedding_model": "bge-m3",
     "retrieved_chunks": 8,
-    "retrieval_query": "How is dropout motivated, does this motivation happen inside a neural network, and what do they observe",
+    "retrieval_query": "How large are the train and test set of CIFAR-10 and CIFAR-100 and did the authors apply augmentations to their experiments?",
     "sub_queries": [
-      "What is the theoretical motivation for using dropout in neural networks?",
-      "Does the dropout mechanism actively prevent complex co-adaptations among neurons during training?",
-      "What empirical evidence or observations support the claim that dropout prevents co-adaptation?"
+      "What are the sizes of the training and test sets for CIFAR-10?",
+      "What are the sizes of the training and test sets for CIFAR-100?",
+      "Did the authors apply data augmentation in their experiments?"
     ],
     "retrieval_steps": [
       "search: 4 queries",
       "step 1: evidence sufficient"
     ],
     "tokens": null,
-    "latency_ms": 94457,
-    "timestamp": "2026-07-31T06:46:25Z"
+    "latency_ms": 61304,
+    "timestamp": "2026-07-31T07:43:39Z"
   }
 }

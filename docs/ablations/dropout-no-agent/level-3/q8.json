@@ -1,29 +1,29 @@
 {
-  "question_id": "q4025b1",
+  "question_id": "q7d2d44",
   "level": 3,
   "question": "Summarise the contribution of each section.",
-  "answer": "**Abstract**: Introduces Dropout as a regularization technique that reduces overfitting in large deep neural networks by randomly dropping units during training, achieving state-of-the-art performance across vision, speech, text, and biology tasks.\n\n**1. Introduction**: Introduces the technique for preventing overfitting by randomly dropping hidden and visible units, contributing an efficient weight-scaling method to approximate combining exponentially many thinned architectures at test time without explicit enumeration (1).\n\n**2. Motivation**: Motivates the approach via analogies to sexual reproduction and conspiracy theory, arguing that breaking complex co-adaptations improves robustness and forces units to learn useful features independently rather than relying on redundant partners.\n\n**3. Related Work**: Reviews Denoising Autoencoders and stochastic regularization, contrasting prior input-noise methods with dropout's hidden-layer application, supervised learning extensions, Boltzmann Machine integration, and connections to deterministic regularization via marginalization.\n\n**4. Model Description**: Formally describes the model by modifying standard feed-forward operations through element-wise multiplication of independent Bernoulli variables to generate thinned layer outputs (2). It also specifies multiplying weights by $p$ during test-time inference to maintain expected output.\n\n**5. Learning Dropout Nets**: Outlines the training procedure, confirming that standard SGD improvements like momentum and L2 decay remain applicable while introducing max-norm regularization to constrain weight growth. It further details fine-tuning pretrained networks by scaling weights by $1/p$ and using reduced learning rates to preserve pretrained information and improve generalization error.\n\n**6. Experimental Results**: Presents benchmark evaluations across vision, speech, text, and genetics that consistently demonstrate improved generalization over standard networks. In the comparison with Bayesian neural networks, it highlights that while Bayes nets perform well on small datasets, dropout offers significantly faster training and inference times (3).\n\n**7. Salient Features**: Closely examines how dropout influences feature quality, hidden unit sparsity, and hyperparameter interactions to explain its effectiveness (4). It shows the technique automatically induces sparse representations by reducing highly activated units and lowering mean activations without explicit sparsity regularizers (5). It also analyzes dropout rate effects under fixed vs. constant expected unit conditions, identifies an optimal training dataset size range, and validates weight scaling as a computationally efficient approximation matching Monte-Carlo averaging with roughly 50 samples.\n\n**8. Dropout Restricted Boltzmann Machines**: Formally extends dropout to RBMs by adding binary random variables that probabilistically drop hidden units, characterizing the architecture as a mixture of exponentially many shared-weight models. It explains adapting Contrastive Divergence algorithms for training and notes that dropout RBMs learn qualitatively different, coarser, and significantly sparser features than standard RBMs.\n\n**9. Marginalizing Dropout**: Explores deterministic models derived by marginalizing the noise, which eliminate random bits and enable gradient computation for marginalized loss functions (6). It demonstrates mathematical equivalence to ridge regression in linear settings with probability-dependent regularization, discusses Gaussian approximations for logistic regression and deep networks, compares Bernoulli versus Gaussian dropout on MNIST and CIFAR-10, introduces multiplicative Gaussian noise as a moment-matched generalization with potential high-entropy advantages, and summarizes broader applicability while proposing deterministic regularizers as future work.\n\n**10. Multiplicative Gaussian Noise**: Introduces multiplying activations by variables drawn from N(1, σ²), establishes mathematical equivalence to Bernoulli dropout via first and second moment matching, and suggests the noise's high entropy may yield slight performance gains over standard Bernoulli dropout.\n\n**11. Conclusion**: Summarizes Dropout's broad applicability and state-of-the-art performance across architectures, reiterates its extension to RBMs, discusses the training-speed versus generalization trade-off, and proposes marginalizing noise as a pathway to deterministic regularizers.",
+  "answer": "**Abstract:** Introduces Dropout as a regularization technique that reduces overfitting and achieves state-of-the-art performance across vision, speech, text classification, and computational biology tasks.\n\n**1. Introduction:** Presents Dropout to prevent overfitting by randomly dropping units during training, contributing an efficient weight-scaling method to approximate exponentially many thinned architectures for test-time averaging.\n\n**2. Motivation:** Argues that breaking complex co-adaptations improves model robustness in non-stationary conditions, providing a theoretical basis for why dropout forces independent feature learning.\n\n**3. Related Work:** Reviews Denoising Autoencoders and stochastic regularization, highlighting contributions like applying higher noise in hidden layers, extending concepts to supervised learning and Boltzmann Machines, and connecting dropout to deterministic regularization via marginalization.\n\n**4. Model Description:** Formally defines the model by modifying the standard feed-forward operation with independent Bernoulli variables to sample thinned sub-networks during training, and specifies weight scaling ($p$) for test-time inference (1).\n\n**5. Learning Dropout Nets:** Outlines the training procedure, detailing backpropagation protocols that incorporate max-norm regularization to constrain weights, and unsupervised pretraining/fine-tuning steps using weight scaling and decayed learning rates.\n\n**6. Experimental Results:** Presents comparative experiments across vision, speech, text, and genetics domains against standard networks and other regularizers, demonstrating consistent generalization improvements on benchmarks like MNIST, CIFAR-10, ImageNet, and TIMIT (2). The section also compares Dropout to Bayesian Neural Networks, noting that while Bayes nets may achieve higher performance, Dropout offers a much faster and more scalable alternative for training and inference (3).\n\n**7. Salient Features:** Analyzes how dropout affects feature quality, induces sparsity in hidden activations, and varies with the retention probability, network size, and dataset size to explain its efficacy (4). It further demonstrates that standard networks develop complex co-adaptations while dropout forces hidden units to detect robust features like edges and strokes, and automatically lowers mean activations to create sparse representations without explicit regularizers (5).\n\n**8. Dropout Restricted Boltzmann Machines:** Extends Dropout to RBMs by defining a mixture of exponentially many networks with shared weights, adapting Contrastive Divergence for mask sampling, and demonstrating that the method learns coarser features and significantly sparser hidden representations.\n\n**9. Marginalizing Dropout:** Explores deterministic alternatives to Monte-Carlo dropout by marginalizing noise, enabling gradient computation without random bits (6). The section reviews related deterministic regularization work, shows equivalence to ridge regression in linear settings, and discusses approximate Gaussian marginalization for logistic regression and deep networks.\n\n**10. Multiplicative Gaussian Noise:** Generalizes Dropout by multiplying activations with N(1, σ²) variables, establishes moment-matching equivalence to Bernoulli Dropout, and suggests its higher entropy may offer a marginal performance boost.\n\n**11. Conclusion:** Summarizes Dropout's state-of-the-art results and broad applicability, discusses the computational trade-offs of noisy gradients during training versus improved generalization, and proposes marginalization for deterministic regularizers as future work.\n\n**Appendix A & B:** Appendix A provides a practical guide for training Dropout networks with hyperparameter tuning considerations (7), while Appendix B details network architectures, training specifications, GPU implementation using CUDA libraries, and reproducibility code.",
   "conversation_id": "level-3",
   "sources": [
     {
-      "page": 3,
-      "quote": "This paper is structured as follows. Section 2 describes the motivation for this idea. Section 3 describes relevant previous work. Section 4 formally describes the dropout model. Section 5 gives an algorithm for training dropout networks. In Section 6, we present our experimental results where we apply dropout to problems in different domains and compare it with other forms of regularization and model combination. Section 7 analyzes the effect of dropout on different properties of a neural network and describes how dropout interacts with the network’s hyperparameters. Section 8 describes the Dropout RBM model. In Section 9 we explore the idea of marginalizing dropout.",
-      "score": 0.0258
-    },
-    {
       "page": 5,
       "quote": "This section describes the dropout neural network model. Consider a neural network with L hidden layers. Let l∈{ 1,...,L } index the hidden layers of the network. Let z(l) denote the vector of inputs into layer l, y(l) denote the vector of outputs from layer l (y(0) = x is the input). W (l) and b(l) are the weights and biases at layer l. The feed-forward operation of a standard neural network (Figure 3a) can be described as (for l∈{ 0,...,L − 1} and any hidden unit i)",
-      "score": 0.0024
+      "score": 0.0023
+    },
+    {
+      "page": 3,
+      "quote": "This paper is structured as follows. Section 2 describes the motivation for this idea. Section 3 describes relevant previous work. Section 4 formally describes the dropout model. Section 5 gives an algorithm for training dropout networks. In Section 6, we present our experimental results where we apply dropout to problems in different domains and compare it with other forms of regularization and model combination. Section 7 analyzes the effect of dropout on different properties of a neural network and describes how dropout interacts with the network’s hyperparameters. Section 8 describes the Dropout RBM model. In Section 9 we explore the idea of marginalizing dropout.",
+      "score": 0.0251
     },
     {
       "page": 13,
       "quote": "However, Bayesian neural nets are slow to train and difficult to scale to very large network sizes. Besides, it is expensive to get predictions from many large nets at test time. On the other hand, dropout neural nets are much faster to train and use at test time. In this section, we report experiments that compare Bayesian neural nets with dropout neural nets on a small data set where Bayesian neural networks are known to perform well and obtain state-of-the-art results. The aim is to analyze how much does dropout lose compared to Bayesian neural nets.",
-      "score": 0.001
+      "score": 0.0009
     },
     {
       "page": 14,
       "quote": "The experiments described in the previous section provide strong evidence that dropout is a useful technique for improving neural networks. In this section, we closely examine how dropout affects a neural network. We analyze the effect of dropout on the quality of features produced. We see how dropout affects the sparsity of hidden unit activations.",
-      "score": 0.0034
+      "score": 0.0035
     },
     {
       "page": 16,
@@ -33,7 +33,12 @@
     {
       "page": 21,
       "quote": ") dropout, these models do not need random bits and it is possible to get gradients for the marginalized loss functions. In this section, we briefly explore these models.",
-      "score": 0.0032
+      "score": 0.003
+    },
+    {
+      "page": 3,
+      "quote": "In Section 9 we explore the idea of marginalizing dropout.",
+      "score": 0.0021
     }
   ],
   "diagnostics": {
@@ -43,15 +48,16 @@
     "retrieved_chunks": 8,
     "retrieval_query": "Summarise the contribution of each section.",
     "sub_queries": [
-      "What is the main contribution of Section 1?",
-      "What is the main contribution of Section 2?",
-      "What is the main contribution of Section 3?"
+      "What are the main points presented in Section 1?",
+      "What are the main points presented in Section 2?",
+      "What are the main points presented in Section 3?",
+      "What are the main points presented in Section 4?"
     ],
     "retrieval_steps": [
-      "search: 4 queries"
+      "search: 5 queries"
     ],
     "tokens": null,
-    "latency_ms": 187752,
-    "timestamp": "2026-07-31T07:16:12Z"
+    "latency_ms": 158085,
+    "timestamp": "2026-07-31T07:48:59Z"
   }
 }

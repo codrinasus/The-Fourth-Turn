@@ -256,7 +256,7 @@
             "url": "{{base_url}}/query",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"question\": \"How is dropout motivated? Does this motivation actually happen inside a neural network, and what do they observe?\",\n  \"level\": 3\n}"
+              "raw": "{\n  \"question\": \"How large are the train and test set of CIFAR-10 and CIFAR-100 and did the authors apply augmentations to their experiments?\",\n  \"level\": 3\n}"
             }
           }
         }

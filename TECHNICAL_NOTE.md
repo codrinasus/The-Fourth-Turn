@@ -104,13 +104,14 @@ question set implies.
 Three additions, because whole-document questions fail in more than one way.
 
 **Multi-query decomposition** (`rag/decompose.py`), which writes the loop's opening moves.
-q9 asks how dropout is motivated *and* whether that motivation is borne out inside a
-network — the motivation is the sexual-reproduction analogy on page 4, the evidence is the
-autoencoder features on pages 15–16, and the two share almost no vocabulary. Embedded as
-one string it is a mediocre match for both and `top_k` goes to whichever half dominates.
-The model splits it into 2–4 standalone sub-questions, each gets its own dense + BM25 pass,
-and every ranking is fused **together** (not pairwise, which would apply RRF twice and bury
-a chunk only one sub-query found).
+q9 asks two unrelated things at once — how large the CIFAR train and test sets are, and
+whether the authors augmented their data. The sizes are in Appendix B.3 on page 26, the
+augmentation statement is in Section 6 on page 10, and the two share almost no vocabulary.
+Embedded as one string it is a mediocre match for both and `top_k` goes to whichever half
+dominates. The model splits it into 2–4 standalone sub-questions, each gets its own dense +
+BM25 pass, and every ranking is fused **together** (not pairwise, which would apply RRF
+twice and bury a chunk only one sub-query found). Both halves are retrieved: page 26 at
+0.99 and page 10 at 0.67.
 
 **A ReAct-style retrieval loop** (`rag/agent.py`). Decomposition writes its sub-questions
 *before* anything has been retrieved, from the question alone — so if a hop comes back
@@ -205,25 +206,35 @@ and it is the most useful thing we measured.
 
 | | loop off | loop on (shipped) |
 |---|---|---|
-| q7 (Gaussian vs Bernoulli dropout) | p23 0.72 | p23 **0.73** — unchanged |
-| q8 (summarise every section) | p3 **0.03**, rest 0.00 | p3 0.39, p23 **0.41**, p23 0.51 |
-| q9 (motivation, and does it happen) | p4 0.43, p14 0.38, p23 0.35 | p4 0.47, p15 **0.70** |
-| latency | 84–190 s | 116–196 s |
+| q7 (Gaussian vs Bernoulli) | p23 0.73 | p23 0.72 — unchanged |
+| q8 (summarise every section) | p3 0.03, rest 0.00 | p3 0.01, rest 0.00 — unchanged |
+| q9 (CIFAR sizes + augmentation) | p26 0.99, p10 0.43 | p26 0.99, p10 **0.67** |
+| latency | 60–160 s | 61–286 s |
 
 Both columns run with rewriting on and differ only in `AGENT_ENABLED`, confirmed from the
-`retrieval_steps` trace in each response. The loop is neutral on q7, whose evidence is all
-on one page, and helps on the two questions that genuinely span the document: q8 gains
-scoreable passages instead of a pool of zeros, and q9 reaches §7.1 on page 15 — the place
-the paper actually *shows* co-adaptation being broken, which is half of what that question
-asks.
+`retrieval_steps` trace in each response.
 
-Getting here meant finding a bug the ablation exposed, and it was not the one we assumed.
-An earlier measurement had the loop making q8 *worse*, dropping its best passage from 0.89
-to 0.03. The mechanism: the cross-encoder scores every candidate **independently**, so
-extra candidates can never lower an existing one's score. The only way a good passage loses
-is by never reaching the reranker. The paragraph describing what each section does was
-out-voted in fusion by invented section-specific queries, fell below the 60-candidate pool
-cut, and was never scored at all.
+**Honest reading: on this question set the loop is close to neutral.** It improves the
+weaker half of q9 — the augmentation sentence on page 10, retrieved at 0.67 with the loop
+against 0.43 without — and changes nothing measurable on q7 or q8, while costing up to 2×
+latency on q8. We keep it enabled because agentic retrieval is the level-appropriate
+technique here and because the reserved pool makes extra rounds strictly additive, but we
+are not claiming it carries Level 3 on these questions.
+
+q8 cannot discriminate this ablation at all, and that is worth stating rather than hiding:
+its chunk scores sit at 0.00–0.03 in both columns, and across repeated runs of the *same*
+configuration we have seen its best source swing between 0.01 and 0.51. Its answer comes
+from the section index, not from any single passage, so the chunk scores are measuring
+something the answer does not depend on. A question whose evidence is the document's
+structure is the wrong instrument for a retrieval ablation.
+
+An earlier version of this loop actively **hurt**, and finding out why produced the two
+fixes below. The measurement had q8's best passage falling from 0.89 to 0.03. The
+mechanism: the cross-encoder scores every candidate **independently**, so extra candidates
+can never lower an existing one's score — the only way a good passage loses is by never
+reaching the reranker. The paragraph describing what each section does was out-voted in
+fusion by invented section-specific queries, fell below the 60-candidate pool cut, and was
+never scored at all.
 
 We had asserted in code comments that "a wasted round cannot displace an earlier hit,
 because everything is fused at the end". That was false. Two fixes made it true:
@@ -239,14 +250,22 @@ because everything is fused at the end". That was false. Two fixes made it true:
 
 | | q1 | q2 | q3 | q4 | q5 | q6 | q7 | q8 | q9 |
 |---|---|---|---|---|---|---|---|---|---|
-| best source | 0.9 | 0.99 | 0.97 | 0.97 | 1.0 | 0.86 | 0.73 | 0.51 | 0.7 |
-| latency (s) | 76 | 50 | 45 | 29 | 31 | 26 | 116 | 196 | 94 |
-| sources | 2 | 3 | 3 | 1 | 1 | 3 | 3 | 8 | 3 |
+| best source | 0.9 | 0.99 | 0.97 | 0.97 | 1.0 | 0.86 | 0.72 | 0.01 | 0.99 |
+| latency (s) | 76 | 50 | 45 | 29 | 31 | 26 | 105 | 286 | 61 |
+| sources | 2 | 3 | 3 | 1 | 1 | 3 | 3 | 7 | 2 |
 
 All nine were checked by hand against the PDF and are factually correct, including the
-details q7 turns on — that Gaussian noise has the higher entropy of the two, that the
-comparison is "preliminary", and that Table 10 covers MNIST and CIFAR-10 over 10 seeds.
-All 27 evidence quotes are verbatim on their cited page, median 676 characters.
+details each turns on: that Gaussian noise has the higher entropy of the two and the
+comparison is explicitly "preliminary" (q7); that CIFAR-10 and CIFAR-100 have 50,000
+training and 10,000 test images each and used **no** augmentation "apart from the input
+dropout" (q9). All 25 evidence quotes are verbatim on their cited page, median
+660 characters.
+
+q8's 0.01 is not a failure and is the one number here that needs reading carefully. No
+passage in the paper summarises every section, so there is nothing for a cross-encoder to
+score highly; the answer is built from the 34-entry section index and is complete and
+correct. A low passage score is the system reporting accurately that the evidence was
+structural rather than quotable.
 
 ### Cost
 
@@ -256,7 +275,7 @@ From `diagnostics.latency_ms`, wall clock, thinking enabled:
 |---|---|---|
 | 1 | 45–76 s | one rewrite call, one dense + one BM25 pass, rerank, answer |
 | 2 | 26–31 s | same, with the rewrite actually changing the query |
-| 3 | 94–196 s | plus decomposition, up to 2 judge calls with their retrieval passes, 8 passages and the 34-section outline in the prompt |
+| 3 | 61–286 s | plus decomposition, up to 2 judge calls with their retrieval passes, 8 passages and the 34-section outline in the prompt |
 
 The cross-encoder is not the expensive part anywhere: scoring a 60-candidate pool costs
 well under a second against a 20–120 s generation. Ingest is 2m50s end to end — 30 pages
@@ -305,10 +324,15 @@ to one question, which is what *Integrity* penalises.
 
 - **Memory is process-local.** A dict in `rag/memory.py`; it does not survive a restart and
   does not work across workers. Redis would be a small change and we did not make it.
-- **The reflective loop helps two Level-3 questions of three, and costs latency on all of
-  them.** q7's evidence is all on one page, so the extra rounds buy nothing there. A cheap
-  improvement we did not build: stop early when a round retrieves nothing the pool did not
-  already contain.
+- **The reflective loop is close to neutral on this question set.** It improves the weaker
+  half of q9 (0.43 → 0.67) and changes nothing measurable on q7 or q8, while costing up to
+  2× latency. A cheap improvement we did not build: stop early when a round retrieves
+  nothing the pool did not already contain.
+- **Run-to-run variance is real and we have not characterised it.** q8's best source has
+  swung between 0.01 and 0.51 across repeated runs of an identical configuration, because
+  the decomposition is model-generated and changes each time. Single-run ablation rows
+  should be read with that in mind; the q5 rewriting result is far outside that noise, the
+  Level-3 rows are not.
 - **Level-2 answers vary between runs.** When a topic-opening answer enumerates several
   things, "why does that happen?" is genuinely ambiguous and different runs resolve it to
   different items. The rewriter is instructed to take the first, which makes it stable in
@@ -320,14 +344,14 @@ to one question, which is what *Integrity* penalises.
 - **No table-structure reasoning.** Tables are flattened to pipe-separated rows and split on
   row boundaries, which keeps rows intact but leaves the model to parse the layout. A
   question needing a specific cell by row *and* column header is not handled structurally.
-- **We do not abstain.** The idea is sound — on our previous document a genuinely
-  unanswerable question produced a pool topping out at 0.007, exactly the "not in this
-  document" signal a calibrated reranker should give. But on the submitted document every
-  one of the nine answers scores between **0.51 and 1.00**, so we have no failing case here
-  to calibrate a threshold against, and on the previous document correct answers ran as low
-  as 0.021 — overlapping the failure outright. Picking a constant from nine observations
-  would be fitting it to our own question set. A defensible threshold needs a labelled set
-  of questions the document genuinely cannot answer; we do not have one, so we ship without
+- **We do not abstain, and this document settles it.** The idea is sound: on our previous
+  document a genuinely unanswerable question produced a pool topping out at **0.007** —
+  exactly the "not in this document" signal a calibrated reranker should give. But here q8
+  is **correct at 0.01**, because its evidence is the document's structure rather than any
+  passage. A correct answer and a hopeless one are indistinguishable by score, so no
+  threshold separates them; any constant we picked would be fitted to our own nine
+  questions, which is what the rules penalise. A defensible threshold needs a labelled set
+  of questions the document genuinely cannot answer. We do not have one, so we ship without
   abstention and say so.
 
 ---

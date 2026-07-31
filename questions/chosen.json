@@ -42,6 +42,6 @@
   {
     "id": "q9",
     "level": 3,
-    "question": "How is dropout motivated? Does this motivation actually happen inside a neural network, and what do they observe?"
+    "question": "How large are the train and test set of CIFAR-10 and CIFAR-100 and did the authors apply augmentations to their experiments?"
   }
 ]
