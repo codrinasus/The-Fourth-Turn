@@ -1,19 +1,19 @@
 {
-  "question_id": "q2625ca",
+  "question_id": "q6222ce",
   "level": 3,
   "question": "What do the authors conclude about Gaussian and Bernoulli dropout? Based on what experiments and which datasets do they reach that conclusion?",
-  "answer": "The authors conclude that multiplicative Gaussian dropout performs just as well as, and potentially slightly better than, standard Bernoulli dropout because it preserves the same mean and variance while possessing higher entropy, which may yield a marginal performance advantage (1, 2). They reached this conclusion through preliminary classification experiments on the MNIST and CIFAR-10 datasets (3). The comparative results demonstrated that Gaussian dropout achieved marginally lower test error rates than Bernoulli dropout on both MNIST (0.95% vs. 1.08%) and CIFAR-10 (12.5% vs. 12.6%) (3).",
+  "answer": "The authors conclude that replacing Bernoulli multiplicative noise with Gaussian multiplicative dropout works just as well as, or potentially slightly better than, standard Bernoulli dropout (1). They reason that while both methods are effective, the Gaussian approach has the highest entropy of the two, and this high-entropy property may yield a slight performance advantage (2). \n\nThis conclusion is based on preliminary classification error experiments evaluated specifically on the MNIST and CIFAR-10 datasets (3). Averaged over 10 random seeds, Gaussian dropout achieved marginally lower test errors than Bernoulli dropout, recording 0.95% vs. 1.08% on MNIST and 12.5% vs. 12.6% on CIFAR-10 (3).",
   "conversation_id": "level-3",
   "sources": [
     {
       "page": 23,
-      "quote": "Therefore, dropout can be seen as multiplying hi by a Bernoulli random variablerb that takes the value 1/p with probability p and 0 otherwise. E[rb] = 1 and Var [rb] = (1−p)/p. For the Gaussian multiplicative noise, if we set σ2 = (1−p)/p, we end up multiplying hi by a random variable rg, where E[rg] = 1 and Var [rg] = (1 −p)/p. Therefore, both forms of dropout can be set up so that the random variable being multiplied by has the same mean and variance. However, given these first and second order moments, rg has the highest entropy andrb has the lowest. Both these extremes work well, although preliminary experimental results shown in Table 10 suggest that the high entropy case might work slightly better.",
-      "score": 0.7249
+      "quote": "10. Multiplicative Gaussian Noise Dropout involves multiplying hidden activations by Bernoulli distributed random variables which take the value 1 with probability p and 0 otherwise. This idea can be generalized by multiplying the activations with random variables drawn from other distributions. We recently discovered that multiplying by a random variable drawn from N (1, 1) works just as well, or perhaps better than using Bernoulli noise. This new form of dropout amounts to adding a Gaussian distributed random variable with zero mean and standard deviation equal to the activation of the unit. That is, each hidden activation hi is perturbed to hi +hir where r∼N (0, 1), or equivalently hir′ where r′∼N (1, 1).",
+      "score": 0.3685
     },
     {
       "page": 23,
-      "quote": "10. Multiplicative Gaussian Noise Dropout involves multiplying hidden activations by Bernoulli distributed random variables which take the value 1 with probability p and 0 otherwise. This idea can be generalized by multiplying the activations with random variables drawn from other distributions. We recently discovered that multiplying by a random variable drawn from N (1, 1) works just as well, or perhaps better than using Bernoulli noise. This new form of dropout amounts to adding a Gaussian distributed random variable with zero mean and standard deviation equal to the activation of the unit. That is, each hidden activation hi is perturbed to hi +hir where r∼N (0, 1), or equivalently hir′ where r′∼N (1, 1).",
-      "score": 0.3685
+      "quote": "Therefore, dropout can be seen as multiplying hi by a Bernoulli random variablerb that takes the value 1/p with probability p and 0 otherwise. E[rb] = 1 and Var [rb] = (1−p)/p. For the Gaussian multiplicative noise, if we set σ2 = (1−p)/p, we end up multiplying hi by a random variable rg, where E[rg] = 1 and Var [rg] = (1 −p)/p. Therefore, both forms of dropout can be set up so that the random variable being multiplied by has the same mean and variance. However, given these first and second order moments, rg has the highest entropy andrb has the lowest. Both these extremes work well, although preliminary experimental results shown in Table 10 suggest that the high entropy case might work slightly better.",
+      "score": 0.7315
     },
     {
       "page": 23,
@@ -28,16 +28,19 @@
     "retrieved_chunks": 8,
     "retrieval_query": "What do the authors conclude about Gaussian and Bernoulli dropout? Based on what experiments and which datasets do they reach that conclusion?",
     "sub_queries": [
-      "What are the authors' conclusions regarding the performance or behavior of Gaussian dropout compared to Bernoulli dropout?",
-      "Which experiments did the authors conduct to compare Gaussian and Bernoulli dropout?",
-      "What specific datasets were used in these experiments?"
+      "What are the authors' conclusions regarding the performance comparison between Gaussian dropout and Bernoulli dropout?",
+      "Which specific experiments were conducted to compare Gaussian and Bernoulli dropout in the study?",
+      "On which datasets did the authors evaluate the effectiveness of Gaussian versus Bernoulli dropout?"
     ],
     "retrieval_steps": [
       "search: 4 queries",
-      "step 1: evidence sufficient"
+      "step 1: missing 'The specific conclusion comparing Gaussian and Bernoulli dropout (e.g., which is better or if they are equivalent) based on the MNIST/CIFAR-10 experiments.' → 2 more queries",
+      "step 2: missing 'The specific conclusion or comparison result between Gaussian and Bernoulli dropout performance (e.g., which is better or if they are equivalent) for the experiments listed in Table 10 or elsewhere.' → 2 more queries",
+      "step 3: missing 'The explicit conclusion comparing Gaussian and Bernoulli dropout performance/results.' → 2 more queries",
+      "step budget (3) reached"
     ],
     "tokens": null,
-    "latency_ms": 92288,
-    "timestamp": "2026-07-31T08:24:42Z"
+    "latency_ms": 113595,
+    "timestamp": "2026-07-31T08:50:42Z"
   }
 }

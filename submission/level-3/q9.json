@@ -1,29 +1,24 @@
 {
-  "question_id": "q75c17a",
+  "question_id": "q765407",
   "level": 3,
   "question": "What datasets did the authors use for their experiments and how large were they in terms of samples and dimensionality? Did they use the raw data or did they apply any preprocessing or augmentation?",
-  "answer": "Based on the provided context, the authors evaluated their models across seven datasets spanning vision, speech, text, and genetics domains. Table 1 in (1) details their input dimensionality and training/test set sizes:\n\n- **MNIST**: Vision, 784-dim (28×28 grayscale), 60K training / 10K test samples\n- **SVHN**: Vision, 3,072-dim (32×32 color), 600K training / 26K test samples\n- **CIFAR-10/100**: Vision, 3,072-dim (32×32 color), 60K training / 10K test samples\n- **ImageNet (ILSVRC-2012)**: Vision, 65,536-dim (256×256 color), 1.2M training / 150K test samples\n- **TIMIT**: Speech, 2,520-dim (120-dim over 21 frames), 1.1M training / 58K test frames\n- **Reuters-RCV1**: Text, 2,000-dim, 200K training / 200K test samples\n- **Alternative Splicing**: Genetics, 1,014-dim, 2,932 training / 733 test samples\n\nRegarding preprocessing and augmentation, the authors explicitly state that no data augmentation was applied to CIFAR-10 or CIFAR-100 apart from input dropout (2, 3). They also note that leveraging 2-D spatial information and augmenting training sets with distorted images could potentially yield better results on image tasks (4), but the provided excerpt does not detail additional preprocessing or augmentation steps applied to any of the other datasets.",
+  "answer": "Based on the provided document outline and context passages, here are the datasets, their dimensions/sizes, and preprocessing details:\n\n**Datasets, Dimensionality, and Sample Sizes:**\nThe authors evaluated models across seven datasets spanning vision, speech, text, and genetics (1). Table 1 provides the exact specifications (1):\n- **MNIST**: 784 dimensions (28×28 grayscale); 60K training / 10K test samples (1)\n- **SVHN**: 3,072 dimensions (32×32 color); 600K training / 26K test samples (1)\n- **CIFAR-10/100**: 3,072 dimensions (32×32 color); 60K training / 10K test samples (1)\n- **ImageNet (ILSVRC-2012)**: 65,536 dimensions (256×256 color); 1.2M training / 150K test samples (1)\n- **TIMIT**: 2,520 dimensions (120-dim over 21 frames); 1.1M training / 58K test frames (1)\n- **Reuters-RCV1**: 2,000 dimensions; 200K training / 200K test samples (1)\n- **Alternative Splicing (Genetics)**: 1,014 dimensions; 2,932 training / 733 test samples (1)\n\n**Preprocessing and Augmentation:**\nThe context explicitly states that CIFAR images were preprocessed with global contrast normalization per color channel followed by ZCA whitening (2). The supplied passages do not specify whether raw or preprocessed data was used for the other six datasets, nor do they detail specific augmentation techniques beyond noting that certain performance benchmarks were achieved without external data augmentation (3).",
   "conversation_id": "level-3",
   "sources": [
     {
       "page": 8,
       "quote": "Data Set Domain Dimensionality Training Set Test Set MNIST Vision 784 (28 × 28 grayscale) 60K 10K SVHN Vision 3072 (32 × 32 color) 600K 26K CIFAR-10/100 Vision 3072 (32 × 32 color) 60K 10K ImageNet (ILSVRC-2012) Vision 65536 (256 × 256 color) 1.2M 150K TIMIT Speech 2520 (120-dim, 21 frames) 1.1M frames 58K frames Reuters-RCV1 Text 2000 200K 200K Alternative Splicing Genetics 1014 2932 733",
-      "score": 0.4654
+      "score": 0.9614
+    },
+    {
+      "page": 26,
+      "quote": "B.3 CIFAR-10 and CIFAR-100 The CIFAR-10 and CIFAR-100 data sets consists of 50,000 training and 10,000 test images each. They have 10 and 100 image categories respectively. These are 32 × 32 color images. We used 5,000 of the training images for validation. We followed the procedure similar to MNIST, where we found the best hyperparameters using the validation set and then combined it with the training set. The images were preprocessed by doing global contrast normalization in each color channel followed by ZCA whitening. Global contrast normalization means that for image and each color channel in that image, we compute the mean of the pixel intensities and subtract it from the channel.",
+      "score": 0.8954
     },
     {
       "page": 10,
       "quote": "6.1.3 CIF AR-10 and CIF AR-100 The CIFAR-10 and CIFAR-100 data sets consist of 32 × 32 color images drawn from 10 and 100 categories respectively. Figure 5b shows some examples of images from this data set. A detailed description of the data sets, input preprocessing, network architectures and other experimental details is given in Appendix B.3. Table 4 shows the error rate obtained by different methods on these data sets. Without any data augmentation, Snoek et al. (2012) used Bayesian hyperparameter optimization to obtained an error rate of 14.98% on CIFAR-10. Using dropout in the fully connected layers reduces that to 14.32% and adding dropout in every layer further reduces the error to 12.61%. Goodfellow et al. (2013) showed that the error is further reduced to 11.68% by replacing ReLU units with maxout units.",
-      "score": 0.6508
-    },
-    {
-      "page": 10,
-      "quote": "Goodfellow et al. (2013) showed that the error is further reduced to 11.68% by replacing ReLU units with maxout units. On CIFAR-100, dropout reduces the error from 43.48% to 37.20% which is a huge improvement. No data augmentation was used for either data set (apart from the input dropout).",
-      "score": 0.4867
-    },
-    {
-      "page": 9,
-      "quote": "Dropout nets pretrained with stacks of RBMs and Deep Boltzmann Machines also give improvements as shown in Table 2. DBM—pretrained dropout nets achieve a test error of 0.79% which is the best performance ever reported for the permutation invariant setting. We note that it possible to obtain better results by using 2-D spatial information and augmenting the training set with distorted versions of images from the standard training set. We demonstrate the effectiveness of dropout in that setting on more interesting data sets.",
-      "score": 0.3694
+      "score": 0.9048
     }
   ],
   "diagnostics": {
@@ -31,19 +26,21 @@
     "chat_model": "qwen3.6:latest",
     "embedding_model": "bge-m3",
     "retrieved_chunks": 8,
-    "retrieval_query": "What datasets did the authors use for their experiments on Gaussian and Bernoulli dropout, including dataset size and dimensionality, and what preprocessing or augmentation was applied?",
+    "retrieval_query": "What datasets did the authors use for their Gaussian and Bernoulli dropout experiments on MNIST and CIFAR-10, and what were their sample sizes, dimensionality, and preprocessing steps?",
     "sub_queries": [
-      "Which datasets were used by the authors in their experiments?",
-      "What is the size of each dataset in terms of the number of samples and dimensionality?",
-      "Did the authors use raw data or apply preprocessing and augmentation techniques?"
+      "What datasets did the authors use for their experiments?",
+      "What is the size of each dataset in terms of number of samples and dimensionality?",
+      "Did the authors use raw data or apply preprocessing and augmentation to the datasets?"
     ],
     "retrieval_steps": [
       "search: 4 queries",
-      "step 1: missing 'Specific details on data preprocessing or augmentation applied to the MNIST and SVHN datasets (only CIFAR is mentioned as having no augmentation).' → 2 more queries",
-      "step 2: evidence sufficient"
+      "step 1: missing 'Details on preprocessing or augmentation applied to other datasets (SVHN, ImageNet, TIMIT, Reuters-RCV1, etc.), with passage (5) only covering CIFAR specifically.' → 3 more queries",
+      "step 2: missing 'Specific preprocessing or augmentation details for datasets other than CIFAR-10 (e.g., SVHN, ImageNet, MNIST) are not provided.' → 3 more queries",
+      "step 3: missing 'Details on preprocessing or augmentation applied to MNIST, SVHN, ImageNet, and Reuters-RCV1 datasets.' → 3 more queries",
+      "step budget (3) reached"
     ],
     "tokens": null,
-    "latency_ms": 115383,
-    "timestamp": "2026-07-31T08:29:43Z"
+    "latency_ms": 162801,
+    "timestamp": "2026-07-31T08:56:11Z"
   }
 }

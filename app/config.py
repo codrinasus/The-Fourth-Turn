@@ -86,7 +86,10 @@ class Settings(BaseSettings):
     # LLM call plus a retrieval pass. The budget is a hard stop — the loop also ends as
     # soon as the model says the evidence is sufficient or proposes nothing new.
     agent_enabled: bool = True
-    agent_max_steps: int = 2
+    # Three, not two: at two the loop reported the preprocessing half of a Level-3 question
+    # still missing when the budget ran out, which is the loop telling us the budget was
+    # the binding constraint rather than the retrieval.
+    agent_max_steps: int = 3
 
     # The Docling pages are split into page-grounded chunks before indexing.
     chunk_size: int = 800  # target characters per chunk

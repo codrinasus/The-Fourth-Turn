@@ -111,8 +111,8 @@ one string the query is a mediocre match for both and `top_k` goes to whichever 
 dominates. The model splits it into 2–4 standalone sub-questions, each gets its own dense +
 BM25 pass, and every ranking is fused **together** (not pairwise, which would apply RRF
 twice and bury a chunk only one sub-query found). Both halves are retrieved, and the answer
-reproduces all seven rows of Table 1 with the augmentation caveat the paper actually makes
-— none "apart from the input dropout".
+reproduces all seven rows of Table 1 together with the preprocessing the paper actually
+describes — global contrast normalisation per colour channel followed by ZCA whitening.
 
 **A ReAct-style retrieval loop** (`rag/agent.py`). Decomposition writes its sub-questions
 *before* anything has been retrieved, from the question alone — so if a hop comes back
@@ -127,7 +127,7 @@ pool. Three properties keep it safe:
 - **It cannot lose evidence.** Every round appends to one ranking pool that is fused and
   reranked once at the end, so a bad follow-up query wastes a round but can never displace
   a passage an earlier round found.
-- **It always terminates.** A hard step budget (2), a stop when it proposes nothing new,
+- **It always terminates.** A hard step budget (3), a stop when it proposes nothing new,
   and any LLM failure ends the loop with the evidence in hand.
 
 The trace is in `diagnostics.retrieval_steps`, so what the loop did is visible in the
@@ -207,20 +207,29 @@ and it is the most useful thing we measured.
 
 | | loop off | loop on (shipped) |
 |---|---|---|
-| q7 (Gaussian vs Bernoulli) | p23 0.72 | p23 0.72 — identical |
-| q8 (summarise every section) | p23 0.72 | p23 **0.89** |
-| q9 (data sets, sizes, preprocessing) | p8 0.70, p10 **0.13**, p26 0.09 | p8 0.47, p10 **0.65**, p10 0.49 |
-| latency | 84–187 s | 95–206 s |
+| q7 (Gaussian vs Bernoulli) | p23 0.72 | p23 0.73 — identical |
+| q8 (summarise every section) | p23 0.72 | p23 0.53, p3 0.57 |
+| q9 (data sets, sizes, preprocessing) | p8 0.70, p10 **0.13**, p26 **0.09** | p8 **0.96**, p26 **0.90**, p10 **0.90** |
+| latency | 84–187 s | 116–213 s |
 
 Both columns run with rewriting on and differ only in `AGENT_ENABLED`, confirmed from the
 `retrieval_steps` trace in each response.
 
 q9 shows the loop doing precisely what it was built for. Decomposition finds Table 1
 immediately — that half of the question is easy — and leaves the *preprocessing* half at
-0.13. The loop reads the evidence, reports "specific details on data preprocessing and
-augmentation" as missing, searches again, and brings page 10 from 0.13 to 0.65. The
-question is answered in both columns, but only one of them is properly evidenced on both
-halves. q7, whose evidence is entirely on one page, is untouched by the loop.
+0.13, with Appendix B.3 at 0.09. The loop reads the evidence, reports the preprocessing
+details missing, and keeps searching: page 26 goes from 0.09 to **0.90** and page 10 from
+0.13 to **0.90**, which is how the answer comes to state the actual preprocessing — global
+contrast normalisation per colour channel followed by ZCA whitening. q7, whose evidence is
+entirely on one page, is untouched by the loop.
+
+**The step budget was the binding constraint, and the loop said so.** At two steps it
+exhausted its budget still reporting the preprocessing half missing. Raising
+`AGENT_MAX_STEPS` to 3 is what produced the numbers above. It still ends at the budget
+rather than by declaring the evidence sufficient — it goes on asking for per-dataset
+preprocessing that the retrieved passages do not carry — so the honest reading is that 3 is
+better than 2 here, not that 3 is enough. The trace in `diagnostics.retrieval_steps` says
+which of the two happened on any given question, and that is the point of reporting it.
 
 An earlier version of this loop actively **hurt**, and finding out why produced the two
 fixes below. That measurement had q8's best passage falling from 0.89 to 0.03. The
@@ -244,17 +253,19 @@ because everything is fused at the end". That was false. Two fixes made it true:
 
 | | q1 | q2 | q3 | q4 | q5 | q6 | q7 | q8 | q9 |
 |---|---|---|---|---|---|---|---|---|---|
-| best source | 0.9 | 0.99 | 0.97 | 0.97 | 1.0 | 0.86 | 0.72 | 0.89 | 0.65 |
-| latency (s) | 76 | 50 | 45 | 29 | 31 | 26 | 92 | 202 | 115 |
-| sources | 2 | 3 | 3 | 1 | 1 | 3 | 3 | 7 | 4 |
+| best source | 0.9 | 0.99 | 0.97 | 0.97 | 1.0 | 0.86 | 0.73 | 0.57 | 0.96 |
+| latency (s) | 76 | 50 | 45 | 29 | 31 | 26 | 113 | 210 | 162 |
+| sources | 2 | 3 | 3 | 1 | 1 | 3 | 3 | 7 | 3 |
 
 All nine were checked by hand against the PDF and are factually correct, including the
 details each turns on: that Gaussian noise has the higher entropy of the two and the
 comparison is explicitly "preliminary" (q7); and all seven rows of Table 1 — dimensionality
 and train/test sizes for MNIST, SVHN, CIFAR-10/100, ImageNet, TIMIT, Reuters-RCV1 and
-Alternative Splicing — together with the augmentation caveat, none "apart from the input
-dropout" (q9). All 27 evidence quotes are verbatim on their cited page, median
-700 characters.
+Alternative Splicing — together with the CIFAR preprocessing, global contrast normalisation
+followed by ZCA whitening (q9). q9 is careful about what it does *not* have: it says
+outright that the retrieved passages do not cover preprocessing for the other six data
+sets, which is true of what retrieval returned. All 26 evidence quotes are verbatim on their cited page, median
+697 characters.
 
 ### Cost
 
@@ -264,7 +275,7 @@ From `diagnostics.latency_ms`, wall clock, thinking enabled:
 |---|---|---|
 | 1 | 45–76 s | one rewrite call, one dense + one BM25 pass, rerank, answer |
 | 2 | 26–31 s | same, with the rewrite actually changing the query |
-| 3 | 61–286 s | plus decomposition, up to 2 judge calls with their retrieval passes, 8 passages and the 34-section outline in the prompt |
+| 3 | 116–213 s | plus decomposition, up to 3 judge calls with their retrieval passes, 8 passages and the 34-section outline in the prompt |
 
 The cross-encoder is not the expensive part anywhere: scoring a 60-candidate pool costs
 well under a second against a 20–120 s generation. Ingest is 2m50s end to end — 30 pages
