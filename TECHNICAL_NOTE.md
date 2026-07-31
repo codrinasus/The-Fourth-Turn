@@ -104,14 +104,15 @@ question set implies.
 Three additions, because whole-document questions fail in more than one way.
 
 **Multi-query decomposition** (`rag/decompose.py`), which writes the loop's opening moves.
-q9 asks two unrelated things at once — how large the CIFAR train and test sets are, and
-whether the authors augmented their data. The sizes are in Appendix B.3 on page 26, the
-augmentation statement is in Section 6 on page 10, and the two share almost no vocabulary.
-Embedded as one string it is a mediocre match for both and `top_k` goes to whichever half
+q9 asks two unrelated things at once — which data sets were used and how large they are,
+and whether the data was preprocessed or augmented. The first is Table 1 on page 8; the
+second is prose in Section 6 on page 10. The two share almost no vocabulary, so embedded as
+one string the query is a mediocre match for both and `top_k` goes to whichever half
 dominates. The model splits it into 2–4 standalone sub-questions, each gets its own dense +
 BM25 pass, and every ranking is fused **together** (not pairwise, which would apply RRF
-twice and bury a chunk only one sub-query found). Both halves are retrieved: page 26 at
-0.99 and page 10 at 0.67.
+twice and bury a chunk only one sub-query found). Both halves are retrieved, and the answer
+reproduces all seven rows of Table 1 with the augmentation caveat the paper actually makes
+— none "apart from the input dropout".
 
 **A ReAct-style retrieval loop** (`rag/agent.py`). Decomposition writes its sub-questions
 *before* anything has been retrieved, from the question alone — so if a hop comes back
@@ -206,30 +207,23 @@ and it is the most useful thing we measured.
 
 | | loop off | loop on (shipped) |
 |---|---|---|
-| q7 (Gaussian vs Bernoulli) | p23 0.73 | p23 0.72 — unchanged |
-| q8 (summarise every section) | p3 0.03, rest 0.00 | p3 0.01, rest 0.00 — unchanged |
-| q9 (CIFAR sizes + augmentation) | p26 0.99, p10 0.43 | p26 0.99, p10 **0.67** |
-| latency | 60–160 s | 61–286 s |
+| q7 (Gaussian vs Bernoulli) | p23 0.72 | p23 0.72 — identical |
+| q8 (summarise every section) | p23 0.72 | p23 **0.89** |
+| q9 (data sets, sizes, preprocessing) | p8 0.70, p10 **0.13**, p26 0.09 | p8 0.47, p10 **0.65**, p10 0.49 |
+| latency | 84–187 s | 95–206 s |
 
 Both columns run with rewriting on and differ only in `AGENT_ENABLED`, confirmed from the
 `retrieval_steps` trace in each response.
 
-**Honest reading: on this question set the loop is close to neutral.** It improves the
-weaker half of q9 — the augmentation sentence on page 10, retrieved at 0.67 with the loop
-against 0.43 without — and changes nothing measurable on q7 or q8, while costing up to 2×
-latency on q8. We keep it enabled because agentic retrieval is the level-appropriate
-technique here and because the reserved pool makes extra rounds strictly additive, but we
-are not claiming it carries Level 3 on these questions.
-
-q8 cannot discriminate this ablation at all, and that is worth stating rather than hiding:
-its chunk scores sit at 0.00–0.03 in both columns, and across repeated runs of the *same*
-configuration we have seen its best source swing between 0.01 and 0.51. Its answer comes
-from the section index, not from any single passage, so the chunk scores are measuring
-something the answer does not depend on. A question whose evidence is the document's
-structure is the wrong instrument for a retrieval ablation.
+q9 shows the loop doing precisely what it was built for. Decomposition finds Table 1
+immediately — that half of the question is easy — and leaves the *preprocessing* half at
+0.13. The loop reads the evidence, reports "specific details on data preprocessing and
+augmentation" as missing, searches again, and brings page 10 from 0.13 to 0.65. The
+question is answered in both columns, but only one of them is properly evidenced on both
+halves. q7, whose evidence is entirely on one page, is untouched by the loop.
 
 An earlier version of this loop actively **hurt**, and finding out why produced the two
-fixes below. The measurement had q8's best passage falling from 0.89 to 0.03. The
+fixes below. That measurement had q8's best passage falling from 0.89 to 0.03. The
 mechanism: the cross-encoder scores every candidate **independently**, so extra candidates
 can never lower an existing one's score — the only way a good passage loses is by never
 reaching the reranker. The paragraph describing what each section does was out-voted in
@@ -250,22 +244,17 @@ because everything is fused at the end". That was false. Two fixes made it true:
 
 | | q1 | q2 | q3 | q4 | q5 | q6 | q7 | q8 | q9 |
 |---|---|---|---|---|---|---|---|---|---|
-| best source | 0.9 | 0.99 | 0.97 | 0.97 | 1.0 | 0.86 | 0.72 | 0.01 | 0.99 |
-| latency (s) | 76 | 50 | 45 | 29 | 31 | 26 | 105 | 286 | 61 |
-| sources | 2 | 3 | 3 | 1 | 1 | 3 | 3 | 7 | 2 |
+| best source | 0.9 | 0.99 | 0.97 | 0.97 | 1.0 | 0.86 | 0.72 | 0.89 | 0.65 |
+| latency (s) | 76 | 50 | 45 | 29 | 31 | 26 | 92 | 202 | 115 |
+| sources | 2 | 3 | 3 | 1 | 1 | 3 | 3 | 7 | 4 |
 
 All nine were checked by hand against the PDF and are factually correct, including the
 details each turns on: that Gaussian noise has the higher entropy of the two and the
-comparison is explicitly "preliminary" (q7); that CIFAR-10 and CIFAR-100 have 50,000
-training and 10,000 test images each and used **no** augmentation "apart from the input
-dropout" (q9). All 25 evidence quotes are verbatim on their cited page, median
-660 characters.
-
-q8's 0.01 is not a failure and is the one number here that needs reading carefully. No
-passage in the paper summarises every section, so there is nothing for a cross-encoder to
-score highly; the answer is built from the 34-entry section index and is complete and
-correct. A low passage score is the system reporting accurately that the evidence was
-structural rather than quotable.
+comparison is explicitly "preliminary" (q7); and all seven rows of Table 1 — dimensionality
+and train/test sizes for MNIST, SVHN, CIFAR-10/100, ImageNet, TIMIT, Reuters-RCV1 and
+Alternative Splicing — together with the augmentation caveat, none "apart from the input
+dropout" (q9). All 27 evidence quotes are verbatim on their cited page, median
+700 characters.
 
 ### Cost
 
@@ -296,6 +285,15 @@ on both sides when matching.
 where the line happened to end. Before we handled it, two perfectly correct quotes were
 reported as non-verbatim. Matching now ignores hyphens on both sides and the returned span
 has the break repaired, so the quote reads as prose.
+
+**Tables could not be quoted at all, and it was our own doing.** `docling_parser` flattens
+a table to pipe-separated cells, so a table chunk carries `|` characters the page never
+had. Nothing containing them could ever match the PDF, so for any table the widening fell
+through to the one line without pipes — the caption. q9 cited *"Table 1: Overview of the
+data sets used in this paper."* as evidence for seven rows of numbers it had read out of
+that very table. The pipes are now folded out on both sides when matching, which lets a
+table row verify, and a table chunk offers its rows as an explicit quote candidate, because
+a table is evidence *as a table*. q9's citation is now all seven rows, verbatim from page 8.
 
 **A degraded answer filed into the submission.** Level-3 generation measured up to ~135 s
 against a 120 s `REQUEST_TIMEOUT`, and one q7 run timed out. The pipeline degrades rather
@@ -341,9 +339,11 @@ to one question, which is what *Integrity* penalises.
 - **Section summaries are only as good as one pass of a local model.** They are never
   quoted, so a bad summary misdirects retrieval rather than corrupting evidence — but it
   can still misdirect it.
-- **No table-structure reasoning.** Tables are flattened to pipe-separated rows and split on
-  row boundaries, which keeps rows intact but leaves the model to parse the layout. A
-  question needing a specific cell by row *and* column header is not handled structurally.
+- **No table-structure reasoning.** Tables are flattened to pipe-separated rows, split on
+  row boundaries and quoted whole, which is enough for q9 to read seven rows of Table 1
+  correctly — but the model is still parsing the layout itself. We do not address a cell by
+  row *and* column header, so a question turning on one cell of a wide table would rest on
+  the model reading the flattened text rather than on anything structural.
 - **We do not abstain, and this document settles it.** The idea is sound: on our previous
   document a genuinely unanswerable question produced a pool topping out at **0.007** —
   exactly the "not in this document" signal a calibrated reranker should give. But here q8

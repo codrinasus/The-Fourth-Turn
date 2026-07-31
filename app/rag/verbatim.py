@@ -76,6 +76,11 @@ _FOLD = {
 _PUA = re.compile(r"[-]")
 _WS = re.compile(r"\s+")
 _HYPHEN = re.compile(r"-")
+# Our own table rendering. `docling_parser` flattens a table to pipe-separated cells, so a
+# table chunk carries "|" characters the page never had. Dropping them on both sides is
+# what lets a table row be verified against the PDF at all — without this, no table chunk
+# could ever be quoted and the quote collapsed to the caption line above it.
+_PIPE = re.compile(r"\|")
 # A word broken across a line: letter, hyphen, line break, lowercase letter. Repaired in
 # the span we return so a quote reads as prose rather than as a page layout.
 _LINE_BREAK_HYPHEN = re.compile(r"(?<=[A-Za-z])-\s+(?=[a-z])")
@@ -101,7 +106,7 @@ def _fold_with_map(text: str) -> tuple[str, list[int]]:
     for i, ch in enumerate(text):
         # Skip exactly what `_squash` drops, so the haystack and the needle are written in
         # the same alphabet and an index into one means the same thing in the other.
-        if ch.isspace() or ch == "-":
+        if ch.isspace() or ch in "-|":
             continue
         folded = _FOLD.get(ch, "" if _PUA.match(ch) else ch)
         if folded == "-":
@@ -115,6 +120,9 @@ def _fold_with_map(text: str) -> tuple[str, list[int]]:
 def _squash(text: str) -> str:
     """The normal form both sides are compared in: folded, de-hyphenated, whitespace-free.
 
+    Pipes go because they are ours, not the document's: the parser renders a table as
+    pipe-separated cells, so a table chunk contains separators the page never had.
+
     Hyphens go too, and that is not laziness. A PDF breaks words across lines with a
     hyphen, and the two extractors disagree about it: pypdf reports the layout as it
     stands — `optimiza- tion`, `au- tomatically` — while Docling rejoins the word. Neither
@@ -122,7 +130,7 @@ def _squash(text: str) -> str:
     Dropping every hyphen makes `optimiza-tion`, `optimization` and `max-norm` versus
     `maxnorm` all compare equal, which is the behaviour we want in both directions.
     """
-    return _HYPHEN.sub("", _WS.sub("", _fold(text)))
+    return _PIPE.sub("", _HYPHEN.sub("", _WS.sub("", _fold(text))))
 
 
 @lru_cache(maxsize=1)

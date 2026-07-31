@@ -7,12 +7,13 @@ Two jobs, split so that neither the model nor the code does something it is bad 
    up in `sources` instead of every retrieved chunk.
 2. **Which span is the evidence** — the *code* decides. The sentences of a cited chunk are
    scored against the question with the same cross-encoder used for reranking, and then
-   the quote is *widened* around the winner: the whole chunk, else the paragraph
-   containing it, else — when the chunk straddles a page break and neither fits on one
-   page — the largest window around that sentence which the page still contains, trimmed
-   back to a complete sentence. A lone sentence read as truncated, because the
-   best-matching sentence is frequently the one *beside* the sentence carrying the fact,
-   so we return all the context the document will actually vouch for.
+   the quote is *widened* around the winner: the whole chunk, else the table's rows when
+   the chunk is a table, else the paragraph containing it, else — when the chunk straddles
+   a page break and none of those fit on one page — the largest window around that
+   sentence which the page still contains, trimmed back to a complete sentence. A lone
+   sentence read as truncated, because the best-matching sentence is frequently the one
+   *beside* the sentence carrying the fact, so we return all the context the document will
+   actually vouch for.
 
 Because the quote is sliced from indexed text rather than generated, it is verbatim by
 construction: there is no paraphrase to detect and no hallucinated quote to verify.
@@ -199,6 +200,31 @@ def _grow(text: str, start: int, end: int, page: int, limit_start: int, limit_en
     return window
 
 
+def _table_body(text: str) -> str | None:
+    """The longest run of consecutive table rows in `text`, or None if there is no table.
+
+    A table is evidence as a *table*: the answer to "how large are the data sets" is the
+    grid, not one row of it and certainly not the caption. Sentence scoring cannot see
+    that — it happily picked "Table 1: Overview of the data sets used in this paper." and
+    the widening could not recover, because `docling_parser` puts the caption ahead of the
+    rows while the page has it elsewhere, so caption-plus-rows is never one page span.
+
+    The rows on their own are, so they are offered as their own candidate.
+    """
+    best: list[str] = []
+    run: list[str] = []
+    for line in text.splitlines():
+        if line.count("|") >= 2:
+            run.append(line)
+        else:
+            if len(run) > len(best):
+                best = run
+            run = []
+    if len(run) > len(best):
+        best = run
+    return "\n".join(best) if len(best) >= 2 else None
+
+
 def _block_around(text: str, start: int, end: int) -> tuple[int, int]:
     """The paragraph containing `start:end`, as offsets.
 
@@ -255,11 +281,17 @@ def evidence_quote(question: str, context: Context) -> str:
     sentence = text[start : min(end, start + _MAX_QUOTE)].strip()
     block_start, block_end = _block_around(text, start, end)
 
+    # A table chunk is quoted as the table. Offered before the paragraph, because the
+    # paragraph around a table row is the rest of the table anyway, and after the whole
+    # chunk so a table small enough to verify entire still wins.
+    table = _table_body(text) if context.kind == "table" else None
+
     for candidate in (
         text.strip(),  # the whole chunk
+        table,  # its rows, when this chunk is a table
         text[block_start:block_end].strip(),  # the paragraph the best sentence sits in
     ):
-        if verbatim.find(candidate, context.page) is not None:
+        if candidate and verbatim.find(candidate, context.page) is not None:
             return candidate
 
     # Neither fits on one page — usually because the chunk straddles a page break. Grow

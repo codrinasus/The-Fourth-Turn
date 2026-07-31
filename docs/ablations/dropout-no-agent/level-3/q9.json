@@ -1,19 +1,34 @@
 {
-  "question_id": "q0fa8d9",
+  "question_id": "q14a756",
   "level": 3,
-  "question": "How large are the train and test set of CIFAR-10 and CIFAR-100 and did the authors apply augmentations to their experiments?",
-  "answer": "The CIFAR-10 and CIFAR-100 datasets each consist of 50,000 training images and 10,000 test images (1). The authors did not apply any data augmentation to these experiments, with the exception of the input dropout mechanism itself (2).",
+  "question": "What datasets did the authors use for their experiments and how large were they in terms of samples and dimensionality? Did they use the raw data or did they apply any preprocessing or augmentation?",
+  "answer": "The authors evaluated their method across seven datasets spanning multiple domains (1):\n- **MNIST** (Vision): 784-dimensional, 60K training / 10K test samples (1)\n- **SVHN** (Vision): 3,072-dimensional, 600K training / 26K test samples (1)\n- **CIFAR-10/100** (Vision): 3,072-dimensional, 60K training / 10K test samples (1)\n- **ImageNet (ILSVRC-2012)** (Vision): 65,536-dimensional, 1.2M training / 150K test samples (1)\n- **TIMIT** (Speech): 2,520-dimensional, 1.1M training frames / 58K test frames (1)\n- **Reuters-RCV1** (Text): 2,000-dimensional, 200K training / 200K test samples (1)\n- **Alternative Splicing** (Genetics): 1,014-dimensional, 2,932 training / 733 test samples (1)\n\nRegarding preprocessing and augmentation, the authors applied dataset-specific adjustments rather than using raw inputs universally:\n- For **SVHN**, RGB pixels were normalized to zero mean and unit variance, while other techniques like ZCA whitening did not provide noticeable improvements (2).\n- For **CIFAR-10 and CIFAR-100**, the authors explicitly stated that no data augmentation was used for either dataset (3).\n- For **TIMIT**, the networks were trained on windows of 21 log-filter bank frames to predict the label of the central frame (4).\n- The provided context does not specify additional preprocessing or augmentation procedures for MNIST, ImageNet, Reuters-RCV1, or the Alternative Splicing dataset beyond their basic descriptions (5).",
   "conversation_id": "level-3",
   "sources": [
     {
+      "page": 8,
+      "quote": "Data Set Domain Dimensionality Training Set Test Set MNIST Vision 784 (28 × 28 grayscale) 60K 10K SVHN Vision 3072 (32 × 32 color) 600K 26K CIFAR-10/100 Vision 3072 (32 × 32 color) 60K 10K ImageNet (ILSVRC-2012) Vision 65536 (256 × 256 color) 1.2M 150K TIMIT Speech 2520 (120-dim, 21 frames) 1.1M frames 58K frames Reuters-RCV1 Text 2000 200K 200K Alternative Splicing Genetics 1014 2932 733",
+      "score": 0.702
+    },
+    {
       "page": 26,
-      "quote": "B.3 CIFAR-10 and CIFAR-100 The CIFAR-10 and CIFAR-100 data sets consists of 50,000 training and 10,000 test images each. They have 10 and 100 image categories respectively. These are 32 × 32 color images. We used 5,000 of the training images for validation. We followed the procedure similar to MNIST, where we found the best hyperparameters using the validation set and then combined it with the training set. The images were preprocessed by doing global contrast normalization in each color channel followed by ZCA whitening. Global contrast normalization means that for image and each color channel in that image, we compute the mean of the pixel intensities and subtract it from the channel.",
-      "score": 0.9942
+      "quote": "B.2 SVHN The SVHN data set consists of approximately 600,000 training images and 26,000 test images. The training set consists of two parts—A standard labeled training set and another set of labeled examples that are easy. A validation set was constructed by taking examples from both the parts. Two-thirds of it were taken from the standard set (400 per class) and one-third from the extra set (200 per class), a total of 6000 samples. This same process is used by Sermanet et al. (2012). The inputs were RGB pixels normalized to have zero mean and unit variance. Other preprocessing techniques such as global or local contrast normalization or ZCA whitening did not give any noticeable improvements.",
+      "score": 0.0941
     },
     {
       "page": 10,
       "quote": "Goodfellow et al. (2013) showed that the error is further reduced to 11.68% by replacing ReLU units with maxout units. On CIFAR-100, dropout reduces the error from 43.48% to 37.20% which is a huge improvement. No data augmentation was used for either data set (apart from the input dropout).",
-      "score": 0.4325
+      "score": 0.128
+    },
+    {
+      "page": 12,
+      "quote": "Next, we applied dropout to a speech recognition task. We use the TIMIT data set which consists of recordings from 680 speakers covering 8 major dialects of American English reading ten phonetically-rich sentences in a controlled noise-free environment. Dropout neural networks were trained on windows of 21 log-filter bank frames to predict the label of the central frame. No speaker dependent operations were performed. Appendix B.4 describes the data preprocessing and training details.",
+      "score": 0.0279
+    },
+    {
+      "page": 7,
+      "quote": "We trained dropout neural networks for classification problems on data sets in different domains. We found that dropout improved generalization performance on all data sets compared to neural networks that did not use dropout. Table 1 gives a brief description of the data sets. The data sets are",
+      "score": 0.0638
     }
   ],
   "diagnostics": {
@@ -21,18 +36,17 @@
     "chat_model": "qwen3.6:latest",
     "embedding_model": "bge-m3",
     "retrieved_chunks": 8,
-    "retrieval_query": "What is the size of the training and testing sets for CIFAR-10 and CIFAR-100, and were data augmentations applied in the experiments described in section 6 of the paper?",
+    "retrieval_query": "What datasets did the authors use for their experiments and how large were they in terms of samples and dimensionality? Did they use the raw data or did they apply any preprocessing or augmentation?",
     "sub_queries": [
-      "What is the size of the training set in CIFAR-10?",
-      "What is the size of the test set in CIFAR-10?",
-      "What is the size of the training set in CIFAR-100?",
-      "What is the size of the test set in CIFAR-100?"
+      "What datasets did the authors use for their experiments?",
+      "What was the size of each dataset in terms of sample count and dimensionality?",
+      "Did the authors use raw data or apply preprocessing and augmentation?"
     ],
     "retrieval_steps": [
-      "search: 5 queries"
+      "search: 4 queries"
     ],
     "tokens": null,
-    "latency_ms": 62336,
-    "timestamp": "2026-07-31T07:51:39Z"
+    "latency_ms": 116264,
+    "timestamp": "2026-07-31T08:39:59Z"
   }
 }

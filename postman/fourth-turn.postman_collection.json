@@ -256,7 +256,7 @@
             "url": "{{base_url}}/query",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"question\": \"How large are the train and test set of CIFAR-10 and CIFAR-100 and did the authors apply augmentations to their experiments?\",\n  \"level\": 3\n}"
+              "raw": "{\n  \"question\": \"What datasets did the authors use for their experiments and how large were they in terms of samples and dimensionality? Did they use the raw data or did they apply any preprocessing or augmentation?\",\n  \"level\": 3\n}"
             }
           }
         }

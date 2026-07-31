@@ -42,6 +42,6 @@
   {
     "id": "q9",
     "level": 3,
-    "question": "How large are the train and test set of CIFAR-10 and CIFAR-100 and did the authors apply augmentations to their experiments?"
+    "question": "What datasets did the authors use for their experiments and how large were they in terms of samples and dimensionality? Did they use the raw data or did they apply any preprocessing or augmentation?"
   }
 ]
