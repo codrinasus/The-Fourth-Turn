@@ -15,8 +15,14 @@ services:
     build: .
     ports:
       - "8791:8000"
+    # Optional on purpose: `.env` holds local settings and is not committed, so a fresh
+    # clone has none. Marking it required would make `docker compose up` fail before it
+    # starts anything, with a message about a missing file rather than about setup. Without
+    # it the app falls back to the defaults in app/config.py, and the values that actually
+    # differ inside containers are overridden just below and in the other compose files.
     env_file:
-      - .env
+      - path: .env
+        required: false
     environment:
       # Override the localhost defaults from .env with in-container hostnames.
       - QDRANT_URL=http://qdrant:6333

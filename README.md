@@ -59,41 +59,59 @@ Python · FastAPI · `uv` · Docker · Qdrant. Backend only (a frontend is optio
 embeddings run locally through **Ollama** by default. PDF parsing uses local **Docling Serve** by
 default so `/ingest` can trigger extraction directly.
 
-## Quick start
+## Reproducing our submission
 
-```powershell
-# 1. Fork on GitHub, then clone your fork
-git clone https://github.com/<your-team>/essir2026-aim-hackathon-participants.git
-cd essir2026-aim-hackathon-participants
-
-# 2. Create your .env from the example, then edit it (pick your provider + model)
-Copy-Item .env.example .env
-
-# 3. Put your chosen PDF in data/in/
-Copy-Item $HOME\Downloads\your-document.pdf data\in\   # ours: srivastava14a.pdf
-
-# 4. Pull the local Ollama model once, then bring up app + Qdrant + Ollama + Docling.
-docker compose -f docker-compose.yml -f docker-compose.ollama.yml -f docker-compose.docling.yml -f docker-compose.reranker.yml up -d ollama
-docker compose -f docker-compose.yml -f docker-compose.ollama.yml -f docker-compose.docling.yml -f docker-compose.reranker.yml exec ollama ollama pull qwen3.6
-docker compose -f docker-compose.yml -f docker-compose.ollama.yml -f docker-compose.docling.yml -f docker-compose.reranker.yml exec ollama ollama pull bge-m3
-docker compose -f docker-compose.yml -f docker-compose.ollama.yml -f docker-compose.docling.yml -f docker-compose.reranker.yml up -d
-#    app     -> http://localhost:8791      (Swagger UI at /docs)
-#    qdrant  -> http://localhost:6391      (dashboard at /dashboard)
-#    docling -> http://localhost:5001      (API docs at /docs)
-#    reranker-> http://localhost:8792      (bge-reranker-v2-m3, /v1/rerank)
-
-# 5. Index your PDF, then ask a question (just question + level)
-curl.exe http://localhost:8791/ingest -H "content-type: application/json" -d "{}"
-curl.exe http://localhost:8791/query  -H "content-type: application/json" `
-  -d '{"question": "What is this document about?", "level": 1}'
-```
-
-Prefer to run it without Docker?
+Everything below runs on a clean clone of this repository. `.env` is not committed (it is
+where local settings live), and you do **not** need to create one — the compose files supply
+the container hostnames and `app/config.py` supplies the rest. Copy `.env.example` to `.env`
+only if you want to change a setting.
 
 ```bash
-uv sync
-uv run uvicorn app.main:app --port 8791 --reload    # needs a reachable Qdrant + LLM
+git clone https://github.com/codrinasus/The-Fourth-Turn.git
+cd The-Fourth-Turn
+
+# 1. Bring up Ollama first and pull the two models (~20 GB for qwen3.6, once).
+#    The four compose files are always used together.
+CMP="-f docker-compose.yml -f docker-compose.ollama.yml -f docker-compose.docling.yml -f docker-compose.reranker.yml"
+docker compose $CMP up -d ollama
+docker compose $CMP exec ollama ollama pull qwen3.6
+docker compose $CMP exec ollama ollama pull bge-m3
+
+# 2. Bring up the rest. The reranker downloads a ~600 MB GGUF on first start.
+docker compose $CMP up -d --build
+#    app      -> http://localhost:8791   (Swagger UI at /docs)
+#    qdrant   -> http://localhost:6391   (dashboard at /dashboard)
+#    docling  -> http://localhost:5001
+#    reranker -> http://localhost:8792
+
+# 3. Index the committed PDF. REQUIRED before any query: the chunk files and both Qdrant
+#    collections are built here and none of them are committed. Takes ~3 minutes.
+curl -s localhost:8791/ingest -H 'content-type: application/json' -d '{"reset": true}'
+# -> {"document":"srivastava14a.pdf","pages":30,"chunks":151,...}
+
+# 4. Ask our nine questions and re-file them, or ask your own.
+uv run python scripts/run_questions.py            # all nine, into submission/
+curl -s localhost:8791/query -H 'content-type: application/json' \
+  -d '{"question": "What is the motivation for dropout described in the paper?", "level": 1}'
+
+# 5. Check every evidence quote against the PDF (exits non-zero if any fails).
+uv run python scripts/audit_quotes.py
 ```
+
+If you already run Ollama on the host, drop `-f docker-compose.ollama.yml`; the app reaches
+it through `host.docker.internal`. That is how we ran it.
+
+**Reproducing the ablations in the technical note** — each is one switch:
+
+```bash
+./scripts/set_flag.sh REWRITE_ENABLED false   # Level-2 ablation; verifies the container took it
+uv run python scripts/run_questions.py 2 --out docs/ablations/scratch
+./scripts/set_flag.sh REWRITE_ENABLED true
+```
+
+Answers vary a little between runs — the query rewriting and Level-3 decomposition are
+model-generated, so the retrieved pool is not bit-identical. The committed answers are one
+such run; §4 of the technical note says which numbers are robust to that and which are not.
 
 ## Where things are
 
